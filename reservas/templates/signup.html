@@ -11,6 +11,10 @@
 
 
 {% block contenido %}
-{% lorem 1 b random %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Enviar</button>
+  </form>
 {% endblock contenido %}
 
