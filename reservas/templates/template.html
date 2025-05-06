@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center">
+            <img
+              src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png"
+              alt="Logo"
+              class="h-10 w-10 mr-2"
+            />
+            <a href="#" class="text-xl font-bold text-gray-800">Reservas</a>
+          </div>
+          <div class="hidden sm:flex sm:space-x-8">
+            {% block enlaces %}
+            <!-- Aquí puedes agregar enlaces adicionales -->
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto p-8 sm:px-6 lg:px-8">
+      {% block contenido %} {% endblock %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+{% extends "template.html" %}
+
+{% block enlaces %}
+{% comment "Estilo de los enlaces" %}{% endcomment %}
+{% with estilo_enlaces="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium" %}
+<a href="#" class="estilo_enlaces">Inicio</a>
+<a href="login" class="estilo_enlaces">Login</a>
+<a href="signup" class="estilo_enlaces">Signup</a>
+{% endwith %}
+{% endblock enlaces %}
+
+
+{% block contenido %}
+<header class="text-center my-10">
+    <h1 class="text-4xl font-bold text-gray-800">Bienvenido a Reservas App</h1>
+    <p class="mt-4 text-gray-600">Por favor, inicia sesión o regístrate para continuar.</p>
+    <div class="mt-6">
+        <a href="login" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 mx-2">Iniciar Sesión</a>
+        <a href="signup" class="bg-gray-500 text-white px-4 py-2 rounded-md shadow hover:bg-gray-600 mx-2">Registrarse</a>
+    </div>
+</header>
+{% endblock contenido %}
