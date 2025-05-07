@@ -17,3 +17,11 @@ Si no:
 - reservar
     - formulario, con lista de espacio, debe ser dinamico, mostar dependiendo del tipo de espacio seleccionado
     - Mensaje de culminacion
+
+
+# To do
+
+- Proteger rutas
+    - crear middleware que redireccione si esta autenticado o no, solo puede acceder a home, login, signup, contacto
+    - Crear grupos de usuarios (dos grupos)
+    - proteger rutas, y controlar acceso por permisos (si no tienes permisos, entonces bad request)
