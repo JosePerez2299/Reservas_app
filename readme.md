@@ -3,25 +3,14 @@
 - Reserva (usuario, espacio, fecha de uso, hora de inicio, hora de fin, estado (pendiente, aprobada, rechazada), motivo de uso)
 
 # Casos de uso
-Template Main: Pagina de bienvenida, login, signup. Redireccionar dependiendo del tipo de usuario
+- Como usuario
+    - Reservar Sala
+    - Ver mis solicitudes
 
-Si el usuario es admin:
+- Como Admin
+    - CRUD de usuarios
+    - CRUD de salas
 
-- puede ver todas las solicitudes (con botones ver, editar, eliminar con ventanas modales)
-- incluye un buscador (por espacio, usuario, email, fecha)
-    - paginacion
-- crear espacios
-
-Si no: 
-- Ver su lista de solicitudes (Puede tener varias reservas? Cuanto seria el maximo?)
-- reservar
-    - formulario, con lista de espacio, debe ser dinamico, mostar dependiendo del tipo de espacio seleccionado
-    - Mensaje de culminacion
-
-
-# To do
-
-- Proteger rutas
-    - crear middleware que redireccione si esta autenticado o no, solo puede acceder a home, login, signup, contacto
-    - Crear grupos de usuarios (dos grupos)
-    - proteger rutas, y controlar acceso por permisos (si no tienes permisos, entonces bad request)
+- Como Moderador
+    - Aprobar, Rechazar Solicitudes
+    - CRUD de usuarios

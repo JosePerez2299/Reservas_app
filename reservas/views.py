@@ -15,10 +15,8 @@ class Login(LoginView):
     # Esto se borra cuando se cree el redireccionamiento condicional de dashboard
     def get_success_url(self):
         user = self.request.user
-
-
         print(user.groups)
-        if user.groups.filter(name='manager').exists():
+        if user.groups.filter(name='administrador').exists():
             return reverse_lazy('manager_dashboard')
         else:
             return reverse_lazy('user_dashboard')
