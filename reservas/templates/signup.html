@@ -11,10 +11,40 @@
 
 
 {% block contenido %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Enviar</button>
-  </form>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <div>
+    {{ form.username.label_tag }}
+    {{ form.username }}
+    {{ form.username.help_text }}
+    {{ form.username.errors }}
+  </div>
+
+  <div>
+    {{ form.email.label_tag }}
+    {{ form.email }}
+    {{ form.email.help_text }}
+    {{ form.email.errors }}
+  </div>
+
+  <div>
+    {{ form.password1.label_tag }}
+    {{ form.password1 }}
+    {{ form.password1.help_text }}
+    {{ form.password1.errors }}
+  </div>
+
+  <div>
+    {{ form.password2.label_tag }}
+    {{ form.password2 }}
+    {{ form.password2.help_text }}
+    {{ form.password2.errors }}
+  </div>
+
+  <button type="submit">Registrarse</button>
+</form>
+
 {% endblock contenido %}
 
