@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LoginView
+from reservas.utils.utils import get_access
 from reservas.utils.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
 
@@ -15,14 +16,8 @@ class Signup(LoginMixin, SignupView):
 
 class Dashboard(LoginMixin, View):
     def get(self, request, *args, **kwargs):
-
-        permissions = request.user.get_all_permissions()
-        print("User Permissions:", permissions)
-        return render(request, 'dashboard.html')
+        user = request.user 
+        models = get_access(user)
+        print(models)
+        return render(request, 'dashboard.html', {'models': models})
     
-        user = request.user
-        if user.groups.filter(name='administrador').exists():
-            return render(request, 'administrador/dashboard.html')
-        else:
-            return render(request, 'usuario/dashboard.html')
-

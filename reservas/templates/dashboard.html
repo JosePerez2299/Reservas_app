@@ -1,0 +1,24 @@
+{% extends "template.html" %}
+
+{% block navbar %}
+
+
+    {% if user.is_authenticated %}
+        {% for model  in models %}
+        <a href="#">{{ model }}</a>
+        {% endfor %}
+        <a href="#">Logout</a>
+
+
+    {% else %}
+        <p>Please log in to access more features.</p>
+    {% endif %}
+    
+
+{% endblock navbar %}
+
+{% block contenido %}
+
+<h1>dashboard</h1>
+
+{% endblock contenido %}
