@@ -15,6 +15,11 @@ class Signup(LoginMixin, SignupView):
 
 class Dashboard(LoginMixin, View):
     def get(self, request, *args, **kwargs):
+
+        permissions = request.user.get_all_permissions()
+        print("User Permissions:", permissions)
+        return render(request, 'dashboard.html')
+    
         user = request.user
         if user.groups.filter(name='administrador').exists():
             return render(request, 'administrador/dashboard.html')
