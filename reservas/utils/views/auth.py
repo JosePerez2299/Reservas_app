@@ -12,13 +12,8 @@ from reservas.utils.forms.auth import UserCreationForm
 class SignupView(CreateView):
     form_class = UserCreationForm
     template_name = 'auth/signup.html'
-    success_url = reverse_lazy('')  # Cambia esto a donde quieras redirigir al usuario
+    success_url = reverse_lazy('')  
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        # Iniciar sesión automáticamente
-        login(self.request, self.object)
-        # Añadir al grupo 'usuario'
-        # grupo = Group.objects.get(name='usuario')
-        # self.object.groups.add(grupo)
         return response
