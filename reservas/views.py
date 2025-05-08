@@ -6,9 +6,6 @@ from django.contrib.auth.views import LoginView
 from reservas.utils.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
 
-class Home(TemplateView):
-    template_name = 'home.html'
-
 class Login(LoginView):
     template_name = 'auth/login.html'
     redirect_authenticated_user = True  
@@ -20,7 +17,7 @@ class Dashboard(LoginMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.groups.filter(name='administrador').exists():
-            return render(request, 'manager/dashboard.html')
+            return render(request, 'administrador/dashboard.html')
         else:
-            return render(request, 'user/dashboard.html')
+            return render(request, 'usuario/dashboard.html')
 

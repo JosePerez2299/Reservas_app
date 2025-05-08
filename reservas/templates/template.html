@@ -19,9 +19,15 @@
             <a href="/" class="text-xl font-bold text-gray-800">Reservas</a>
           </div>
           <div class="hidden sm:flex sm:space-x-8">
-            {% block enlaces %}
-            <!-- Aquí puedes agregar enlaces adicionales -->
-            {% endblock %}
+            {% with estilo_enlaces="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium" %}
+            {% if not user.is_authenticated %}
+                <a href="/login" class="{{ estilo_enlaces }}">Login</a>
+                <a href="#" class="{{ estilo_enlaces }}">Contacto</a>
+            {% else %}
+            {% comment %} TO DO: Recorrer los enlaces que vienen del context {% endcomment %}
+                <a href="logout" class="{{ estilo_enlaces }}">Logout</a>
+            {% endif %}
+            {% endwith %}
           </div>
         </div>
       </div>
