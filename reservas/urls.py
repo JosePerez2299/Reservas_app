@@ -2,9 +2,8 @@ from django.http import HttpResponse
 from django.urls import path
 from reservas.views import *  
 urlpatterns = [
-    path('', HomeView.as_view()), 
-    path('login', Login.as_view()),
-    path('signup', SignupView.as_view()),
-    path('user', UserDashboardView.as_view(), name='user_dashboard'),
-    path('manager', ManagerDashboardView.as_view(), name ='manager_dashboard'),
+    path('', Home.as_view(), name='home'), 
+    path('login/', Login.as_view(), name='login'),
+    path('signup/', Signup.as_view(), name='signup'), 
+    path('dashboard/', Dashboard.as_view(), name='dashboard'),
     ]

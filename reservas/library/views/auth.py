@@ -8,7 +8,7 @@ from django.views.generic import TemplateView, CreateView
 from django.template import loader
 from reservas.utils.forms.auth import UserCreationForm
 
-class SignupView(CreateView):
+class Signup(CreateView):
     form_class = UserCreationForm
     template_name = 'auth/signup.html'
     success_url = reverse_lazy('')  # Cambia esto a donde quieras redirigir al usuario
