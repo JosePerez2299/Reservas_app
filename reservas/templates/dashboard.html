@@ -1,16 +1,7 @@
-{% extends "template.html" %}
-
-{% block navbar %}
-    {% if user.is_authenticated %}
-        {% for model  in models %}
-            <a href="#">{{ model }}</a>
-        {% endfor %}
-        <a href="#">Logout</a>
-    {% else %}
-        <p>Please log in to access more features.</p>
-    {% endif %}
-{% endblock navbar %}
-
-{% block contenido %}
-    <h1>dashboard</h1>
-{% endblock contenido %}
+{% extends 'template.html' %} {% block contenido %}
+  <h1>Panel de {{ group }}</h1>
+  <h1>Bienvenido, {{ request.user.username }}</h1>
+  {% for item in allowed_models %}
+    <a href="{% url item.url_name %}">{{ item.label }}</a>
+  {% endfor %}
+{% endblock %}

@@ -11,15 +11,13 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
           <div class="flex items-center">
-            <img
-              src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png"
-              alt="Logo"
-              class="h-10 w-10 mr-2"
-            />
+            <img src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png" alt="Logo" class="h-10 w-10 mr-2" />
             <a href="/" class="text-xl font-bold text-gray-800">Reservas</a>
           </div>
           <div class="hidden sm:flex sm:space-x-8">
-              {% block navbar %}{% endblock navbar  %}
+            {% for item in allowed_models %}
+              <a href="{% url item.url_name %}">{{ item.label }}</a>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -32,9 +30,7 @@
     <footer class="bg-white shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex justify-between items-center">
-          <p class="text-gray-600 text-sm">
-            &copy; 2025 Reservas App. Todos los derechos reservados.
-          </p>
+          <p class="text-gray-600 text-sm">&copy; 2025 Reservas App. Todos los derechos reservados.</p>
           <div class="flex space-x-4">
             <a href="#" class="text-gray-600 hover:text-gray-800 text-sm">Política de privacidad</a>
             <a href="#" class="text-gray-600 hover:text-gray-800 text-sm">Términos de servicio</a>

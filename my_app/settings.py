@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'reservas.library.context_proccesors.dashboard_access.dashboard_access',
             ],
         },
     },
@@ -128,9 +129,19 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-
 DASHBOARD_ACCESS = {
-    'administrador': ['Usuarios', 'Espacios'],
-    'moderador':   ['Reservas', 'Usuarios'],
-    'usuario':   ['Reservas'],
+    'administrador': [
+        {'label': 'Usuarios', 'url_name': 'usuarios_list'},
+        {'label': 'Espacios', 'url_name': 'espacios_list'},
+        {'label': 'Logout', 'url_name': 'logout'},
+    ],
+    'moderador': [
+        {'label': 'Reservas', 'url_name': 'reservas_list'},
+        {'label': 'Usuarios', 'url_name': 'usuarios_list'},
+        {'label': 'Logout', 'url_name': 'logout'},
+    ],
+    'usuario': [
+        {'label': 'Reservas', 'url_name': 'reservas_list'},
+        {'label': 'Logout', 'url_name': 'logout'},
+    ],
 }

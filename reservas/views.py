@@ -16,8 +16,5 @@ class Signup(LoginMixin, SignupView):
 
 class Dashboard(LoginMixin, View):
     def get(self, request, *args, **kwargs):
-        user = request.user 
-        models = get_access(user)
-        print(models)
-        return render(request, 'dashboard.html', {'models': models})
+        return render(request, 'dashboard.html')
     
