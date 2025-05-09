@@ -14,9 +14,6 @@ def get_access(user):
         set: Un conjunto de cadenas que representan los nombres de los modelos 
         (con la primera letra en mayúscula y en plural) a los que el usuario tiene acceso.
     """
-
-
-
     models = set()
     for grupo in user.groups.all():
         for permiso in grupo.permissions.all():
