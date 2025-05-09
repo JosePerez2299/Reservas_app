@@ -2,6 +2,8 @@
   <h1>Panel de {{ group }}</h1>
   <h1>Bienvenido, {{ request.user.username }}</h1>
   {% for item in allowed_models %}
-    <a href="{% url item.url_name %}">{{ item.label }}</a>
+  <a href="{% url 'crud' item.section %}">
+    {{ item.label }}
+  </a>
   {% endfor %}
 {% endblock %}

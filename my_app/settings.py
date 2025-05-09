@@ -131,17 +131,14 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 DASHBOARD_ACCESS = {
     'administrador': [
-        {'label': 'Usuarios', 'url_name': 'usuarios_list'},
-        {'label': 'Espacios', 'url_name': 'espacios_list'},
-        {'label': 'Logout', 'url_name': 'logout'},
+        {'label': 'Usuarios', 'section': 'usuarios'},
+        {'label': 'Espacios', 'section': 'espacios'},
     ],
     'moderador': [
-        {'label': 'Reservas', 'url_name': 'reservas_list'},
-        {'label': 'Usuarios', 'url_name': 'usuarios_list'},
-        {'label': 'Logout', 'url_name': 'logout'},
+        {'label': 'Reservas', 'section': 'reservas'},
+        {'label': 'Usuarios', 'section': 'usuarios'},
     ],
     'usuario': [
-        {'label': 'Reservas', 'url_name': 'reservas_list'},
-        {'label': 'Logout', 'url_name': 'logout'},
+        {'label': 'Reservas', 'section': 'reservas'},
     ],
 }

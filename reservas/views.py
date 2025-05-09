@@ -18,3 +18,10 @@ class Dashboard(LoginMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, 'dashboard.html')
     
+class Crud(LoginMixin, View):
+    def get(self, request, section):
+        context = {
+            'current_section' : section
+        }
+        return render(request, 'crud.html', context)
+    
