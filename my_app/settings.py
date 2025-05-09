@@ -129,16 +129,20 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+
+
+ALL_SECTIONS_MODELS = {'usuario': 'modelo_usuario', 'espacio': 'modelo_espacio', 'reserva': 'modelo_reserva'}
+
 DASHBOARD_ACCESS = {
     'administrador': [
-        {'label': 'Usuarios', 'section': 'usuarios'},
-        {'label': 'Espacios', 'section': 'espacios'},
+         'usuario',
+         'espacio',
     ],
     'moderador': [
-        {'label': 'Reservas', 'section': 'reservas'},
-        {'label': 'Usuarios', 'section': 'usuarios'},
+         'reserva',
+         'usuario',
     ],
     'usuario': [
-        {'label': 'Reservas', 'section': 'reservas'},
+         'reserva',
     ],
 }

@@ -1,0 +1,15 @@
+{% extends "template.html" %}
+
+{% block contenido %}
+<h2>
+    Gestion de {{current_section|capfirst}}s
+</h2>
+<hr>
+<ul>
+    <li><a href="create">Crear {{current_section}}/s</a></li>
+    <li><a href="create">Ver {{current_section}}/s</a></li>
+    <li><a href="create">Actualizar datos {{current_section}}/s</a></li>
+    <li><a href="create">Eliminar {{current_section}}/s</a></li>
+</ul>
+
+{% endblock contenido %}

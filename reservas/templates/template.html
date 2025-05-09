@@ -17,8 +17,8 @@
           <div class="hidden sm:flex sm:space-x-8">
             {% if user.is_authenticated %}
               <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-800">Inicio</a>
-              {% for item in allowed_models %}
-                <a href="{% url 'crud' item.section %}">{{ item.label }}</a>
+              {% for section in allowed_models %}
+                <a href="{% url 'crud' section %}">{{ section }}</a>
               {% endfor %}
               <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800">Cerrar sesión</a>
             {% else %}

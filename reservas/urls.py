@@ -12,5 +12,7 @@ urlpatterns = [
     path('dashboard/', Dashboard.as_view(), name='logout'),
 
     # TODO operaciones del crud
-    path('dashboard/<str:section>/', Crud.as_view(), name='crud'),
+    path('dashboard/<str:current_section>/', Crud.as_view(), name='crud'),
+    path('dashboard/<str:current_section>/create/', Create.as_view(), name='create'),
+
     ]

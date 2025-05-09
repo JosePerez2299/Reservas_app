@@ -1,9 +1,8 @@
 {% extends 'template.html' %} {% block contenido %}
   <h1>Panel de {{ group }}</h1>
+  <hr>
   <h1>Bienvenido, {{ request.user.username }}</h1>
   {% for item in allowed_models %}
-  <a href="{% url 'crud' item.section %}">
-    {{ item.label }}
-  </a>
+    <a href="{% url 'crud' item%}">{{ item }}</a>
   {% endfor %}
 {% endblock %}
