@@ -4,7 +4,7 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LoginView
 from reservas.utils.utils import get_access
-from reservas.utils.views.auth import SignupView
+from reservas.library.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
 
 class Login(LoginView):

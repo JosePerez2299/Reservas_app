@@ -50,7 +50,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-APPEND_SLASH = True 
 ROOT_URLCONF = 'my_app.urls'
 
 TEMPLATES = [
@@ -123,7 +122,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Parametros agregados/modificados
+APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
-
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+DASHBOARD_ACCESS = {
+    'administrador': ['Usuarios', 'Espacios'],
+    'moderador':   ['Reservas', 'Usuarios'],
+    'usuario':   ['Reservas'],
+}
