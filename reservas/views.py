@@ -23,5 +23,9 @@ class Crud(LoginMixin, View):
         context = {
             'current_section' : section
         }
+
+        # TODO dependiendo de la seccion, ejecutar una vista crud del modelo
+        # Para cada crud, manejar las 4 operaciones. Crear 4 vistas
+        # crud --> crud_usuarios --> Tambien por params: ver todos, editar, eliminar, crear
         return render(request, 'crud.html', context)
     
