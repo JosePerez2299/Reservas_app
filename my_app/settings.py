@@ -46,7 +46,15 @@ COMPRESS_ROOT = BASE_DIR / 'static'
 
 COMPRESS_ENABLED = True
 STATIC_URL = "static/"
-STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
+STATICFILES_FINDERS = [
+    # para tus archivos en STATICFILES_DIRS
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    # para los static/ de cada app (incluye admin)
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # compresión y concatenación de CSS/JS
+    'compressor.finders.CompressorFinder',
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
