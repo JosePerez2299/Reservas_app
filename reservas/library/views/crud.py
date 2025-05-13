@@ -15,10 +15,5 @@ class CrudView(LoginMixin, View):
         for group in groups:
             # Validar en el contexto global, no los permisos de BD
             if current_section in DASHBOARD_ACCESS[group]:
-              return render(request, 'crud/crud.html', context)
+              return render(request, 'crud.html', context)
         return redirect('dashboard')
-
-    
-
-class CrudCreate(CreateView):
-    pass
