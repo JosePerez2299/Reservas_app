@@ -1,88 +1,103 @@
 {% extends "template.html" %}
 
 {% block contenido %}
-  <h2>Lista de Espacios</h2>
-  <form method="get">
-    <!-- Buscar texto -->
-    <div>
-      <label for="id_q">Buscar</label>
-      <input type="text" id="id_q" name="q" value="{{ q }}" placeholder="Nombre u ubicación…">
-    </div>
+<h2 class="text-xl font-semibold mb-4">Lista de Espacios</h2>
 
-    <!-- Disponibilidad -->
-    <div>
-      <label for="id_available">Disponibilidad</label>
-      <select id="id_available" name="available">
-        <option value="all" {% if available == 'all' %}selected{% endif %}>Todos</option>
-        <option value="yes" {% if available == 'yes' %}selected{% endif %}>Disponibles</option>
-        <option value="no" {% if available == 'no' %}selected{% endif %}>No disponibles</option>
-      </select>
-    </div>
+<form method="get" class="form-grid">
+  <!-- Buscar texto -->
+  <div class="form-group">
+    <label for="id_q" class="form-label">Buscar</label>
+    <input type="text" id="id_q" name="q" value="{{ q }}" placeholder="Nombre u ubicación…" class="form-input">
+  </div>
 
-    <!-- Tipo -->
-    <div>
-      <label for="id_tipo">Tipo</label>
-      <select id="id_tipo" name="tipo">
-        <option value="all" {% if tipo == 'all' %}selected{% endif %}>Todos</option>
-        {% for value, label in tipos %}
-          <option value="{{ value }}" {% if tipo == value %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
+  <!-- Disponibilidad -->
+  <div class="form-group">
+    <label for="id_available" class="form-label">Disponibilidad</label>
+    <select id="id_available" name="available" class="form-select">
+      <option value="all" {% if available == 'all' %}selected{% endif %}>Todos</option>
+      <option value="yes" {% if available == 'yes' %}selected{% endif %}>Disponibles</option>
+      <option value="no" {% if available == 'no' %}selected{% endif %}>No disponibles</option>
+    </select>
+  </div>
 
-    <!-- Capacidad mínima -->
-    <div>
-      <label for="id_cap_min">Capacidad min.</label>
-      <input type="number" id="id_cap_min" name="cap_min" value="{{ cap_min }}" min="0">
-    </div>
+  <!-- Tipo -->
+  <div class="form-group">
+    <label for="id_tipo" class="form-label">Tipo</label>
+    <select id="id_tipo" name="tipo" class="form-select">
+      <option value="all" {% if tipo == 'all' %}selected{% endif %}>Todos</option>
+      {% for value, label in tipos %}
+        <option value="{{ value }}" {% if tipo == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
 
-    <!-- Capacidad máxima -->
-    <div>
-      <label for="id_cap_max">Capacidad max.</label>
-      <input type="number" id="id_cap_max" name="cap_max" value="{{ cap_max }}" min="0">
-    </div>
-    
-    <!-- Botones -->
-    <div>
-      <button type="submit">Filtrar</button>
-      <a href="{% url 'espacio_list' %}">Limpiar</a>
-    </div>
-  </form>
+  <!-- Capacidad mínima -->
+  <div class="form-group">
+    <label for="id_cap_min" class="form-label">Capacidad min.</label>
+    <input type="number" id="id_cap_min" name="cap_min" value="{{ cap_min }}" min="0" class="form-input">
+  </div>
 
-  <table>
-    
-<thead>
-  <tr>
-    <th><a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'nombre' %}-nombre{% else %}nombre{% endif %}">Nombre</a></th>
-    <th><a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'ubicacion' %}-ubicacion{% else %}ubicacion{% endif %}">Ubicación</a></th>
-    <th><a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'capacidad' %}-capacidad{% else %}capacidad{% endif %}">Capacidad</a></th>
-    <th>Tipo</th>
-    <th>Disponible</th>
-    <th>Acciones</th>
-  </tr>
-</thead>
+  <!-- Capacidad máxima -->
+  <div class="form-group">
+    <label for="id_cap_max" class="form-label">Capacidad max.</label>
+    <input type="number" id="id_cap_max" name="cap_max" value="{{ cap_max }}" min="0" class="form-input">
+  </div>
+
+  <!-- Botones -->
+  <div class="form-group flex items-end gap-2">
+    <button type="submit" class="btn-primary">Filtrar</button>
+    <a href="{% url 'espacio_list' %}" class="btn-secondary">Limpiar</a>
+  </div>
+</form>
+
+
+  <table class="table my-5">
+    <thead class="table-header">
+      <tr>
+        <th class="table-header-cell">
+          <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'nombre' %}-nombre{% else %}nombre{% endif %}">
+            Nombre
+          </a>
+        </th>
+        <th class="table-header-cell">
+          <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'ubicacion' %}-ubicacion{% else %}ubicacion{% endif %}">
+            Ubicación
+          </a>
+        </th>
+        <th class="table-header-cell">
+          <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={% if sort == 'capacidad' %}-capacidad{% else %}capacidad{% endif %}">
+            Capacidad
+          </a>
+        </th>
+        <th class="table-header-cell">Tipo</th>
+        <th class="table-header-cell">Disponible</th>
+        <th class="table-header-cell">Acciones</th>
+      </tr>
+    </thead>
     <tbody>
       {% for espacio in espacios %}
-        <tr>
-          <td>{{ espacio.nombre }}</td>
-          <td>{{ espacio.ubicacion }}</td>
-          <td>{{ espacio.capacidad }}</td>
-          <td>{{ espacio.get_tipo_display }}</td>
-          <td>{% if espacio.disponible %}Sí{% else %}No{% endif %}</td>
-          <td>
-            <a href="{% url 'espacio_edit' espacio.pk %}">Editar</a>
-            <a href="{% url 'espacio_delete' espacio.pk %}">Eliminar</a>
+        <tr class="table-row">
+          <td class="table-cell">{{ espacio.nombre }}</td>
+          <td class="table-cell">{{ espacio.ubicacion }}</td>
+          <td class="table-cell">{{ espacio.capacidad }}</td>
+          <td class="table-cell">{{ espacio.get_tipo_display }}</td>
+          <td class="table-cell">
+            {% if espacio.disponible %}Sí{% else %}No{% endif %}
+          </td>
+          <td class="table-cell">
+            <a href="{% url 'espacio_edit' espacio.pk %}" class="btn-edit">Editar</a>
+            <a href="{% url 'espacio_delete' espacio.pk %}" class="btn-delete">Eliminar</a>
           </td>
         </tr>
       {% empty %}
-        <tr>
-          <td colspan="6">No hay espacios.</td>
+        <tr class="table-row">
+          <td class="table-cell text-center italic text-gray-500" colspan="6">No hay espacios.</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-
   
+
 <!-- Paginación -->
 <div>
   <nav>

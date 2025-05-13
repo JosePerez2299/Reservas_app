@@ -1,48 +1,53 @@
+{% load compress %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reservas App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'src/output.css' %}">
+    {% endcompress %}
   </head>
-  <body class="bg-gray-100 flex flex-col min-h-screen">
-    <nav class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
-          <div class="flex items-center">
-            <img src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png" alt="Logo" class="h-10 w-10 mr-2" />
-            <a href="/" class="text-xl font-bold text-gray-800">Reservas</a>
+  <body class="neutral-color flex flex-col min-h-screen">
+    <nav class="navbar bg-white">
+      <div class="navbar-container">
+        <div class="navbar-inner">
+          <div class="navbar-brand">
+            <img src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png" alt="Logo" class="navbar-logo" />
+            <a href="/" class="navbar-title">Reservas</a>
           </div>
-          <div class="hidden sm:flex sm:space-x-8">
+          <div class="navbar-links">
             {% if user.is_authenticated %}
-              <a href="{% url 'dashboard' %}" class="text-gray-600 hover:text-gray-800">Inicio</a>
+              <a href="{% url 'dashboard' %}" class="navbar-link">Inicio</a>
               {% for section in allowed_models %}
-                <a href="{% url 'crud' section %}">{{ section }}</a>
+                <a href="{% url 'crud' section %}" class="navbar-link">{{ section }}</a>
               {% endfor %}
-              <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800">Cerrar sesión</a>
+              <a href="{% url 'logout' %}" class="navbar-link">Cerrar sesión</a>
             {% else %}
-              <a href="{% url 'login' %}" class="text-gray-600 hover:text-gray-800">Iniciar sesión</a>
+              <a href="{% url 'login' %}" class="navbar-link">Iniciar sesión</a>
             {% endif %}
           </div>
         </div>
       </div>
     </nav>
+    
 
-    <div class="flex-grow container mx-auto p-8 sm:px-6 lg:px-8">
+    <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
       {% block contenido %}
 
       {% endblock %}
     </div>
 
-    <footer class="bg-white shadow">
+    <footer class="navbar bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex justify-between items-center">
           <p class="text-gray-600 text-sm">&copy; 2025 Reservas App. Todos los derechos reservados.</p>
           <div class="flex space-x-4">
-            <a href="#" class="text-gray-600 hover:text-gray-800 text-sm">Política de privacidad</a>
-            <a href="#" class="text-gray-600 hover:text-gray-800 text-sm">Términos de servicio</a>
-            <a href="#" class="text-gray-600 hover:text-gray-800 text-sm">Contacto</a>
+            <a href="#" class="navbar-link">Política de privacidad</a>
+            <a href="#" class="navbar-link">Términos de servicio</a>
+            <a href="#" class="navbar-link">Contacto</a>
           </div>
         </div>
       </div>
