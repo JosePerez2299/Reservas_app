@@ -14,3 +14,8 @@
 - Como Moderador
     - Aprobar, Rechazar Solicitudes
     - CRUD de usuarios
+
+
+ 
+    python manage.py runserver
+    npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch

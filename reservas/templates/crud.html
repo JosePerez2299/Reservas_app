@@ -1,13 +1,13 @@
 {% extends "template.html" %}
 
 {% block contenido %}
-<h2>
+<h2 class="text-center">
     Gestion de {{current_section|capfirst}}s
 </h2>
 <hr>
 <ul>
-    <li><a href="create">Crear {{current_section}}/s</a></li>
-    <li><a href="list">Gestionar {{current_section}}/s</a></li>
+    <li class="text-center"><a href="create">Crear {{current_section}}/s</a></li>
+    <li class="text-center"><a href="list">Gestionar {{current_section}}/s</a></li>
 </ul>
 
 {% endblock contenido %}
