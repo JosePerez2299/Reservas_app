@@ -3,7 +3,10 @@
 {% block contenido %}
 <h2 class="text-xl font-semibold mb-4">Lista de Espacios</h2>
 
-<form method="get" class="form-grid">
+<form method="get" >
+
+  <div class="form-grid" >
+    
   <!-- Buscar texto -->
   <div class="form-group">
     <label for="id_q" class="form-label">Buscar</label>
@@ -43,10 +46,12 @@
     <input type="number" id="id_cap_max" name="cap_max" value="{{ cap_max }}" min="0" class="form-input">
   </div>
 
+</div>
+
   <!-- Botones -->
-  <div class="form-group flex items-end gap-2">
-    <button type="submit" class="btn-primary">Filtrar</button>
-    <a href="{% url 'espacio_list' %}" class="btn-secondary">Limpiar</a>
+  <div class="inline-block mt-3" >
+    <button type="submit" class="btn-primary ">Filtrar</button>
+    <a href="{% url 'espacio_list' %}" class="btn-danger m-2">Limpiar</a>
   </div>
 </form>
 

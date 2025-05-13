@@ -4,13 +4,14 @@ from reservas.models import Espacio
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.db.models import Q
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
-
-class EspacioListView(ListView):
+class EspacioListView(PermissionRequiredMixin, ListView):
     model = Espacio
     template_name = 'espacios/list.html'
     context_object_name = 'espacios'
     paginate_by = 10
+    permission_required = 'reservas.view_espacio'
 
     def get_queryset(self):
         qs = super().get_queryset()
