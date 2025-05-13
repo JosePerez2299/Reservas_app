@@ -12,7 +12,7 @@ class Espacio(models.Model):
 
     nombre = models.CharField(max_length=100, unique=True)
     ubicacion = models.CharField(max_length=255)
-    capacidad = models.PositiveIntegerField()
+    capacidad = models.PositiveIntegerField(max_length=10000)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     disponible = models.BooleanField(default=True)
 

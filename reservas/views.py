@@ -3,6 +3,7 @@ from django.views import View
 from django.contrib.auth.views import LoginView
 from django.views.generic import TemplateView
 from reservas.library.views.crud import *
+from reservas.library.views.espacios import EspacioCreateView
 from reservas.utils.utils import get_access, get_model_by_section, get_user_groups
 from reservas.library.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
@@ -20,7 +21,4 @@ class Dashboard(LoginMixin, TemplateView):
 
 
 class Crud(CrudView):
-    pass
-
-class Create(CrudCreate):
     pass
