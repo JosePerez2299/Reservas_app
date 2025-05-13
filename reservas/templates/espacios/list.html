@@ -82,29 +82,26 @@
     </tbody>
   </table>
 
+  
 <!-- Paginación -->
 <div>
   <nav>
     <ul>
+      
+      <li>Mostrando: {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} entradas </li>
       {% if page_obj.has_previous %}
         <li>
           <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={{ sort }}&page={{ page_obj.previous_page_number }}">Anterior</a>
         </li>
       {% endif %}
-      {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-          <li><span>{{ num }}</span></li>
-        {% else %}
-          <li>
-            <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={{ sort }}&page={{ num }}">{{ num }}</a>
-          </li>
-        {% endif %}
-      {% endfor %}
+    
       {% if page_obj.has_next %}
         <li>
           <a href="?q={{ q }}&available={{ available }}&tipo={{ tipo }}&cap_min={{ cap_min }}&cap_max={{ cap_max }}&sort={{ sort }}&page={{ page_obj.next_page_number }}">Siguiente</a>
         </li>
       {% endif %}
+      
+   
     </ul>
   </nav>
 </div>

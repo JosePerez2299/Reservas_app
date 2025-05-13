@@ -10,7 +10,7 @@ class EspacioListView(ListView):
     model = Espacio
     template_name = 'espacios/list.html'
     context_object_name = 'espacios'
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super().get_queryset()
