@@ -3,7 +3,7 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView
 from my_app.settings import DASHBOARD_ACCESS
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
-from reservas.utils.utils import get_user_groups
+from reservas.library.utils.utils import get_user_groups
 
 class CrudView(LoginMixin, View):
     def get(self, request, current_section):
