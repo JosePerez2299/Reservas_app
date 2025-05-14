@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_filters',
+    'widget_tweaks',
     'compressor',
     'reservas',
     'django.contrib.admin',
