@@ -1,6 +1,5 @@
 from django.contrib.auth.views import LoginView
 from django.views.generic import TemplateView
-from reservas.library.views.crud import *
 from reservas.library.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
 
@@ -14,7 +13,3 @@ class Signup(LoginMixin, SignupView):
 
 class Dashboard(LoginMixin, TemplateView):
     template_name = 'dashboard.html'
-
-
-class Crud(CrudView):
-    pass

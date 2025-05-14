@@ -93,3 +93,6 @@ Reservas_app/
   En [settings.py](c:\Users\josej\Reservas_app\my_app\settings.py) se ha configurado `django-compressor` para gestionar la compresión y concatenación de archivos CSS y JavaScript.
 - **Acceso y permisos:**  
   La lógica de permisos y acceso al dashboard se encuentra en parte en los archivos de vistas y en el manejador de señales, según los grupos definidos en la configuración.
+
+
+npm install flowbite --save
