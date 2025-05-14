@@ -1,34 +1,48 @@
-- Como admin:
-    - puedo crear, listar, ver, eliminar espacios 
-        - SIN RESTRICCION
-    - Para los espacios, asignar moderadores
-    - Ver lista de reserva por espacio (Todas las reservas)
-    - puedo crear, listar, eliminar usuarios
-        - Restriccion: 
-            - el usuario a crear debe ser moderador o usuario normal, no administrador
-    - eliminar reservas, ver
-        - Sin restriccion
+# Casos de Uso
 
-    - No puedo crear reservas
+## Como Administrador:
+- **Gestión de Espacios:**
+  - Crear, listar, ver y eliminar espacios.
+    - **Restricción:** Sin restricciones.
+  - Asignar moderadores a los espacios.
+  - Ver lista de reservas por espacio (todas las reservas).
 
+- **Gestión de Usuarios:**
+  - Crear, listar y eliminar usuarios.
+    - **Restricción:** Solo se pueden crear usuarios moderadores o normales, no administradores.
 
-- Como moderador:
-    - ver los espacios gestionados por mi usuario
-        - Ver reseras por espacios (un espacio en especifico)
-    - ver lista de reservas (todas las reservas de los espacios gestionados )
-    - aprobar, rechazar reservas (de las salas ):
-        - Solo aprobar reservas si yo estoy autorizado a moderar ese espacio
-    - puedo crear, listar, eliminar? de USUARIOS:
-        - Restriccion:
-            - solo usuarios normales. (Quizas ser una eliminacion pasiva, no eliminar por completo)
+- **Gestión de Reservas:**
+  - Eliminar y ver reservas.
+    - **Restricción:** Sin restricciones.
+  - **Nota:** No puede crear reservas.
 
+---
 
-- Como usuario:
-    - crear, gestionar reservas:
-        - eliminar, ver estado ( solo de mis reservas)
+## Como Moderador:
+- **Gestión de Espacios:**
+  - Ver los espacios gestionados por su usuario.
+  - Ver reservas por espacio (un espacio específico).
+  - Ver lista de reservas (todas las reservas de los espacios gestionados).
 
+- **Gestión de Reservas:**
+  - Aprobar o rechazar reservas de las salas.
+    - **Restricción:** Solo puede aprobar reservas si está autorizado a moderar ese espacio.
 
-- El sistema:
-    -  Manejar reservas vencidas (si la fecha actual es mayor a la fecha de la reserva, cambiar el estatus)
-    - Panel estadisticas??
+- **Gestión de Usuarios:**
+  - Crear, listar y eliminar usuarios.
+    - **Restricción:** Solo puede gestionar usuarios normales.
+    - **Nota:** La eliminación podría ser pasiva (no eliminar por completo).
 
+---
+
+## Como Usuario:
+- **Gestión de Reservas:**
+  - Crear y gestionar sus propias reservas.
+    - **Acciones permitidas:** Eliminar y ver el estado de sus reservas.
+
+---
+
+## El Sistema:
+- Manejar reservas vencidas:
+  - Si la fecha actual es mayor a la fecha de la reserva, cambiar el estatus de la reserva.
+- **Panel de estadísticas:** (¿Implementar?)
