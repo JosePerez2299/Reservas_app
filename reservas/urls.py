@@ -3,7 +3,6 @@ from django.urls import path
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
-
 urlpatterns = [
     path('', Login.as_view(), name='home'),
     path('login/', Login.as_view(), name='login'),

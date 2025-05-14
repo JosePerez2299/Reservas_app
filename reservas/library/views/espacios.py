@@ -1,77 +1,24 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from reservas.library.mixins.list_helpers import AutoFilterMixin, ColumnsMixin
 from reservas.models import Espacio
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
-from django.db.models import Q
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-class EspacioListView(PermissionRequiredMixin, ListView):
+
+class EspacioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, ListView):
     model = Espacio
-    template_name = 'espacios/list.html'
-    context_object_name = 'espacios'
+    permission_required = 'reservas.change_espacio'
+    template_name = 'table_view.html'
     paginate_by = 10
-    permission_required = 'reservas.view_espacio'
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        q         = self.request.GET.get('q', '').strip()
-        available = self.request.GET.get('available', 'all')
-        tipo      = self.request.GET.get('tipo', 'all')
-        cap_min   = self.request.GET.get('cap_min', '').strip()
-        cap_max   = self.request.GET.get('cap_max', '').strip()
-        sort = self.request.GET.get('sort', '')
-
-
-        # Búsqueda texto
-        if q:
-            qs = qs.filter(
-                Q(nombre__icontains=q) |
-                Q(ubicacion__icontains=q)
-            )
-
-        # Disponibilidad
-        if available == 'yes':
-            qs = qs.filter(disponible=True)
-        elif available == 'no':
-            qs = qs.filter(disponible=False)
-
-        # Tipo de espacio
-        if tipo in dict(Espacio.TIPO_CHOICES):
-            qs = qs.filter(tipo=tipo)
-
-        # Rango de capacidad
-        if cap_min.isdigit():
-            qs = qs.filter(capacidad__gte=int(cap_min))
-        if cap_max.isdigit():
-            qs = qs.filter(capacidad__lte=int(cap_max))
-
-         # Ordenamiento
-        valid_sorts = {
-            'nombre': 'nombre',
-            '-nombre': '-nombre',
-            'capacidad': 'capacidad',
-            '-capacidad': '-capacidad',
-            'ubicacion': 'ubicacion',
-            '-ubicacion': '-ubicacion',
-        }
-        if sort in valid_sorts:
-            qs = qs.order_by(valid_sorts[sort])
-        return qs
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'q':         self.request.GET.get('q', '').strip(),
-            'available': self.request.GET.get('available', 'all'),
-            'tipo':      self.request.GET.get('tipo', 'all'),
-            'cap_min':   self.request.GET.get('cap_min', '').strip(),
-            'cap_max':   self.request.GET.get('cap_max', '').strip(),
-            'tipos':     Espacio.TIPO_CHOICES,
-            'sort': self.request.GET.get('sort', ''),
-        })
-        return ctx
-
+    list_display = [
+        ('nombre', 'Nombre'),        
+        ('tipo', 'Tipo'),
+        ('capacidad', 'Capacidad'),
+        ('disponible', 'Disponible'),
+    ]
 
 class EspacioCreateView(SuccessMessageMixin, CreateView):
     model = Espacio
