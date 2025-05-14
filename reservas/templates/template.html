@@ -11,7 +11,7 @@
     {% endcompress %}
   </head>
   <body class="neutral-color flex flex-col min-h-screen">
-    <nav class="navbar bg-white">
+    <nav class="navbar">
       <div class="navbar-container">
         <div class="navbar-inner">
           <div class="navbar-brand">
@@ -21,9 +21,21 @@
           <div class="navbar-links">
             {% if user.is_authenticated %}
               <a href="{% url 'dashboard' %}" class="navbar-link">Inicio</a>
-              {% for section in allowed_models %}
-                <a href="{% url 'crud' section %}" class="navbar-link">{{ section }}</a>
+          
+              {% for model, perms in dashboard_access.items %}
+                {% if 'view' in perms or 'change' in perms or 'delete' in perms %}
+                  <a href="{% url model %}" class="navbar-link">
+                    Gestionar {{ model|capfirst }}
+                  </a>
+                {% endif %}
+          
+                {% if 'add' in perms %}
+                  <a href="{% url model|add:'_create' %}" class="navbar-link">
+                    Crear {{ model|capfirst }}
+                  </a>
+                {% endif %}
               {% endfor %}
+          
               <a href="{% url 'logout' %}" class="navbar-link">Cerrar sesión</a>
             {% else %}
               <a href="{% url 'login' %}" class="navbar-link">Iniciar sesión</a>
@@ -32,7 +44,6 @@
         </div>
       </div>
     </nav>
-    
 
     <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
       {% block content %}

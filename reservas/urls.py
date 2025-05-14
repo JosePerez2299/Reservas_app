@@ -11,10 +11,22 @@ urlpatterns = [
 
     # TODO Logout
     path('dashboard/', Dashboard.as_view(), name='logout'),
-    path('dashboard/<str:current_section>/', Crud.as_view(), name='crud'),
-    path('dashboard/espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),
-    path('dashboard/espacio/list/', EspacioListView.as_view(), name='espacio_list'),
-    path('dashboard/espacio/<int:pk>/view', EspacioListView.as_view(), name='espacio_list'),
-    path('dashboard/espacio/<int:pk>/edit/', EspacioUpdateView.as_view(), name='espacio_edit'),
-    path('dashboard/espacio/<int:pk>/delete/', EspacioDeleteView.as_view(), name='espacio_delete'),
+    # Espacio crud
+    path('espacio/', EspacioListView.as_view(), name='espacio'),
+    path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),
+    path('espacio/view/<int:pk>/', EspacioListView.as_view(), name='espacio_view'),
+    path('espacio/edit/<int:pk>/', EspacioUpdateView.as_view(), name='espacio_edit'),
+    path('espacio/delete/<int:pk>/', EspacioDeleteView.as_view(), name='espacio_delete'),
+
+    path('usuario/', EspacioListView.as_view(), name='usuario'),
+    path('usuario/create/', EspacioCreateView.as_view(), name='usuario_create'),
+    path('usuario/view/<int:pk>/', EspacioListView.as_view(), name='usuario_list'),
+    path('usuario/edit/<int:pk>/', EspacioUpdateView.as_view(), name='usuario_edit'),
+    path('usuario/delete/<int:pk>/', EspacioDeleteView.as_view(), name='usuario_delete'),
+
+    path('reserva/', EspacioListView.as_view(), name='reserva'),
+    path('reserva/create/', EspacioCreateView.as_view(), name='reserva_create'),
+    path('reserva/view/<int:pk>/', EspacioListView.as_view(), name='reserva_list'),
+    path('reserva/edit/<int:pk>/', EspacioUpdateView.as_view(), name='reserva_edit'),
+    path('reserva/delete/<int:pk>/', EspacioDeleteView.as_view(), name='reserva_delete'),
 ]
