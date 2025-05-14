@@ -22,7 +22,7 @@ class EspacioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, Li
 
 class EspacioCreateView(SuccessMessageMixin, CreateView):
     model = Espacio
-    template_name = 'espacios/create.html'
+    template_name = 'create.html'
     fields = ['nombre', 'ubicacion', 'capacidad', 'tipo']
     success_url = reverse_lazy('espacio_list')
     success_message = "¡El espacio fue creado con éxito!"
@@ -35,7 +35,7 @@ class EspacioCreateView(SuccessMessageMixin, CreateView):
 class EspacioUpdateView(UpdateView):
     model = Espacio
     fields = ['nombre', 'ubicacion', 'capacidad', 'tipo', 'disponible']
-    template_name = 'espacios/edit.html'  # plantilla parcial
+    template_name = 'update.html'  # plantilla parcial
     context_object_name = 'espacio'
 
     def get_success_url(self):
@@ -43,7 +43,7 @@ class EspacioUpdateView(UpdateView):
     
 class EspacioDeleteView(DeleteView):
     model = Espacio
-    template_name = 'espacios/confirm_delete.html'
+    template_name = 'delete.html'
     context_object_name = 'espacio'
     success_url = reverse_lazy('espacio_list')
 

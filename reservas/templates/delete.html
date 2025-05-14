@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Confirmar eliminación</h2>
+    <p>¿Estás seguro de que deseas eliminar este elemento?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
