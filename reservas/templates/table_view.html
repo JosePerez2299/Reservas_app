@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="flex flex-col md:flex-row gap-6">
+<div class=" flex flex-col md:flex-row items-start gap-6">
 
   <!-- Filtros -->
   <form method="get" class="w-full md:w-1/4 space-y-4 bg-white p-4 rounded-lg shadow">
@@ -22,25 +22,32 @@
       <a href="{{request.path}}" class="btn-danger">Limpiar</a>
     </div>
   </form>
+ <!-- Tabla + paginación -->
+ <div class="w-full md:w-3/4 flex flex-col gap-4">
 
-  <!-- Tabla de resultados -->
-  <div class="w-full md:w-3/4 overflow-x-auto">
-    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+  <!-- Scroll sólo en sm -->
+  <div class="w-full overflow-x-auto md:overflow-x-visible">
+    <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
+      <span class="whitespace-nowrap">
+        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+      </span>
+    </div>
+    <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden md:min-w-max">
       <thead class="bg-gray-800 text-white text-sm uppercase">
         <tr>
           {% for col in cols %}
-            <th class="px-4 py-2 text-left">{{ col.verbose }}</th>
+            <th class="px-4 py-2 text-left whitespace-nowrap">{{ col.verbose }}</th>
           {% endfor %}
-          <th class="px-2 py-2 text-left w-10">Acción</th>
-      </tr>
-
+          <th class="px-2 py-2 text-left whitespace-nowrap">Acción</th>
+        </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
         {% for obj in object_list %}
           <tr class="hover:bg-gray-50">
             {% for col in cols %}
-            
-              <td class="px-4 py-2 text-sm text-gray-800">{{ obj|get_attr:col.name }}</td>
+              <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">
+                {{ obj|get_attr:col.name }}
+              </td>
             {% endfor %}
 
             <!-- Celda de acciones -->
@@ -54,25 +61,50 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="{{ cols|length }}" class="px-4 py-3 text-center text-gray-500">No se encontraron resultados.</td>
+            <td colspan="{{ cols|length }}" class="px-4 py-3 text-center text-gray-500">
+              No se encontraron resultados.
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
 
-    <!-- Paginación -->
-    <div class="flex justify-between items-center mt-4 text-sm text-gray-600">
-      <span>Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} resultados</span>
-      <div class="space-x-2">
-        {% if page_obj.has_previous %}
-          <a href="?{% query_transform request page=page_obj.previous_page_number %}" class="btn-secondary">Anterior</a>
-        {% endif %}
-        {% if page_obj.has_next %}
-          <a href="?{% query_transform request page=page_obj.next_page_number %}" class="btn-secondary">Siguiente</a>
-        {% endif %}
-      </div>
+  <!-- Paginación SIEMPRE VISIBLE debajo -->
+  
+  
+  <div>
+    <div class="flex justify-between items-center text-sm text-gray-600">
+      <p class="whitespace-nowrap">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+      </p>
+      <p class="whitespace-nowrap">
+        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+      </p>
+  
+  
+  
+  
+    </div>
+    <div class="text-center">
+      {% if page_obj.has_previous %}
+      <a href="?{% query_transform request page=1 %}" class="btn-secondary whitespace-nowrap">Inicio</a>
+      <a href="?{% query_transform request page=page_obj.previous_page_number %}"
+        class="btn-secondary whitespace-nowrap">←
+        Anterior</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+      <a href="?{% query_transform request page=page_obj.next_page_number %}"
+        class="btn-secondary whitespace-nowrap">Siguiente →</a>
+      <a href="?{% query_transform request page=page_obj.paginator.num_pages %}"
+        class="btn-secondary whitespace-nowrap">Fin</a>
+      {% endif %}
     </div>
   </div>
+  
+  
+  </div>
+  
 
 </div>
 

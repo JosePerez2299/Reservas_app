@@ -43,7 +43,7 @@
 
   /* Navbar */
   .navbar-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
   }
 
   .navbar-inner {
@@ -118,7 +118,7 @@
 
   /* Botones */
   .btn {
-    @apply bg-gray-200 text-black text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-400 transition;
+    @apply bg-gray-300 text-black text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-400 transition;
   }
 
   .btn-primary {
