@@ -9,22 +9,24 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 class EspacioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, ListView):
     model = Espacio
-    permission_required = 'reservas.change_espacio'
+    permission_required = 'reservas.view_espacio'
     template_name = 'table_view.html'
-    paginate_by = 10
+    paginate_by = 50
 
     list_display = [
         ('nombre', 'Nombre'),        
         ('tipo', 'Tipo'),
         ('capacidad', 'Capacidad'),
+        ('ubicacion', 'Ubicación'),  # Cambiado para mostrar la clave foránea
         ('disponible', 'Disponible'),
     ]
 
-class EspacioCreateView(SuccessMessageMixin, CreateView):
+class EspacioCreateView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     model = Espacio
+    permission_required = 'reservas.add_espacio'
     template_name = 'create.html'
-    fields = ['nombre', 'ubicacion', 'capacidad', 'tipo']
-    success_url = reverse_lazy('espacio_list')
+    fields = ['nombre', 'ubicacion', 'piso','capacidad', 'tipo']
+    success_url = reverse_lazy('espacio')
     success_message = "¡El espacio fue creado con éxito!"
 
     def form_invalid(self, form):

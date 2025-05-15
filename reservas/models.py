@@ -22,7 +22,7 @@ class Ubicacion(models.Model):
 class Usuario(AbstractUser):
     email = models.EmailField('email address', unique=True)
     ubicacion = models.ForeignKey(
-        Ubicacion, on_delete=models.SET_NULL,
+        Ubicacion, on_delete=models.SET_NULL, 
         null= True,
         help_text="La sede/edificio al que pertenece el usuario", 
     )

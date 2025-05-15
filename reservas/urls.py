@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.urls import path
+from django.contrib.auth.views import LogoutView
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
@@ -8,9 +9,9 @@ urlpatterns = [
     path('login/', Login.as_view(), name='login'),
     path('signup/', Signup.as_view(), name='signup'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
     # TODO Logout
-    path('dashboard/', Dashboard.as_view(), name='logout'),
     # Espacio crud
     path('espacio/', EspacioListView.as_view(), name='espacio'),
     path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),

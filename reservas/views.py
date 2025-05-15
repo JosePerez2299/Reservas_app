@@ -9,6 +9,8 @@ class Login(LoginView):
     template_name = 'auth/login.html'
     redirect_authenticated_user = True
 
+
+    # TO DO MEJORAR
     def form_valid(self, form):
         # Aquí ya se validó la contraseña y el usuario existe
         user = form.get_user()

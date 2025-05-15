@@ -58,9 +58,12 @@
             {% endif %}
           {% endfor %}
 
-          <a href="{% url 'logout' %}" class="navbar-link text-gray-600 hover:text-gray-800">
-            Cerrar sesión
-          </a>
+          <form action="{% url 'logout' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="navbar-link text-gray-600 hover:text-gray-800">
+              Cerrar sesión
+            </button>
+          </form>
         {% else %}
           <a href="{% url 'login' %}" class="navbar-link text-gray-600 hover:text-gray-800">
             Iniciar sesión
