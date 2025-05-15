@@ -58,12 +58,9 @@
             {% endif %}
           {% endfor %}
 
-          <form action="{% url 'logout' %}" method="post" style="display:inline">
-            {% csrf_token %}
-            <button type="submit" class="navbar-link text-gray-600 hover:text-gray-800">
-              Cerrar sesión
-            </button>
-          </form>
+          <a href="{% url 'logout' %}" class="navbar-link text-gray-600 hover:text-gray-800">
+            Cerrar sesión
+          </a>
         {% else %}
           <a href="{% url 'login' %}" class="navbar-link text-gray-600 hover:text-gray-800">
             Iniciar sesión
@@ -93,5 +90,7 @@
         </div>
       </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </body>
 </html>

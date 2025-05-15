@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class=" flex flex-col md:flex-row items-start gap-6">
+<div class="flex flex-col md:flex-row items-start gap-6">
 
   <!-- Filtros -->
   <form method="get" class="w-full md:w-1/4 space-y-4 bg-white p-4 rounded-lg shadow">
@@ -17,94 +17,130 @@
         {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" }}
       </div>
     {% endfor %}
-    <div class="pt-2 flex justify-around ">
+    <div class="pt-2 flex justify-around">
       <button type="submit" class="btn-primary">Filtrar</button>
-      <a href="{{request.path}}" class="btn-danger">Limpiar</a>
+      <a href="{{ request.path }}" class="btn-danger">Limpiar</a>
     </div>
   </form>
- <!-- Tabla + paginación -->
- <div class="w-full md:w-3/4 flex flex-col gap-4">
 
-  <!-- Scroll sólo en sm -->
-  <div class="w-full overflow-x-auto md:overflow-x-visible">
-    <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
-      <span class="whitespace-nowrap">
-        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
-      </span>
-    </div>
-    <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden md:min-w-max">
-      <thead class="bg-gray-800 text-white text-sm uppercase">
-        <tr>
-          {% for col in cols %}
-            <th class="px-4 py-2 text-left whitespace-nowrap">{{ col.verbose }}</th>
-          {% endfor %}
-          <th class="px-2 py-2 text-left whitespace-nowrap">Acción</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200">
-        {% for obj in object_list %}
-          <tr class="hover:bg-gray-50">
-            {% for col in cols %}
-              <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">
-                {{ obj|get_attr:col.name }}
-              </td>
-            {% endfor %}
+  <!-- Tabla + paginación -->
+  <div class="w-full md:w-3/4 flex flex-col gap-4">
 
-            <!-- Celda de acciones -->
-            <td class="px-2 py-2 text-sm text-gray-800 w-24">
-              <div class="flex items-center justify-start gap-2">
-                <a href="/{{ model_name_lower }}/view/{{obj.pk}}" class="text-blue-600 hover:text-blue-800" title="Ver">👁️</a>
-                <a href="/{{ model_name_lower }}/edit/{{obj.pk}}" class="text-yellow-600 hover:text-yellow-800" title="Editar">✏️</a>
-                <a href="/{{ model_name_lower }}/delete/{{obj.pk}}" class="text-red-600 hover:text-red-800" title="Eliminar">🗑️</a>
-              </div>
-            </td>
-          </tr>
-        {% empty %}
+    <!-- Scroll sólo en sm -->
+    <div class="w-full overflow-x-auto md:overflow-x-visible">
+      <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
+        <span class="whitespace-nowrap">
+          Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+        </span>
+      </div>
+      <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden md:min-w-max">
+        <thead class="bg-gray-800 text-white text-sm uppercase">
           <tr>
-            <td colspan="{{ cols|length }}" class="px-4 py-3 text-center text-gray-500">
-              No se encontraron resultados.
-            </td>
+            {% for col in cols %}
+              <th class="px-4 py-2 text-left whitespace-nowrap">{{ col.verbose }}</th>
+            {% endfor %}
+            <th class="px-2 py-2 text-left whitespace-nowrap">Acción</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for obj in object_list %}
+            <tr class="hover:bg-gray-50">
+              {% for col in cols %}
+                <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">
+                  {{ obj|get_attr:col.name }}
+                </td>
+              {% endfor %}
+              <!-- Celda de acciones -->
+              <td class="px-2 py-2 text-sm text-gray-800 w-24">
+                <div class="flex items-center justify-start gap-2">
+                  <a href="/{{ model_name_lower }}/view/{{ obj.pk }}" class="text-blue-600 hover:text-blue-800" title="Ver">👁️</a>
+                  <a href="/{{ model_name_lower }}/edit/{{ obj.pk }}" class="text-yellow-600 hover:text-yellow-800" title="Editar">✏️</a>
+                  <a href="/{{ model_name_lower }}/delete/{{ obj.pk }}" class="text-red-600 hover:text-red-800" title="Eliminar">🗑️</a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="{{ cols|length }}" class="px-4 py-3 text-center text-gray-500">
+                No se encontraron resultados.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Paginación SIEMPRE VISIBLE debajo -->
-  
-  
-  <div>
-    <div class="flex justify-between items-center text-sm text-gray-600">
-      <p class="whitespace-nowrap">
-        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-      </p>
-      <p class="whitespace-nowrap">
-        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
-      </p>
-  
-  
-  
-  
-    </div>
-    <div class="text-center">
-      {% if page_obj.has_previous %}
-      <a href="?{% query_transform request page=1 %}" class="btn-secondary whitespace-nowrap">Inicio</a>
-      <a href="?{% query_transform request page=page_obj.previous_page_number %}"
-        class="btn-secondary whitespace-nowrap">←
-        Anterior</a>
-      {% endif %}
-      {% if page_obj.has_next %}
-      <a href="?{% query_transform request page=page_obj.next_page_number %}"
-        class="btn-secondary whitespace-nowrap">Siguiente →</a>
-      <a href="?{% query_transform request page=page_obj.paginator.num_pages %}"
-        class="btn-secondary whitespace-nowrap">Fin</a>
-      {% endif %}
-    </div>
+    <!-- Paginación -->
+    <nav aria-label="Page navigation example" class="w-full ">
+      <ul class="flex flex-wrap justify-center w-full -space-x-px text-sm">
+        <!-- Inicio/Anterior -->
+        {% if page_obj.has_previous %}
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=1 %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100">«</a>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=page_obj.previous_page_number %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-e-0 border-gray-300 hover:bg-gray-100">‹</a>
+          </li>
+        {% else %}
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-300 bg-gray-100 border border-e-0 border-gray-300 rounded-s-lg">«</span>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-300 bg-gray-100 border border-e-0 border-gray-300">‹</span>
+          </li>
+        {% endif %}
+
+        <!-- Saltos y números centrales -->
+        {% if page_obj.number > 4 %}
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=1 %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300 hover:bg-gray-100">1</a>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300">…</span>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            <li class="flex-1 md:flex-none">
+              {% if num == page_obj.number %}
+                <span aria-current="page" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-blue-600 bg-blue-50 border border-gray-300">{{ num }}</span>
+              {% else %}
+                <a href="?{% query_transform request page=num %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300 hover:bg-gray-100">{{ num }}</a>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300">…</span>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=page_obj.paginator.num_pages %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300 hover:bg-gray-100">{{ page_obj.paginator.num_pages }}</a>
+          </li>
+        {% endif %}
+
+        <!-- Siguiente/Fin -->
+        {% if page_obj.has_next %}
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=page_obj.next_page_number %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-e-0 border-gray-300 hover:bg-gray-100">›</a>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <a href="?{% query_transform request page=page_obj.paginator.num_pages %}" class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100">»</a>
+          </li>
+        {% else %}
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-300 bg-gray-100 border border-e-0 border-gray-300">›</span>
+          </li>
+          <li class="flex-1 md:flex-none">
+            <span class="w-full md:w-auto block px-3 h-8 flex items-center justify-center text-gray-300 bg-gray-100 border border-gray-300 rounded-e-lg">»</span>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+
   </div>
-  
-  
-  </div>
-  
 
 </div>
 
