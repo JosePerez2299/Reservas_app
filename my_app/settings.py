@@ -142,6 +142,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Parametros agregados/modificados
+AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'

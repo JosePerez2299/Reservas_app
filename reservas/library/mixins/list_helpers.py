@@ -45,3 +45,5 @@ class AutoFilterMixin(FilterView):
             field_names = [f.name for f in model._meta.fields if f.name != 'id']
 
         return create_generic_filterset(model=model, include_fields=field_names)
+
+

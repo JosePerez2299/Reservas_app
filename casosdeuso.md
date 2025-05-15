@@ -10,6 +10,7 @@
 - **Gestión de Usuarios:**
   - Crear, listar y eliminar usuarios.
     - **Restricción:** Solo se pueden crear usuarios moderadores o normales, no administradores.
+  - Promover permisos o degradar
 
 - **Gestión de Reservas:**
   - Eliminar y ver reservas.
@@ -46,3 +47,15 @@
 - Manejar reservas vencidas:
   - Si la fecha actual es mayor a la fecha de la reserva, cambiar el estatus de la reserva.
 - **Panel de estadísticas:** (¿Implementar?)
+
+
+Usuario(username (unique), password, email (unique), ubicacion (FK a Ubicacion), piso (max value 40))
+Ubicacion (nombre)
+Reserva(usuario (fk), espacio(fk), fecha de uso, hora inicio, hora fin, estado (pendiente, aprobada, rechazada), motivo de uso, aprobado_por (fk a usuario, nullable))
+Espacio(nombre, ubicacion (fk), capacidad (max 1000), tipo (salon, laboratorio, auditorio), disponibilidad)
+
+
+Restricciones:
+Para reserva: unique en conjunto (usuario, espacio, fecha).. crear validadores para que no se solapen las horas. motivo de uso es obligatorio (no null)
+
+

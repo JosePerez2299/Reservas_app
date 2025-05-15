@@ -1,6 +1,20 @@
 from django.contrib import admin
-from reservas.models import Espacio, Reserva
-
+from reservas.models import *
 # Register your models here.
-admin.site.register(Espacio)
-admin.site.register(Reserva)
+
+class UsuarioAdmin(admin.ModelAdmin):
+    fields = [
+        'username',
+        'email',
+        'ubicacion',
+        'piso',
+        'is_active',
+        'is_staff',
+        'groups',
+        'user_permissions',
+    ]
+    filter_horizontal = ('groups', 'user_permissions')
+
+admin.site.register(Usuario, UsuarioAdmin)
+admin.site.register([Espacio,  Ubicacion, Reserva])
+
