@@ -10,7 +10,7 @@ from reservas.library.mixins.list_helpers import AutoFilterMixin, ColumnsMixin
 
 class UsuarioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, ListView):
     model = User
-    permission_required = 'auth.view_user'
+    permission_required = 'reservas.view_usuario'
     template_name = 'table_view.html'
     paginate_by = 10
 

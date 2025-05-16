@@ -1,96 +1,42 @@
-{% load compress %}
-{% load static %}
+{% load compress %} {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reservas App</title>
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'src/output.css' %}">
-    {% endcompress %}
-  </head>
-  <body class="neutral-color flex flex-col min-h-screen">
-    {% load static %}
-<nav class="navbar bg-white shadow">
-  <div class="navbar-container">
-    <div class="navbar-inner flex justify-between items-center">
-      <div class="navbar-brand flex items-center">
-        <img src="https://www.southcharlottefamilycounseling.com/wp-content/uploads/2015/10/cropped-logo-dummy.png"
-             alt="Logo" class="navbar-logo h-10 w-10 mr-2" />
-        <a href="/" class="navbar-title text-xl font-bold text-gray-800">Reservas</a>
-      </div>
 
-      <div class="navbar-links flex items-center space-x-4">
-        {% if user.is_authenticated %}
-          <a href="{% url 'dashboard' %}" class="navbar-link text-gray-600 hover:text-gray-800">Inicio</a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservas CANTV</title>
+  {% compress css %}
+  <link rel="stylesheet" href="{% static 'src/output.css' %}" />
+  {% endcompress %}
+</head>
 
-          {% for model, perms in dashboard_access.items %}
-            {% comment %} Solo mostrar si tiene al menos un permiso relevante {% endcomment %}
-            {% if perms %}
-              <div class="relative group">
-                <button type="button"
-                        class="navbar-link inline-flex items-center text-gray-600 hover:text-gray-800 focus:outline-none">
-                  {{ model|capfirst }}
-                  <svg class="ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                       viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+<body class="neutral-color flex flex-col min-h-screen">
+  <c-navbar.principal
+    logo='https://upload.wikimedia.org/wikipedia/commons/c/c7/Cantv_logo.PNG'
+    title=" Reservas" :dashboard_access=dashboard_access />
 
-                <div class="absolute left-0 mt-2 w-44 bg-white border border-gray-200 rounded-md shadow-lg
-                            opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                  {% if 'view' in perms or 'change' in perms or 'delete' in perms %}
-                    <a href="{% url model %}"
-                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Gestionar {{ model|capfirst }}
-                    </a>
-                  {% endif %}
-                  {% if 'add' in perms %}
-                    <a href="{% url model|add:'_create' %}"
-                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Crear {{ model|capfirst }}
-                    </a>
-                  {% endif %}
-                </div>
-              </div>
-            {% endif %}
-          {% endfor %}
-
-          <a href="{% url 'logout' %}" class="navbar-link text-gray-600 hover:text-gray-800">
-            Cerrar sesión
-          </a>
-        {% else %}
-          <a href="{% url 'login' %}" class="navbar-link text-gray-600 hover:text-gray-800">
-            Iniciar sesión
-          </a>
-        {% endif %}
-      </div>
-    </div>
+  <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
+    {% block content %} {% endblock %}
   </div>
-</nav>
 
-
-    <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
-      {% block content %}
-
-      {% endblock %}
-    </div>
-
-    <footer class="navbar bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex justify-between items-center">
-          <p class="text-gray-600 text-sm">&copy; 2025 Reservas App. Todos los derechos reservados.</p>
-          <div class="flex space-x-4">
-            <a href="#" class="navbar-link">Política de privacidad</a>
-            <a href="#" class="navbar-link">Términos de servicio</a>
-            <a href="#" class="navbar-link">Contacto</a>
-          </div>
+  <footer class="navbar bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex justify-between items-center">
+        <p class="text-gray-600 text-sm">
+          &copy; 2025 Reservas App. Todos los derechos reservados.
+        </p>
+        <div class="flex space-x-4">
+          <a href="#" class="navbar-link">Política de privacidad</a>
+          <a href="#" class="navbar-link">Términos de servicio</a>
+          <a href="#" class="navbar-link">Contacto</a>
         </div>
       </div>
-    </footer>
+    </div>
+  </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-  </body>
+  <!-- Alpine.js (deferred para que no bloquee el parseo del HTML) -->
+  <script  src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+
 </html>

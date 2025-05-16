@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_cotton',
     'django_filters',
     'widget_tweaks',
     'compressor',
@@ -146,7 +147,7 @@ AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = 'login/'
-LOGOUT_REDIRECT_URL = '/login/'
+LOGOUT_REDIRECT_URL = '/dashboard'
 
 
 

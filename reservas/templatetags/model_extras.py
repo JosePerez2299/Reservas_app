@@ -13,3 +13,11 @@ def get_model_fields(model, exclude=None):
 @register.filter
 def get_attr(obj, attr_name):
     return getattr(obj, attr_name)
+
+
+@register.filter
+def get_attr(obj, attr_name):
+    return getattr(obj, attr_name)
+
+
+

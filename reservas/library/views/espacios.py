@@ -11,7 +11,7 @@ class EspacioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, Li
     model = Espacio
     permission_required = 'reservas.view_espacio'
     template_name = 'table_view.html'
-    paginate_by = 50
+    paginate_by = 15
 
     list_display = [
         ('nombre', 'Nombre'),        
