@@ -28,6 +28,12 @@ class EspacioCreateView(PermissionRequiredMixin, SuccessMessageMixin, CreateView
     fields = ['nombre', 'ubicacion', 'piso','capacidad', 'tipo']
     success_url = reverse_lazy('espacio')
     success_message = "¡El espacio fue creado con éxito!"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Añade el nombre del modelo al contexto
+        context['model_name'] = self.model.__name__
+        return context
 
     def form_invalid(self, form):
         messages.error(self.request, "Hubo un error al crear el espacio. Por favor, verifica los datos.")

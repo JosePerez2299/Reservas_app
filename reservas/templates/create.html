@@ -1,12 +1,22 @@
-{% extends "template.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Create New Item</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Create</button>
-    </form>
+  <h2>Create New Item</h2>
+  <form method="post">
+    {% csrf_token %}
+
+    {% for field in form.visible_fields %}
+      {% with
+        input_type=field.field.widget.input_type
+        widget_attrs="name='{{ field.html_name }}' id='{{ field.id_for_label }}' value='{{ field.value|default_if_none:'' }}' placeholder='{{ field.field.widget.attrs.placeholder|default_if_none:'' }}'"
+      %}
+        {{input_type}}
+      {% endwith %}
+  {% endfor %}
+  
+
+    <button type="submit" class="btn btn-primary mt-4">Create</button>
+  </form>
 </div>
 {% endblock %}
