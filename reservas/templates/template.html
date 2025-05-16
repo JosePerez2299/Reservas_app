@@ -12,28 +12,16 @@
 </head>
 
 <body class="neutral-color flex flex-col min-h-screen">
-  <c-navbar.principal
+  <c-nav_main
     logo='https://upload.wikimedia.org/wikipedia/commons/c/c7/Cantv_logo.PNG'
-    title=" Reservas" :dashboard_access=dashboard_access />
+    title=" Reservas" :dashboard_access=dashboard_access 
+  />
 
   <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
     {% block content %} {% endblock %}
   </div>
 
-  <footer class="navbar bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <div class="flex justify-between items-center">
-        <p class="text-gray-600 text-sm">
-          &copy; 2025 Reservas App. Todos los derechos reservados.
-        </p>
-        <div class="flex space-x-4">
-          <a href="#" class="navbar-link">Política de privacidad</a>
-          <a href="#" class="navbar-link">Términos de servicio</a>
-          <a href="#" class="navbar-link">Contacto</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <c-footer></c-footer>
 
   <!-- Alpine.js (deferred para que no bloquee el parseo del HTML) -->
   <script  src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
