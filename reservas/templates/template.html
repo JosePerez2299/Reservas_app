@@ -12,10 +12,8 @@
 </head>
 
 <body class="neutral-color flex flex-col min-h-screen">
-  <c-nav_main
-    logo='https://upload.wikimedia.org/wikipedia/commons/c/c7/Cantv_logo.PNG'
-    title=" Reservas" :dashboard_access=dashboard_access 
-  />
+  <c-nav_main logo='https://upload.wikimedia.org/wikipedia/commons/c/c7/Cantv_logo.PNG' title=" Reservas"
+    :dashboard_access=dashboard_access />
 
   <div class="flex-grow container max-w-6xl mx-auto p-8 sm:px-6 lg:px-8">
     {% block content %} {% endblock %}
@@ -24,7 +22,7 @@
   <c-footer></c-footer>
 
   <!-- Alpine.js (deferred para que no bloquee el parseo del HTML) -->
-  <script  src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 
 </html>
