@@ -1,31 +1,16 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
+  <div x-data="{ showModal: false, formData: {} }"  class=" max-w-1/3  mx-auto rounded-lg overflow-hidden shadow-lg">
 
-{% for field in filter.form %}
-<div class="flex flex-col">
-  <label for="{{ field.id_for_label }}" class="mb-1 text-sm font-medium text-gray-700">{{ field.label }}</label>
-  {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" }}
-</div>
-{% endfor %}
-  <div x-data="{ showModal: false, formData: {} }"  class=" bg-white max-w-1/3 mx-auto border rounded-lg overflow-hidden shadow-lg">
-
-    <h2 class="p-4 bg-gray-800 text-white ">Crear Nuevo Item</h2>
+    <h2 class="p-4 bg-blue-900 text-white ">Crear Nuevo Item</h2>
     
+    <form x-ref='createForm' @submit.prevent="showModal = true" method="post" method="post" class=" bg-blue-50 p-4 flex flex-col gap-4">
 
-    <form x-ref='createForm' @submit.prevent="showModal = true" method="post" method="post" class="flex flex-col gap-4">
-
-
-    {% csrf_token %}
-    
-    {% for field in form.visible_fields %}
-
-      <c-input :field='{{field}}' class="p-2"></c-input>
-    
-  
-    {% endfor %}
-  
+      {% csrf_token %}
+       {{form|crispy}}
   
     <button type="submit" class="btn btn-primary mt-4">Crear</button>
   </form>
@@ -34,12 +19,7 @@
   <template x-if="showModal">
     <c-modal title="Estas seguro?" refSubmmit = "$refs.createForm.submit()" confirmText="AAA" refClose= "showModal = false">
       <c-slot name="content">
-        {% for field in form.visible_fields %}
-
-        <c-input :field='{{field}}'></c-input>
-      
-    
-      {% endfor %}
+          <h1> MOSTRAR CONTENIDO</h1>
       </c-slot>
     </c-modal>
   </template>

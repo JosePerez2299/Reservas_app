@@ -25,12 +25,14 @@
     --color-teal-200: #99F6E4;
     --color-blue-50: #EFF6FF;
     --color-blue-100: #DBEAFE;
+    --color-blue-200: #BFDBFE;
     --color-blue-300: #93C5FD;
     --color-blue-400: #60A5FA;
     --color-blue-500: #3B82F6;
     --color-blue-600: #2563EB;
     --color-blue-700: #1D4ED8;
     --color-blue-800: #1E40AF;
+    --color-blue-900: #1E3A8A;
     --color-blue-950: oklch(28.2% 0.091 267.935);
     --color-slate-600: oklch(44.6% 0.043 257.281);
     --color-gray-50: #F9FAFB;
@@ -621,8 +623,23 @@
   .bg-blue-50 {
     background-color: var(--color-blue-50);
   }
+  .bg-blue-100 {
+    background-color: var(--color-blue-100);
+  }
+  .bg-blue-200 {
+    background-color: var(--color-blue-200);
+  }
+  .bg-blue-400 {
+    background-color: var(--color-blue-400);
+  }
   .bg-blue-600 {
     background-color: var(--color-blue-600);
+  }
+  .bg-blue-800 {
+    background-color: var(--color-blue-800);
+  }
+  .bg-blue-900 {
+    background-color: var(--color-blue-900);
   }
   .bg-gray-100 {
     background-color: var(--color-gray-100);

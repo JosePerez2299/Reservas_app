@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
+{% load crispy_forms_tags %}
 {% load model_extras %}
+
 {% load widget_tweaks %}
 {% load querystring %}
 
@@ -11,12 +13,14 @@
   <!-- Filtros -->
   <form method="get" class="w-full md:w-1/4 space-y-4 bg-white p-4 rounded-lg shadow">
     <h2 class="text-lg font-semibold mb-2 text-gray-700">Filtros</h2>
-    {% for field in filter.form %}
+
+    {{filter.form|crispy}}
+    {% comment %} {% for field in filter.form %}
       <div class="flex flex-col">
         <label for="{{ field.id_for_label }}" class="mb-1 text-sm font-medium text-gray-700">{{ field.label }}</label>
         {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" }}
       </div>
-    {% endfor %}
+    {% endfor %} {% endcomment %}
     <div class="pt-2 flex justify-around">
       <button type="submit" class="btn-primary">Filtrar</button>
       <a href="{{ request.path }}" class="btn-danger">Limpiar</a>
@@ -28,7 +32,7 @@
     <div class="w-full overflow-x-auto md:overflow-x-visible">
     
       <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden md:min-w-max">
-        <thead class="bg-gray-800 text-white text-sm uppercase">
+        <thead class="bg-gray-800 text-white text-sm">
           <tr>
             {% for col in cols %}
               <th class="px-4 py-2 text-left whitespace-nowrap">{{ col.verbose }}</th>
@@ -41,7 +45,10 @@
             <tr class="hover:bg-gray-50">
               {% for col in cols %}
                 <td class="px-4 py-2 text-sm text-gray-800 whitespace-nowrap">
-                  {{ obj|get_attr:col.name }}
+                  {% with value=obj|get_attr:col.name  %}
+
+                  {{value}}
+                  {% endwith %}
                 </td>
               {% endfor %}
               <!-- Celda de acciones -->
