@@ -1,11 +1,11 @@
 {# templates/components/c_input.html #}
 {% with input_type=field.field.widget.input_type %}
 
-<div>
+<div class={{class}}>
 
     <label
       for="{{ field.id_for_label }}"
-      class="block text-sm font-medium text-gray-700 capitalize mb-1"
+      class="  block text-sm font-medium text-gray-700 capitalize mb-1"
     >
       {{ field.name|capfirst }}
     </label>
@@ -14,12 +14,17 @@
       <select
         name="{{ field.html_name }}"
         id="{{ field.id_for_label }}"
-        class="block w-full border rounded shadow-sm px-3 py-2 focus:ring focus:ring-opacity-50 {% if field.errors %}border-red-500{% endif %}"
+        class=" bg-white  block w-full border rounded shadow-sm px-3 py-2 focus:ring focus:ring-opacity-50 
+        {% if field.errors %}
+        border-red-500
+        {% endif %}"
       >
         {% for value, label in field.field.choices %}
           <option
             value="{{ value }}"
-            {% if field.value|stringformat:"s" == value|stringformat:"s" %} selected{% endif %}
+            {% if field.value|stringformat:"s" == value|stringformat:"s" %}
+             selected
+            {% endif %}
           >
             {{ label }}
           </option>
@@ -34,7 +39,7 @@
         value="{{ field.value|default_if_none:'' }}"
         min="{{ field.field.min_value }}"
         {% if field.field.max_value is not None %} max="{{ field.field.max_value }}" {% endif %}
-        class="block w-full border rounded shadow-sm px-3 py-2 focus:outline-none focus:ring {% if field.errors %}border-red-500{% endif %}"
+        class=" bg-white block w-full border rounded shadow-sm px-3 py-2 focus:outline-none focus:ring {% if field.errors %}border-red-500{% endif %}"
       />
 
     {% else %}
@@ -44,12 +49,12 @@
         id="{{ field.id_for_label }}"
         value="{{ field.value|default_if_none:'' }}"
         placeholder="{{ field.field.widget.attrs.placeholder|default_if_none:'' }}"
-        class="block w-full border rounded shadow-sm px-3 py-2 focus:outline-none focus:ring {% if field.errors %}border-red-500{% endif %}"
+        class=" bg-white block w-full border rounded shadow-sm px-3 py-2 focus:outline-none focus:ring {% if field.errors %}border-red-500{% endif %}"
       />
     {% endif %}
 
     {% if field.errors %}
-      <p class="text-red-600 text-sm mt-1">
+      <p class=" bg-white text-red-600 text-sm mt-1">
         {{ field.errors|striptags }}
       </p>
     {% endif %}

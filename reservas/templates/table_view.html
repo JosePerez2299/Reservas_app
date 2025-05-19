@@ -22,13 +22,11 @@
       <a href="{{ request.path }}" class="btn-danger">Limpiar</a>
     </div>
   </form>
-  <div class="container mt-5 w-3/">
+
+  <!-- Tabla -->
+  <div class="container w-3/">
     <div class="w-full overflow-x-auto md:overflow-x-visible">
-      <div class="flex justify-between items-center text-sm text-gray-600 mb-2">
-        <span class="whitespace-nowrap">
-          Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
-        </span>
-      </div>
+    
       <table class="table-auto w-full bg-white shadow-md rounded-lg overflow-hidden md:min-w-max">
         <thead class="bg-gray-800 text-white text-sm uppercase">
           <tr>
@@ -67,7 +65,7 @@
     </div>
 
     <!-- Paginación -->
-    <nav aria-label="Page navigation example" class="w-full ">
+    <nav aria-label="Page navigation example" class="w-full mt-2 ">
       <ul class="flex flex-wrap justify-center w-full -space-x-px text-sm">
         <!-- Inicio/Anterior -->
         {% if page_obj.has_previous %}
