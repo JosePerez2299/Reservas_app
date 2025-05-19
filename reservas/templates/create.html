@@ -1,22 +1,29 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2>Create New Item</h2>
-  <form method="post">
+
+  <div class=" max-w-2xs mx-auto">
+
+    <h2 class="my-4">Crear Nuevo Item</h2>
+    
+
+    <form method="post" class="flex flex-col gap-4">
+
+
     {% csrf_token %}
-
+    
     {% for field in form.visible_fields %}
-      {% with
-        input_type=field.field.widget.input_type
-        widget_attrs="name='{{ field.html_name }}' id='{{ field.id_for_label }}' value='{{ field.value|default_if_none:'' }}' placeholder='{{ field.field.widget.attrs.placeholder|default_if_none:'' }}'"
-      %}
-        {{input_type}}
-      {% endwith %}
-  {% endfor %}
-  
 
-    <button type="submit" class="btn btn-primary mt-4">Create</button>
+      <c-input :field='{{field}}'></c-input>
+
+  
+    {% endfor %}
+  
+  
+    <button type="submit" class="btn btn-primary mt-4">Crear</button>
   </form>
-</div>
+  
+  </div>
+
+    
 {% endblock %}
