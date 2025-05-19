@@ -17,7 +17,8 @@ class EspacioListView(PermissionRequiredMixin, AutoFilterMixin, ColumnsMixin, Li
         ('nombre', 'Nombre'),        
         ('tipo', 'Tipo'),
         ('capacidad', 'Capacidad'),
-        ('ubicacion', 'Ubicación'),  # Cambiado para mostrar la clave foránea
+        ('ubicacion', 'Ubicación'),
+        ('piso', 'Piso'),  
         ('disponible', 'Disponible'),
     ]
 
