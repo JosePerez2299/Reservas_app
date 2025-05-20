@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'crispy_forms',
-    "crispy_tailwind",
+    'crispy_tailwind',
     'django_cotton',
     'django_filters',
     'widget_tweaks',

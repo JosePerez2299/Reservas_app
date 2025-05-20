@@ -2,6 +2,7 @@
 import django_filters
 from django.db import models
 from django.utils.text import capfirst
+import django_filters.widgets
 
 def create_generic_filterset(model, include_fields=None, exclude_fields=None):
     """
@@ -19,11 +20,18 @@ def create_generic_filterset(model, include_fields=None, exclude_fields=None):
             continue
 
         if isinstance(field, (models.CharField, models.TextField)):
-            filter_fields[field.name] = django_filters.CharFilter(
-                field_name=field.name,
-                lookup_expr='icontains',
-                label=capfirst(field.verbose_name)
-            )
+            if field.choices:  # Si tiene choices definidos
+                filter_fields[field.name] = django_filters.ChoiceFilter(
+                    field_name=field.name,
+                    choices=field.choices,
+                    label=capfirst(field.verbose_name)
+                )
+            else:
+                filter_fields[field.name] = django_filters.CharFilter(
+                    field_name=field.name,
+                    lookup_expr='icontains',
+                    label=capfirst(field.verbose_name)
+                )
         elif isinstance(field, (models.BooleanField,)):
             filter_fields[field.name] = django_filters.BooleanFilter(
                 field_name=field.name,
@@ -33,7 +41,13 @@ def create_generic_filterset(model, include_fields=None, exclude_fields=None):
         elif isinstance(field, (models.IntegerField, models.FloatField, models.DecimalField)):
             filter_fields[field.name] = django_filters.RangeFilter(
                 field_name=field.name,
-                label=capfirst(field.verbose_name)
+                label=capfirst(field.verbose_name),
+                widget=django_filters.widgets.RangeWidget(
+                    attrs=[ 
+                        {'type': 'number', 'class': 'form-control', 'placeholder': 'Desde'},
+                        {'type': 'number', 'class': 'form-control', 'placeholder': 'Hasta'},
+                    ]
+                )
             )
         elif isinstance(field, models.DateField):
             filter_fields[field.name] = django_filters.DateFromToRangeFilter(
