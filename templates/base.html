@@ -2,64 +2,103 @@
 {% load crispy_forms_tags %}
 
 <!DOCTYPE html>
-<html lang="en" x-data="themeSwitcher()" 
-x-init="init()" 
->
+<html lang="en" x-data="themeSwitcher()" x-init="init()">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas CANTV</title>
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'src/css/output.css' %}" />
+    {% endcompress %}
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reservas CANTV</title>
-  {% compress css %}
-  <link rel="stylesheet" href="{% static 'src/css/output.css' %}" />
-  {% endcompress %}
-</head>
+  <body class="flex flex-col min-h-screen">
+    <div class="drawer">
+      <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col">
+        <!-- Navbar -->
+        <div class="navbar bg-base-300 w-full">
+          <div class="flex-none lg:hidden">
+            <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-6 w-6 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </label>
+          </div>
+          <div class="mx-2 flex-1 px-2">
+            <div>
+              <a href="{% url 'dashboard' %}" class="inline-block transition-transform duration-300 hover:scale-110">{% include 'includes/logo.html' %}</a>
+            </div>
+          </div>
+          <div class="hidden flex-none lg:block">
+            <ul class="menu menu-horizontal">
+              <!-- Navbar menu content here -->
+              <li>
+                <a>Navbar Item 1</a>
+              </li>
+              <li>
+                <a>Navbar Item 2</a>
+              </li>
+              <li>
+                {% include 'includes/switch_theme.html' %}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- Page content here -->
+        {% block content %}
+        {% endblock %}
+      </div>
+      <div class="drawer-side">
+        <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+        <ul class="menu bg-base-200 min-h-full w-80 p-4">
+          <!-- Sidebar content here -->
+          <li>
+            {% include 'includes/switch_theme.html' %}
+          </li>
+          <li>
+            <a>Sidebar Item 1</a>
+          </li>
+          <li>
+            <a>Sidebar Item 2</a>
+          </li>
+        </ul>
+      </div>
+    </div>
 
-<body class="flex flex-col min-h-screen">
-
-    {# INCLUIDO: navbar #}
-    {% include 'includes/navbar.html' %}
-  
-    {# CONTENIDO PRINCIPAL #}
-    <main class="flex-grow container mx-auto p-6">
-      {% block content %}{% endblock %}
-    </main>
-
-<script>
-  function themeSwitcher() {
-    return {
-      // usamos booleano para simplificar el binding con el checkbox
-      dark: localStorage.getItem('theme') === 'dark',
-
-      init() {
-        // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
-        this.applyTheme(this.dark);
-      },
-
-      toggle() {
-        // invocado al hacer click sobre el swap
-        console.log(this.dark);
-        this.dark = !this.dark;
-        this.applyTheme(this.dark);
-      },
-
-      applyTheme(isDark) {
-        // ponemos el atributo data-theme que DaisyUI utiliza
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        // guardamos la preferencia
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    <script>
+      function themeSwitcher() {
+        return {
+          // usamos booleano para simplificar el binding con el checkbox
+          dark: localStorage.getItem('theme') === 'dark',
+      
+          init() {
+            // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
+            this.applyTheme(this.dark)
+          },
+      
+          toggle() {
+            // invocado al hacer click sobre el swap
+            console.log(this.dark)
+            this.dark = !this.dark
+            this.applyTheme(this.dark)
+          },
+      
+          applyTheme(isDark) {
+            // ponemos el atributo data-theme que DaisyUI utiliza
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+            // guardamos la preferencia
+            localStorage.setItem('theme', isDark ? 'dark' : 'light')
+          }
+        }
       }
-    }
-  }
-</script>
+    </script>
 
-<!-- Alpine Plugins -->
-<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
- 
-<!-- Alpine Core -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
 
-</body>
-
+    <!-- Alpine Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  </body>
 </html>
