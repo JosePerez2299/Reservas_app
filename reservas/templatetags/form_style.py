@@ -6,43 +6,45 @@ register = template.Library()
 
 @register.filter(name='mystyle')
 def mystyle(form):
-    output = ""
+    non_field_errors = "".join(
+        [f"<div class='alert alert-error text-sm mb-4'>{e}</div>" for e in form.non_field_errors()]
+    )
+    output = non_field_errors
 
     for field in form.visible_fields():
-        # Detectar tipo de widget
         widget = field.field.widget
 
         if isinstance(widget, Textarea):
-            css_class = "textarea w-full"
+            css_class = "textarea textarea-bordered w-full"
         elif isinstance(widget, CheckboxInput):
             css_class = "checkbox"
         elif isinstance(widget, Select):
-            css_class = "select w-full"
+            css_class = "select select-bordered w-full"
         elif isinstance(widget, PasswordInput):
-            css_class = "input input-bordered w-full"  # Puedes agregar estilos especiales si quieres
+            css_class = "input input-bordered w-full"
         else:
             css_class = "input input-bordered w-full"
 
-        # Errors
-        errors = "".join([f"<div class='text-error text-sm mt-1'>{e}</div>" for e in field.errors])
+        help_text = f"<label class='label-text-alt text-sm text-base-content'>{field.help_text}</label>" if field.help_text else ""
 
-        # Help text
-        help_text = f"<p class='label text-xs text-base-content/70 mt-1'>{field.help_text}</p>" if field.help_text else ""
+        error_html = "".join(
+            [f"<div class='text-error text-sm mt-1'>{e}</div>" for e in field.errors]
+        )
 
-        # Widget con estilos
         widget_html = field.as_widget(attrs={
             "class": css_class,
             "id": field.auto_id,
-            "placeholder": field.label
         })
 
         output += f"""
-        <fieldset class="fieldset mb-4">
-            <legend class="fieldset-legend text-sm font-semibold text-base-content">{field.label}</legend>
+        <div class="form-control mb-4">
+            <label class="label">
+                <span class="label-text font-semibold text-base-content">{field.label}</span>
+            </label>
             {widget_html}
             {help_text}
-            {errors}
-        </fieldset>
+            {error_html}
+        </div>
         """
 
     return mark_safe(output)

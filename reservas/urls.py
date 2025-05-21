@@ -7,7 +7,6 @@ from reservas.library.views.espacios import *
 urlpatterns = [
     path('', Login.as_view(), name='home'),
     path('login/', Login.as_view(), name='login'),
-    path('signup/', Signup.as_view(), name='signup'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
