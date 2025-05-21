@@ -15,17 +15,17 @@ def mystyle(form):
         widget = field.field.widget
 
         if isinstance(widget, Textarea):
-            css_class = "textarea textarea-bordered w-full"
+            css_class = "textarea neutral input-sm w-full"
         elif isinstance(widget, CheckboxInput):
             css_class = "checkbox"
         elif isinstance(widget, Select):
-            css_class = "select select-bordered w-full"
+            css_class = "select neutral input-sm w-full"
         elif isinstance(widget, PasswordInput):
-            css_class = "input input-bordered w-full"
+            css_class = "input neutral input-sm w-full"
         else:
-            css_class = "input input-bordered w-full"
+            css_class = "input neutral input-sm w-full"
 
-        help_text = f"<label class='label-text-alt text-sm text-base-content'>{field.help_text}</label>" if field.help_text else ""
+        help_text = f"<label class='label-text-alt text-sm text-'>{field.help_text}</label>" if field.help_text else ""
 
         error_html = "".join(
             [f"<div class='text-error text-sm mt-1'>{e}</div>" for e in field.errors]
@@ -39,7 +39,7 @@ def mystyle(form):
         output += f"""
         <div class="form-control mb-4">
             <label class="label">
-                <span class="label-text font-semibold text-base-content">{field.label}</span>
+                <span class="label-text text-xs font-semibold text-base-content">{field.label}</span>
             </label>
             {widget_html}
             {help_text}

@@ -1,12 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-  {% comment %} <h1 class="text-2xl font-bold text-center mb-8">Panel de {{ group }}</h1>
+{% extends 'base.html' %} 
 
-  <h2 class="text-center">Bienvenido, {{ request.user.username }}</h2>
-  <div class="mx-auto max-w-xl px-4 text-center p-10 bg-amber-50">
-    {% lorem 1 b random %}
-  </div>
-
-  <h1 class="text-2xl font-bold text-center mb-8">Panel de {{ group }}</h1> {% endcomment %}
+{% block content %}
 
   <div class="hero h-[calc(100vh-4rem)] bg-cover bg-center" style="background-image: url('https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp');">
     <div class="hero-overlay"></div>

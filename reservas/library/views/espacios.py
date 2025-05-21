@@ -22,7 +22,6 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',
-            'tipo': 'Tipo',
             'capacidad': 'Capacidad',
             'piso': 'Piso',
             'disponible': 'Disponible',
