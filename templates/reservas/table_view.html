@@ -4,14 +4,14 @@
 {% load model_extras %}
 {% load widget_tweaks %}
 {% load querystring %}
+{% load form_style %}
 
 {% block content %}
 
 <div class="container mx-auto px-4 py-6">
-  <!-- Usando el componente FilterableTable de Django Cotton -->
+  <!-- Usando la plantilla de tabla personalizada -->
   <div class="w-full">
-    <h1>hola</h1>
-    <c-filterable :object_list='{{object_list}}' :cols='{{cols}}' :filter='{{filter}}' model_name_lower='{{model_name_lower}}' :page_obj='{{page_obj}}'/>
+    {% include 'includes/table.html' %}
   </div>
 </div>
 

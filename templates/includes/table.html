@@ -1,6 +1,7 @@
 {% load model_extras %}
 {% load querystring %}
 {% load widget_tweaks %}
+{% load form_style %}
 
 <div class="w-full" x-data="{ showFilters: false }">
   <form method="get">
@@ -40,16 +41,7 @@
         class="mt-2 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-lg"
       >
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {% for col in cols %}
-            {% with field=filter.form|get_field_by_name:col %}
-              {% if field %}
-              <div class="space-y-1">
-                <label class="block text-sm font-semibold text-gray-700">{{ col }}</label>
-                {{ field|add_class:'w-full px-4 py-2 text-gray-800 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150' }}
-              </div>
-              {% endif %}
-            {% endwith %}
-          {% endfor %}
+          {{ filter.form|mystyle }}
         </div>
         
         <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end space-x-3">

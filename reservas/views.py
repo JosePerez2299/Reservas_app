@@ -4,10 +4,12 @@ from django.views.generic import TemplateView
 from reservas.library.views.auth import SignupView
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginMixin
 from django.contrib import messages
+from reservas.library.forms.login import LoginForm
 
 class Login(LoginView):
-    template_name = 'auth/login.html'
+    template_name = 'reservas/login.html'
     redirect_authenticated_user = True
+    authentication_form = LoginForm
 
 
     # TO DO MEJORAR

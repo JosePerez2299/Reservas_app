@@ -1,9 +1,31 @@
 {
   "devDependencies": {
-    "@tailwindcss/cli": "^4.1.6",
-    "tailwindcss": "^4.1.6"
+    "@tailwindcss/cli": "^4.1.7",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^5.0.35",
+    "tailwindcss": "^4.1.7"
   },
   "dependencies": {
     "flowbite": "^3.1.2"
-  }
+  },
+  "name": "reservas_app",
+  "version": "1.0.0",
+  "description": "Esta aplicación está desarrollada en Django y permite gestionar reservas de espacios. Tiene distintos roles (usuario, admin, moderador) que pueden reservar y administrar salas.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "npx tailwindcss -i ./static/src/css/input.css -o ./static/src/css/output.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JosePerez2299/Reservas_app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JosePerez2299/Reservas_app/issues"
+  },
+  "homepage": "https://github.com/JosePerez2299/Reservas_app#readme"
 }

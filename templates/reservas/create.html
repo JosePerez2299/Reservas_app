@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load form_filters %}
 
 {% block content %}
 
@@ -10,20 +11,10 @@
     <form x-ref='createForm' @submit.prevent="showModal = true" method="post" method="post" class=" bg-blue-50 p-4 flex flex-col gap-4">
 
       {% csrf_token %}
-       {{form|crispy}}
-  
+       {{form|mystyle}}
+      
     <button type="submit" class="btn btn-primary mt-4">Crear</button>
   </form>
-
-
-  <template x-if="showModal">
-    <c-modal title="Estas seguro?" refSubmmit = "$refs.createForm.submit()" confirmText="AAA" refClose= "showModal = false">
-      <c-slot name="content">
-          <h1> MOSTRAR CONTENIDO</h1>
-      </c-slot>
-    </c-modal>
-  </template>
-  
   </div>
 
     
