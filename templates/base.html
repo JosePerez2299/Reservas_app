@@ -32,13 +32,27 @@
           </div>
           <div class="hidden flex-none lg:block">
             <ul class="menu menu-horizontal">
-              <!-- Navbar menu content here -->
-              <li>
-                <a>Navbar Item 1</a>
-              </li>
-              <li>
-                <a>Navbar Item 2</a>
-              </li>
+              {% if request.user.is_authenticated %}
+                <li>
+                  <a href="{% url 'dashboard' %}">Inicio</a>
+                </li>
+
+                {# Dropdowns por cada modelo con permisos #}
+                {% for model, perms in dashboard_access.items %}
+                  <li>
+                    <a href="{% url model %}">{{ model|capfirst }}s</a>
+                  </li>
+                {% endfor %}
+
+                {# Cerrar sesión #}
+                <li>
+                  <a url="{% url 'dashboard' %}">Cerrar sesión</a>
+                </li>
+              {% else %}
+                {# Si no está autenticado, sólo “Iniciar sesión” #}
+                <a url="{% url 'dashboard' %}">Iniciar sesión</a>
+              {% endif %}
+
               <li>
                 {% include 'includes/switch_theme.html' %}
               </li>
@@ -47,21 +61,47 @@
         </div>
         <!-- Page content here -->
         {% block content %}
+
         {% endblock %}
       </div>
+
+      <!-- Sidebar -->
       <div class="drawer-side">
         <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+
         <ul class="menu bg-base-200 min-h-full w-80 p-4">
+          <li>
+            <h1>Panel de aministrador</h1>
+
+          </li>
           <!-- Sidebar content here -->
+          {% if request.user.is_authenticated %}
           <li>
-            {% include 'includes/switch_theme.html' %}
+            <a href="{% url 'dashboard' %}">Inicio</a>
           </li>
+
+          {# Dropdowns por cada modelo con permisos #}
+          {% for model, perms in dashboard_access.items %}
+            <li>
+              <a href="{% url model %}">{{ model|capfirst }}s</a>
+            </li>
+          {% endfor %}
+
+          {# Cerrar sesión #}
           <li>
-            <a>Sidebar Item 1</a>
+            <a url="{% url 'dashboard' %}">Cerrar sesión</a>
           </li>
+
+
           <li>
-            <a>Sidebar Item 2</a>
+
+              {% include 'includes/switch_theme.html' %}
+
           </li>
+        {% else %}
+          {# Si no está autenticado, sólo “Iniciar sesión” #}
+          <a url="{% url 'dashboard' %}">Iniciar sesión</a>
+        {% endif %}
         </ul>
       </div>
     </div>
