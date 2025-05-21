@@ -47,12 +47,9 @@ class EspacioFilter(django_filters.FilterSet):
     
     disponible = django_filters.BooleanFilter(
         field_name='disponible',
-        label='Disponible',
-        widget=django_filters.widgets.forms.CheckboxInput(attrs={
-            'class': 'rounded text-blue-600 focus:ring-blue-500',
-        })
+        widget=django_filters.widgets.BooleanWidget()
     )
-    
+
     class Meta:
         model = Espacio
         fields = ['tipo']  # El campo tipo se manejará por defecto

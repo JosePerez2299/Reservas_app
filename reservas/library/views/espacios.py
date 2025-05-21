@@ -13,7 +13,8 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
     model = Espacio
     permission_required = 'reservas.view_espacio'
     template_name = 'reservas/table_view.html'
-    paginate_by = 15
+    ordering = ['nombre']
+    paginate_by = 10
     filterset_class = EspacioFilter
 
     def get_context_data(self, **kwargs):
