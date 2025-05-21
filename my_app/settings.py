@@ -31,9 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'crispy_forms',
-    'crispy_tailwind',
-    'django_cotton',
     'django_filters',
     'widget_tweaks',
     'compressor',
@@ -46,9 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 
-CRISPY_TEMPLATE_PACK = "tailwind"
 COMPRESS_ROOT = BASE_DIR / 'static'
 
 COMPRESS_ENABLED = False

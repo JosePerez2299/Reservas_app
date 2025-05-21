@@ -2,6 +2,4 @@ django==5.2
 django-filter
 django-widget-tweaks
 django-compressor
-django-crispy-forms
-crispy-tailwind
-django-cotton
+
