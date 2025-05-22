@@ -1,16 +1,6 @@
-{% extends "includes/modal.html" %}
 {% load form_style %}
-{% block modal_content %}
-<form method="post">
-    {% csrf_token %}
-    {{ form|mystyle }}
-  
-    <div class="modal-action justify-end space-x-2">
-      <!-- botón de cerrar: usando JS para cerrar o href -->
-      <button method="dialog" type="button" class="btn btn-ghost" onclick="document.getElementById('{{ modal_id }}').close()">Cancelar</button>
-      <!-- botón de submit -->
-      <button type="submit" class="btn btn-primary">Guardar</button>
-      
-    </div>
-  </form>
+{% block content %}
+{% url 'espacio_create' as url %}
+{% include 'includes/modal.html' with button_class='btn btn-primary' button_text='Abrir Dashboarssd' modal_id='modal_dashboard' content_url=url%}
+
 {% endblock %}
