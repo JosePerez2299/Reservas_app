@@ -60,8 +60,9 @@
     </button>
     
     <!-- Modal -->
-    {% include 'includes/modal.html' with modal_id="my_modal_1" title="Título" description="Descssripción" button_text="Añadir" close_text="Cerrar" %}
-    
+    {% include 'includes/create.html' with modal_id="my_modal_1" title="Título" description="Descssripción" content="prueba" button_text="Añadir" form=form close_text="Cerrar" %}
+  
+
     <!-- Filtros -->
     <button @click="showFilters = !showFilters" class="btn btn-xs btn-info flex  items-center justify-center space-y-1">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

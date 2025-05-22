@@ -1,7 +1,7 @@
 {% load compress %} {% load static %}
 
 <!DOCTYPE html>
-<html lang="en"  x-data="themeSwitcher()" x-init="init()">
+<html lang="en" x-data="themeSwitcher()" x-init="init()">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,26 +45,26 @@
 
                 {# Cerrar sesión #}
                 <li>
-                  <a url="{% url 'dashboard' %}">Cerrar sesión</a>
+                  <a href="{% url 'logout' %}">Cerrar sesión</a>
                 </li>
               {% else %}
                 {# Si no está autenticado, sólo “Iniciar sesión” #}
-                <a url="{% url 'dashboard' %}">Iniciar sesión</a>
+                <li>
+                  <a href="{% url 'login' %}">Iniciar sesión</a>
+                </li>
               {% endif %}
-
-              <li>
-                {% include 'includes/switch_theme.html' %}
-              </li>
+                <li>
+                  {% include 'includes/switch_theme.html' %}
+                </li>
             </ul>
           </div>
         </div>
         <!-- Page content here -->
         <div>
-        {% block content %}
-          
-        {% endblock %}
-        </div>
+          {% block content %}
 
+          {% endblock %}
+        </div>
       </div>
 
       <!-- Sidebar -->
@@ -73,41 +73,34 @@
 
         <ul class="menu bg-base-200 min-h-full w-80 p-4">
           <li class="menu-title text-base-content">
-            <p>
-            Panel de {{group}}
-
-            </p>
-
+            <p>Panel de {{ group }}</p>
           </li>
           <div class="divider"></div>
           <!-- Sidebar content here -->
           {% if request.user.is_authenticated %}
-          <li>
-            <a href="{% url 'dashboard' %}">Inicio</a>
-          </li>
-
-          {# Dropdowns por cada modelo con permisos #}
-          {% for model, perms in dashboard_access.items %}
             <li>
-              <a href="{% url model %}">{{ model|capfirst }}s</a>
+              <a href="{% url 'dashboard' %}">Inicio</a>
             </li>
-          {% endfor %}
 
-          {# Cerrar sesión #}
+            {# Dropdowns por cada modelo con permisos #}
+            {% for model, perms in dashboard_access.items %}
+              <li>
+                <a href="{% url model %}">{{ model|capfirst }}s</a>
+              </li>
+            {% endfor %}
+
+            {# Cerrar sesión #}
+            <li>
+              <a url="{% url 'logout' %}">Cerrar sesión</a>
+            </li>
+          {% else %}
+            <li>
+              <a href="{% url 'login' %}">Iniciar sesión</a>
+            </li>
+          {% endif %}
           <li>
-            <a url="{% url 'dashboard' %}">Cerrar sesión</a>
+            {% include 'includes/switch_theme.html' %}
           </li>
-
-
-          <li>
-
-              {% include 'includes/switch_theme.html' %}
-
-          </li>
-        {% else %}
-          {# Si no está autenticado, sólo “Iniciar sesión” #}
-          <a url="{% url 'dashboard' %}">Iniciar sesión</a>
-        {% endif %}
         </ul>
       </div>
     </div>
@@ -125,7 +118,6 @@
       
           toggle() {
             // invocado al hacer click sobre el swap
-            console.log(this.dark)
             this.dark = !this.dark
             this.applyTheme(this.dark)
           },

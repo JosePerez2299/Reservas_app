@@ -5,9 +5,9 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.views import FilterView
-from django.db import models
 from reservas.library.filters.espacio import EspacioFilter
 from django.utils.translation import gettext_lazy as _
+from reservas.library.forms.espacios import EspacioCreateForm
 
 class EspacioListView(PermissionRequiredMixin, FilterView):
     model = Espacio
@@ -19,6 +19,7 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['form'] = EspacioCreateForm()
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',
@@ -27,7 +28,6 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
             'disponible': 'Disponible',
         }
         return ctx
-
 
 
 class EspacioCreateView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):

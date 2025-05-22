@@ -1,23 +1,47 @@
 {% comment %} Componente modal genérico {% endcomment %}
 {% load static %}
 <dialog id="{{ modal_id }}" class="modal">
-    <div class="modal-box">
-      <h3 class="text-lg font-bold">{{ title }}</h3>
-      <p class="py-4">{{ description }}</p>
+  <div class="modal-box">
+    <!-- Botón de cierre en esquina superior derecha -->
+    <form method="dialog" class="absolute right-4 top-4">
+      <button class="btn btn-sm btn-circle btn-ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </form>
+    
+    <!-- Título y descripción -->
+    {% if title %}
+      <h3 class="text-lg text-base-content font-bold pr-6">{{ title }}</h3>
+    {% endif %}
+    
+    {% if description %}
+      <p class="py-2 text-sm text-gray-600">{{ description }}</p>
+    {% endif %}
+    
+    <!-- Contenedor para el contenido dinámico -->
+    <div class="py-4">
+      {% block modal_content %}
+      {% endblock %}
+    </div>
+    
+    <!-- Acciones del modal (opcional) -->
+    {% if close_text %}
       <div class="modal-action">
         <form method="dialog">
-          <!-- if there is a button in form, it will close the modal -->
-          <button class="btn">{{ close_text }}</button>
+          <button class="btn btn-sm">{{ close_text|default:"Cerrar" }}</button>
         </form>
       </div>
-    </div>
-  </dialog> 
+    {% endif %}
+  </div>
+</dialog>
+
 {% comment %}
 Parámetros del componente:
 - modal_id: ID único del modal (requerido)
 - title: Título del modal (opcional)
 - description: Descripción del modal (opcional)
-- button_text: Texto del botón (opcional, por defecto "Añadir")
-- content: Contenido HTML del modal (requerido)
+- content: Contenido HTML del modal (requerido, se pasa con |safe)
 - close_text: Texto del botón de cerrar (opcional, por defecto "Cerrar")
 {% endcomment %}
