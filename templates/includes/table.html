@@ -50,14 +50,17 @@
   
 <div x-show="!showFilters" class="divider divider-end ">
   <div class="flex gap-4 mb-2">
-    <!-- Añadir -->
-    <button class="btn btn-xs btn-success flex  items-center justify-center space-y-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      <span class="text-xs">Añadir</span>
+    <!-- Botón para abrir el modal -->
+    <button class="btn btn-xs btn-success flex items-center justify-center space-y-1" onclick="my_modal_1.showModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="text-xs">Añadir</span>
     </button>
-  
+    
+    <!-- Modal -->
+    {% include 'includes/modal.html' with modal_id="my_modal_1" title="Título" description="Descssripción" button_text="Añadir" close_text="Cerrar" %}
+    
     <!-- Filtros -->
     <button @click="showFilters = !showFilters" class="btn btn-xs btn-info flex  items-center justify-center space-y-1">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

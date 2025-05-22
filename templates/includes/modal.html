@@ -1,0 +1,23 @@
+{% comment %} Componente modal genérico {% endcomment %}
+{% load static %}
+<dialog id="{{ modal_id }}" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">{{ title }}</h3>
+      <p class="py-4">{{ description }}</p>
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- if there is a button in form, it will close the modal -->
+          <button class="btn">{{ close_text }}</button>
+        </form>
+      </div>
+    </div>
+  </dialog> 
+{% comment %}
+Parámetros del componente:
+- modal_id: ID único del modal (requerido)
+- title: Título del modal (opcional)
+- description: Descripción del modal (opcional)
+- button_text: Texto del botón (opcional, por defecto "Añadir")
+- content: Contenido HTML del modal (requerido)
+- close_text: Texto del botón de cerrar (opcional, por defecto "Cerrar")
+{% endcomment %}
