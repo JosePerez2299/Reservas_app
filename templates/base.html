@@ -45,7 +45,10 @@
 
                 {# Cerrar sesión #}
                 <li>
-                  <a href="{% url 'logout' %}">Cerrar sesión</a>
+                  <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Cerrar sesión</button>
+                </form>
                 </li>
               {% else %}
                 {# Si no está autenticado, sólo “Iniciar sesión” #}

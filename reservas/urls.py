@@ -8,7 +8,7 @@ urlpatterns = [
     path('', Login.as_view(), name='home'),
     path('login/', Login.as_view(), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
 
     # TODO Logout
     # Espacio crud

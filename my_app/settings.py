@@ -146,7 +146,7 @@ AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/dashboard'
+LOGOUT_REDIRECT_URL = '/login/'
 
 
 
