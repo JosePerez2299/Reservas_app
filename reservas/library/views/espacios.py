@@ -69,3 +69,8 @@ class EspacioCreateView(CreateView):
             })
         # Si no, comportamiento normal
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['model'] = self.model.__name__.lower()
+        return ctx

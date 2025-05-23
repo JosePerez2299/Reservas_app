@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 from django.db.models import Q, F
+from django.core.validators import RegexValidator
 
 # ——— 1. Ubicación —————————————————————————————————————————————
 class Ubicacion(models.Model):
@@ -53,7 +54,13 @@ class Espacio(models.Model):
         ('auditorio', 'Auditorio'),
     ]
 
-    nombre      = models.CharField(max_length=20, unique=True)
+    nombre      = models.CharField(max_length=20, unique=True, blank=False,
+        validators=[
+            RegexValidator(
+                r'^[a-zA-Z][a-zA-Z0-9_]*$',
+                message="El nombre del espacio debe comenzar con una letra y solo puede contener letras, números y guiones bajos."
+            )
+        ])
     ubicacion   = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
     piso        = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
