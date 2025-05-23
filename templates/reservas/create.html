@@ -1,69 +1,44 @@
 {% load form_style %}
-<div x-data="{ step: 1 }" class="space-y-6">
-  <h2 class="text-2xl font-bold">Crear Espacio (Paso <span x-text="step"></span>/3)</h2>
-  <form x-ref="form" method="post" action="{% url 'espacio_create' %}">
+<div 
+  x-data="{
+    submitForm() {
+      const formEl = this.$refs.form;
+      const data   = new FormData(formEl);
+
+      fetch(formEl.action, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: data,
+      })
+      .then(res => {
+        const ct = res.headers.get('content-type') || '';
+        return ct.includes('application/json')
+          ? res.json()
+          : res.text();
+      })
+      .then(payload => {
+        if (payload.success) {
+          return window.location.href = payload.redirect_url;
+        }
+        // recargamos todo el <div> actual con el HTML que vino (con errores)
+        this.$el.innerHTML = typeof payload === 'string'
+          ? payload
+          : payload.html_form;
+      })
+      .catch(console.error);
+    }
+  }" 
+  class="space-y-6"
+>
+  <h2 class="text-2xl font-bold">Crear Espacio</h2>
+  <form 
+    x-ref="form"
+    @submit.prevent="submitForm"
+    method="post"
+    action="{% url 'espacio_create' %}"
+  >
     {% csrf_token %}
-
-    <!-- Paso 1 -->
-    <div x-show="step === 1" x-transition>
-      <div class="mb-4">
-        {{ form.nombre.label_tag }}<br>
-        {{ form.nombre|mystyle }}
-        {{ form.nombre.errors }}
-      </div>
-      <div class="mb-4">
-        {{ form.ubicacion.label_tag }}<br>
-        {{ form.ubicacion|mystyle }}
-        {{ form.ubicacion.errors }}
-      </div>
-    </div>
-
-    <!-- Paso 2 -->
-    <div x-show="step === 2" x-transition>
-      <div class="mb-4">
-        {{ form.piso.label_tag }}<br>
-        {{ form.piso|mystyle }}
-        {{ form.piso.errors }}
-      </div>
-      <div class="mb-4">
-        {{ form.capacidad.label_tag }}<br>
-        {{ form.capacidad|mystyle }}
-        {{ form.capacidad.errors }}
-      </div>
-    </div>
-
-    <!-- Paso 3 -->
-    <div x-show="step === 3" x-transition>
-      <div class="mb-4">
-        {{ form.tipo.label_tag }}<br>
-        {{ form.tipo|mystyle }}
-        {{ form.tipo.errors }}
-      </div>
-    </div>
-
-    <!-- Navegación -->
-    <div class="flex justify-between">
-      <button
-        type="button"
-        class="btn"
-        :disabled="step === 1"
-        @click="step--"
-      >Atrás</button>
-
-      <div>
-        <button
-          type="button"
-          class="btn btn-primary mr-2"
-          :disabled="step === 3"
-          @click="step++"
-        >Siguiente</button>
-
-        <button
-          type="submit"
-          class="btn btn-secondary"
-          x-show="step === 3"
-        >Finalizar</button>
-      </div>
-    </div>
+    {{ form|mystyle }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
   </form>
 </div>

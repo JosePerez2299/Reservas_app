@@ -8,7 +8,7 @@ from django.db.models import Q, F
 
 # ——— 1. Ubicación —————————————————————————————————————————————
 class Ubicacion(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
+    nombre = models.CharField(max_length=20, unique=True)
 
     class Meta:
         verbose_name_plural = "Ubicaciones"
@@ -53,13 +53,13 @@ class Espacio(models.Model):
         ('auditorio', 'Auditorio'),
     ]
 
-    nombre      = models.CharField(max_length=100, unique=True)
+    nombre      = models.CharField(max_length=20, unique=True)
     ubicacion   = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
     piso        = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
-        help_text="Piso en que se encuentra el espacio"
+        help_text="Piso en que se encuentra el espacio (≤ 40)"
     )
-    capacidad   = models.PositiveIntegerField(
+    capacidad   = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(1000)],
         help_text="Capacidad máxima (≤ 1000)"
     )

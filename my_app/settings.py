@@ -46,7 +46,6 @@ INSTALLED_APPS = [
 
 COMPRESS_ROOT = BASE_DIR / 'static'
 
-COMPRESS_ENABLED = False
 STATIC_URL = "static/"
 STATICFILES_FINDERS = [
     # para tus archivos en STATICFILES_DIRS
@@ -142,12 +141,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Parametros agregados/modificados
+COMPRESS_ENABLED = True
 AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
-LOGIN_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/login/'
-
+LOGIN_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 
 DASHBOARD_ACCESS = {

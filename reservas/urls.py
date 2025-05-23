@@ -1,14 +1,14 @@
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.urls import path
-from django.contrib.auth.views import LogoutView
+from django.contrib.auth.views import LogoutView, LoginView
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
 urlpatterns = [
-    path('', Login.as_view(), name='home'),
-    path('login/', Login.as_view(), name='login'),
+    path('', LoginView.as_view(template_name='reservas/login.html', redirect_authenticated_user=True), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
     # TODO Logout
     # Espacio crud
