@@ -1,5 +1,5 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from reservas.models import Espacio
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
@@ -19,7 +19,8 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['form'] = EspacioCreateForm()
+        ctx['model'] = self.model.__name__.lower()
+        ctx['create_url'] = reverse('espacio_create')
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',

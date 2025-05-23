@@ -1,0 +1,9 @@
+{% extends "includes/modal.html" %}
+{% load static %}
+{% block button %}
+
+<button :class="buttonClass" @click="openModal()" type="button" >
+    <span x-html="buttonIcon" x-show="buttonIcon"></span>
+    <span x-text="buttonText" class="text-xs"></span>
+  </button>
+{% endblock  %}

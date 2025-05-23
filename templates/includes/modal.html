@@ -3,27 +3,38 @@
   x-data="modalComponent({
     buttonClass: '{{ button_class }}',
     buttonText: '{{ button_text }}',
+    buttonIcon: '{{ button_icon|safe }}',
     modalId: '{{ modal_id }}',
     contentUrl: '{{ content_url }}'
   })"
 >
 
 
-  <button :class="buttonClass" @click="openModal()" type="button">
-    <span x-text="buttonText"></span>
-  </button>
+{% block button %}
 
-  <dialog :id="modalId" class="modal" @close="resetModal()">
-    <div class="modal-box" x-ref="contentBox">
-      <h3 class="text-lg font-bold">Cargando...</h3>
-      <p class="py-4">Espera un momento…</p>
-      <div class="modal-action">
-        <form method="dialog">
-          <button class="btn">Cerrar</button>
-        </form>
+{% endblock %}
+  <dialog :id="modalId" class="modal">
+    <div class="modal-box relative">
+      <!-- Botón estático que nunca se borra -->
+      <button 
+        @click="document.getElementById(modalId).close()" 
+        class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"
+        aria-label="Cerrar"
+      >&times;</button>
+  
+      <!-- Contenido dinámico -->
+      <div x-ref="contentBox" >
+        <h3 class="text-lg font-bold">Cargando...</h3>
+        <p class="py-4">Espera un momento…</p>
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn">Cerrar</button>
+          </form>
+        </div>
       </div>
     </div>
   </dialog>
+  
 </div>
 
 <script>
@@ -31,8 +42,9 @@ function modalComponent(params) {
   return {
     buttonClass: params.buttonClass || 'btn',
     buttonText: params.buttonText || 'Abrir modal',
+    buttonIcon: params.buttonIcon || '',
     modalId: params.modalId || 'modal_default',
-    contentUrl: params.contentUrl || '/',
+    contentUrl: params.contentUrl ,
     openModal() {
       const modal = document.getElementById(this.modalId);
       const contentBox = this.$refs.contentBox;

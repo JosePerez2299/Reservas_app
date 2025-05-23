@@ -1,7 +1,7 @@
 {% load form_style %}
-<form>
+<h2 class="text-2xl text-base-content font-bold">Crear Espacio</h2>
+<form method="post">
     {% csrf_token %}
     {{form|mystyle}}
-    <input type="submit" value="">
-
+    <button type="submit" class="btn btn-primary">Crear</button>
 </form>

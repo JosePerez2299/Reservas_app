@@ -3,89 +3,13 @@
 {% load widget_tweaks %}
 {% load form_style %}
 
-<div class="w-full" x-data="{ showFilters: false }" @click.away="showFilters = false">
 
-  <h1 class="mb-4 text-3xl font-extrabold text-base-content md:text-5xl lg:text-5xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-base-content from-secondary">{{current_section|capfirst}}s</span> </h1>
-  {# —————— FORMULARIO DE FILTROS —————— #}
-  <form  method="get" class="mb-6">
+  {# Este template debe ser incluido en un ListView, para poder acceder a: #}
+  {# - object_list: lista de objetos que se van a mostrar en la tabla #}
+  {# - model: el modelo de Django que se va a mostrar en la tabla #}
+  {# - view: la vista que se encarga de mostrar la tabla #}
 
-    {# ——— Bloque colapsable de filtros ——— #}
-    <div 
-      x-show="showFilters"
-      x-transition:enter="transition ease-out duration-200"
-      x-transition:enter-start="opacity-0 -translate-y-2"
-      x-transition:enter-end="opacity-100 translate-y-0"
-      x-transition:leave="transition ease-in duration-150"
-      x-transition:leave-start="opacity-100 translate-y-0"
-      x-transition:leave-end="opacity-0 -translate-y-2"
-      @click.stop
-      class="mt-4 p-6 bg-base-200 border border-base-300 rounded-box shadow-lg"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {{ filter.form|mystyle }}
-      </div>
-      <div class="mt-6 pt-4 border-t border-base-300 flex justify-end gap-2">
-  
-    <!-- Limpiar -->
-    <a href="{{ request.path }}" class="btn btn-xs btn-warning flex items-center gap-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-      </svg>
-      <span class="text-xs">Limpiar</span>
-    </a>
-    <!-- Filtros -->
-    <button type="submit" class="btn btn-xs btn-primary flex items-center gap-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-      </svg>
-      <span class="text-xs">Aplicar</span>
-    </button>
-
-      </div>
-    </div>
-  </form>
-  {# ——————————————————————————————— #}
-
- 
-{# —————— ACCIONES —————— #}
-  
-<div x-show="!showFilters" class="divider divider-end ">
-  <div class="flex gap-4 mb-2">
-    <!-- Botón para abrir el modal -->
-    <button class="btn btn-xs btn-success flex items-center justify-center space-y-1" onclick="my_modal_1.showModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <span class="text-xs">Añadir</span>
-    </button>
-    
-    <!-- Modal -->
-    {% include "includes/create.html" %}
-  
-
-    <!-- Filtros -->
-    <button @click="showFilters = !showFilters" class="btn btn-xs btn-info flex  items-center justify-center space-y-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-      </svg>
-      <span class="text-xs">Filtros</span>
-    </button>
-  
-    <!-- Limpiar -->
-    <a href="{{ request.path }}" class="btn btn-xs btn-warning flex  items-center justify-center space-y-1">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-      </svg>
-      <span class="text-xs">Limpiar</span>
-    </a>
-  
-
-  </div>
-  
-</div>
-
-
-
+<div>
   {# —————— TABLA DE RESULTADOS —————— #}
   <div class="overflow-x-auto">
     <table class="table table-zebra w-full">
