@@ -13,15 +13,44 @@
   {# —————— TABLA DE RESULTADOS —————— #}
   <div class="overflow-x-auto">
     <table class="table table-zebra w-full">
+      {# table.html #}
       <thead class="bg-base-300">
         <tr>
-          {% for col in cols %}
-            <th class="text-center">{{ col|capfirst }}</th>
+          {% for field, label in cols.items %}
+            <th class="text-center">
+              {% comment %}
+                Si ya estamos ordenados por este campo en ascendente,
+                el click invierte a descendente y mostramos ▲
+              {% endcomment %}
+              {% if request.GET.ordering == field %}
+                <a href="?{% query_transform request ordering='-'|add:field %}" class="hover:underline">
+                  {{ label }} ▲
+                </a>
+      
+              {% comment %}
+                Si ya estamos en descendente, volvemos a asc y mostramos ▼
+              {% endcomment %}
+              {% elif request.GET.ordering == '-'|add:field %}
+                <a href="?{% query_transform request ordering=field %}" class="hover:underline">
+                  {{ label }} ▼
+                </a>
+      
+              {% comment %}
+                En cualquier otro caso, ordenamos ascendente
+              {% endcomment %}
+              {% else %}
+                <a href="?{% query_transform request ordering=field %}" class="hover:underline">
+                  {{ label }}
+                </a>
+              {% endif %}
+            </th>
           {% endfor %}
           <th class="text-center">Acción</th>
-          
         </tr>
       </thead>
+      
+
+      
       <tbody>
         {% for obj in object_list %}
           <tr>

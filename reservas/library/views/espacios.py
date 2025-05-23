@@ -1,6 +1,7 @@
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 from reservas.models import Espacio
+from django.db.models.functions import Lower
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -8,12 +9,12 @@ from django_filters.views import FilterView
 from reservas.library.filters.espacio import EspacioFilter
 from django.utils.translation import gettext_lazy as _
 from reservas.library.forms.espacios import EspacioCreateForm
-
+from django.db.models import F, Value
+from django.db.models.functions import Lower
 class EspacioListView(PermissionRequiredMixin, FilterView):
     model = Espacio
     permission_required = 'reservas.view_espacio'
     template_name = 'reservas/table_view.html'
-    ordering = ['nombre']
     paginate_by = 10
     filterset_class = EspacioFilter
 
@@ -30,14 +31,23 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         }
         return ctx
 
+    def get_ordering(self):
+        ordering = self.request.GET.get('ordering')
+        if ordering:
+            if ordering.startswith('-'):
+                return [Lower(ordering[1:]).desc()]
+            else:
+                return [Lower(ordering)]
+        return ['nombre']  # o lo que uses por defecto
 
-class EspacioCreateView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+     
+class EspacioCreateView(PermissionRequiredMixin, CreateView):
     model = Espacio
     permission_required = 'reservas.add_espacio'
     template_name = 'reservas/create.html'
     fields = ['nombre', 'ubicacion', 'piso','capacidad', 'tipo']
     success_url = reverse_lazy('espacio')
-    success_message = "¡El espacio fue creado con éxito!"
+
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
