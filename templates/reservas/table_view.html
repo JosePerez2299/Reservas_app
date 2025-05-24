@@ -57,8 +57,13 @@
         
         <!-- Modal Añadir -->
         {% url create_url as url %}
-        {% include 'includes/modal_button.html' with button_class='btn btn-soft btn-sm btn-success flex  items-center justify-center ' button_text='Añadir ✚' modal_id='add_{{current_section}}' content_url=create_url %}
+        {% include 'includes/modal.html' with button_class='btn btn-soft btn-sm btn-success flex  items-center justify-center ' button_text='Añadir ✚' modal_id='test' content_url=create_url %}
         
+        {% url 'dashboard' as url2 %}
+        {% include 'includes/modal.html' with button_class='btn btn-soft btn-sm btn-success flex  items-center justify-center ' button_text='Dashboard' modal_id='test2' content_url=url %}
+        
+
+
       
         <!-- Filtros -->
         <button @click="showFilters = !showFilters" class="btn btn-sm btn-soft btn-info flex  items-center justify-center ">
