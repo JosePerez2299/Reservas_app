@@ -27,7 +27,7 @@ urlpatterns = [
 
     path('reserva/', ReservaListView.as_view(), name='reserva'),
     path('reserva/create/', ReservaCreateView.as_view(), name='reserva_create'),
-    path('reserva/view/<int:pk>/', ReservaListView.as_view(), name='reserva_list'),
-    path('reserva/edit/<int:pk>/', ReservaListView.as_view(), name='reserva_edit'),
-    path('reserva/delete/<int:pk>/', ReservaListView.as_view(), name='reserva_delete'),
+    path('reserva/view/<int:pk>/', ReservaDetailView.as_view(), name='reserva_view'),
+    path('reserva/edit/<int:pk>/', ReservaUpdateView.as_view(), name='reserva_edit'),
+    path('reserva/delete/<int:pk>/', ReservaDeleteView.as_view(), name='reserva_delete'),
 ]

@@ -18,7 +18,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from reservas.library.utils.utils import get_all_cols
 from reservas.library.filters.reservas import ReservaFilter
-from reservas.library.forms.reservas import ReservaForm
+from reservas.library.forms.reservas import ReservaCreateForm
 
 class ReservaListView(PermissionRequiredMixin, FilterView):
     """
@@ -28,14 +28,18 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
     permission_required = 'reservas.view_reserva'
     template_name = 'reservas/table_view.html'
     paginate_by = 10
-    filterset_class = ReservaFilter
+    filterset_class = ReservaFilter 
+    form_class = ReservaCreateForm
 
 
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = reverse_lazy('reserva_create')
+        ctx['create_url'] = 'reserva_create'
+        ctx['view_url'] = 'reserva_view'
+        ctx['edit_url'] = 'reserva_edit'
+        ctx['delete_url'] = 'reserva_delete'      
         
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
@@ -54,7 +58,7 @@ class ReservaCreateView(AjaxFormMixin, CreateView):
     Crea una nueva reserva
     """
     model = Reserva
-    form_class = ReservaForm
+    form_class = ReservaCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
 
@@ -73,7 +77,7 @@ class ReservaUpdateView(AjaxFormMixin, UpdateView):
     Edita un espacio existente
     """
     model = Reserva
-    form_class = ReservaForm
+    form_class = ReservaCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
 
@@ -91,7 +95,7 @@ class ReservaDetailView(DetailView):
     Muestra los detalles de un espacio
     """
     model = Reserva
-    template_name = 'reservas/view.html'
+    template_name = 'reservas/reservas_detail.html'
 
 
 class ReservaDeleteView(DeleteView):
@@ -105,7 +109,7 @@ class ReservaDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'url': reverse_lazy('reserva_delete', args=[self.object.pk]),
-            'title': f'Eliminar {self.object.nombre}'
+            'url': reverse_lazy('reserva_delete', args=[self.object.pk]),   
+            'title': f'Eliminar Reserva {self.object.pk}'
         })
         return context

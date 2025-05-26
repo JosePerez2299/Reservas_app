@@ -32,7 +32,12 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = reverse_lazy('espacio_create')
+        ctx['create_url'] = 'espacio_create'
+        ctx['view_url'] = 'espacio_view'
+        ctx['edit_url'] = 'espacio_edit'
+        ctx['delete_url'] = 'espacio_delete'
+
+
         
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {

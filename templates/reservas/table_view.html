@@ -54,7 +54,7 @@
     <div x-show="!showFilters" class="divider divider-end ">
       <div class="flex gap-4 mb-2">
 
-        
+        {% url create_url as create_url %}
     
         <!-- Modal Añadir -->
         {% include 'includes/modal.html' with button_class='btn btn-xs btn-success flex  items-center justify-center' button_text='Añadir ✚' modal_id='test' content_url=create_url   %}

@@ -1,0 +1,15 @@
+{% block content %}
+<div class="container mx-auto">
+  <h2 class="text-2xl font-bold text-center">Reserva {{object.pk}}</h2>
+  <ul>
+    <li><strong>Nombre del espacio:</strong> {{object.espacio.nombre}}</li>
+    <li><strong>Fecha de inicio:</strong> {{object.fecha_inicio|date:"d/m/Y H:i"}}</li>
+    <li><strong>Fecha de fin:</strong> {{object.fecha_fin|date:"d/m/Y H:i"}}</li>
+    <li><strong>Responsable:</strong> {{object.responsable}}</li>
+    <li><strong>Asistentes:</strong> {{object.asistentes}}</li>
+    <li><strong>Estado:</strong> {{object.get_estado_display}}</li>
+  </ul>
+</div>
+{% endblock content %}
+
+

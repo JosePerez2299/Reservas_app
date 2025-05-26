@@ -1,3 +1,4 @@
+{% load model_extras %}
 <form 
   x-ref="form"
   method="post"
@@ -5,6 +6,12 @@
 >
   {% csrf_token %}
   <h3 class="text-xl font-bold text-center">¿Estás seguro que deseas eliminar este espacio?</h3>
-  <p class="text-center">Nombre: <strong>{{ object.nombre }}</strong></p>
-  <button type="submit" class="btn btn-error">Sí, eliminar</button>
+
+{{cols}}
+  {% with object.pk|stringformat:"s" as id %}
+    {% for col in cols %}
+      <p class="text-center">{{ col }}: <strong>{{ object|get_attr:col }}</strong></p>
+    {% endfor %}
+    <button type="submit" class="btn btn-error">Sí, eliminar</button>
+  {% endwith %}
 </form>
