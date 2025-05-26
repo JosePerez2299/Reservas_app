@@ -55,30 +55,25 @@
       <div class="flex gap-4 mb-2">
 
         
+    
         <!-- Modal Añadir -->
-        {% url create_url as url %}
-        {% include 'includes/modal.html' with button_class='btn btn-soft btn-sm btn-success flex  items-center justify-center ' button_text='Añadir ✚' modal_id='test' content_url=create_url %}
-        
-        {% url 'dashboard' as url2 %}
-        {% include 'includes/modal.html' with button_class='btn btn-soft btn-sm btn-success flex  items-center justify-center ' button_text='Dashboard' modal_id='test2' content_url=url %}
-        
+        {% include 'includes/modal.html' with button_class='btn btn-outline btn-xs btn-success flex  items-center justify-center' button_text='Añadir ✚' modal_id='test' content_url=create_url   %}
 
-
-      
         <!-- Filtros -->
-        <button @click="showFilters = !showFilters" class="btn btn-sm btn-soft btn-info flex  items-center justify-center ">
+        <button @click="showFilters = !showFilters" class="btn btn-outline btn-xs btn-info flex  items-center justify-center ">
+          <span class="text-xs">Filtros</span>
+          
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
           </svg>
-          <span class="text-xs">Filtros</span>
         </button>
       
         <!-- Limpiar -->
-        <a href="{{ request.path }}" class="btn btn-soft btn-sm btn-warning flex  items-center justify-center space-y-1">
+        <a href="{{ request.path }}" class="btn btn-outline btn-xs btn-warning flex  items-center justify-center ">
+          <span class="text-xs">Limpiar</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
           </svg>
-          <span class="text-xs">Limpiar</span>
         </a>
       
     

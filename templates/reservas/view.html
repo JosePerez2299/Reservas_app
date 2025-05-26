@@ -1,0 +1,8 @@
+<h1>{{ object.nombre }}</h1>
+<p><strong>Ubicación:</strong> {{ object.ubicacion }}</p>
+<p><strong>Capacidad:</strong> {{ object.capacidad }}</p>
+<p><strong>Descripción:</strong> {{ object.descripcion }}</p>
+<p><strong>Creado el:</strong> {{ object.created_at|date:"d M Y H:i" }}</p>
+<p><strong>Disponible:</strong>
+  {% if object.activo %}Activo{% else %}Inactivo{% endif %}
+</p>

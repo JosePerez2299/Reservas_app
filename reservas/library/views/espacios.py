@@ -1,4 +1,4 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from django.urls import reverse, reverse_lazy
 from reservas.models import Espacio
 from django.db.models.functions import Lower
@@ -25,6 +25,7 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
         ctx['create_url'] = reverse('espacio_create')
+        
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',
@@ -74,3 +75,8 @@ class EspacioCreateView(CreateView):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
         return ctx
+
+
+class EspacioViewView(DetailView):
+    model = Espacio
+    template_name = 'reservas/view.html'
