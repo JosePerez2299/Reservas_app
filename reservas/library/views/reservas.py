@@ -62,6 +62,14 @@ class ReservaCreateView(AjaxFormMixin, CreateView):
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
 
+    def get_form_kwargs(self):
+        """
+        Pasa el objeto request al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx.update({
@@ -74,12 +82,20 @@ class ReservaCreateView(AjaxFormMixin, CreateView):
 
 class ReservaUpdateView(AjaxFormMixin, UpdateView):
     """
-    Edita un espacio existente
+    Edita una reserva existente
     """
     model = Reserva
     form_class = ReservaCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
+
+    def get_form_kwargs(self):
+        """
+        Pasa el objeto request al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

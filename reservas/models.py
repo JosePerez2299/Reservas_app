@@ -45,7 +45,13 @@ class Usuario(AbstractUser):
     def is_moderador(self):
         return self.groups.filter(name='moderador').exists()
 
+    @property
+    def is_usuario(self):
+        return self.groups.filter(name='usuario').exists()
 
+    @property
+    def is_admin(self):
+        return self.groups.filter(name='administrador').exists()
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
     TIPO_CHOICES = [
