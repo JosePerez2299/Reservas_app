@@ -1,13 +1,10 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="container mt-5">
-    <h2>Confirmar eliminación</h2>
-    <p>¿Estás seguro de que deseas eliminar este elemento?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Eliminar</button>
-        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
-</div>
-{% endblock %}
+<form 
+  x-ref="form"
+  method="post"
+  action="{{ url }}"
+>
+  {% csrf_token %}
+  <h3 class="text-xl font-bold text-center">¿Estás seguro que deseas eliminar este espacio?</h3>
+  <p class="text-center">Nombre: <strong>{{ object.nombre }}</strong></p>
+  <button type="submit" class="btn btn-error">Sí, eliminar</button>
+</form>

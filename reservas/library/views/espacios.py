@@ -1,20 +1,28 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from django.urls import reverse, reverse_lazy
+"""
+Views para los espacios
+
+* EspacioListView: Muestra una lista de espacios con un formulario de filtrado
+* EspacioCreateView: Crea un nuevo espacio
+* EspacioUpdateView: Edita un espacio existente
+* EspacioDetailView: Muestra los detalles de un espacio
+* EspacioDeleteView: Elimina un espacio existente
+
+"""
+
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from reservas.models import Espacio
-from django.db.models.functions import Lower
-from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.views import FilterView
 from reservas.library.filters.espacio import EspacioFilter
-from django.utils.translation import gettext_lazy as _
-from reservas.library.forms.espacios import EspacioCreateForm
-from django.db.models import F, Value
+from reservas.library.mixins.helpers import AjaxFormMixin
 from django.db.models.functions import Lower
-from django.http import JsonResponse
-from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+
 
 class EspacioListView(PermissionRequiredMixin, FilterView):
+    """
+    Muestra una lista de espacios con un formulario de filtrado
+    """
     model = Espacio
     permission_required = 'reservas.view_espacio'
     template_name = 'reservas/table_view.html'
@@ -24,7 +32,7 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = reverse('espacio_create')
+        ctx['create_url'] = reverse_lazy('espacio_create')
         
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
@@ -46,26 +54,13 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         return ['nombre']  # o lo que uses por defecto
 
 
-# views.py
-
-
-class AjaxFormMixin:
-    def form_invalid(self, form):
-        html = self.render_to_response(self.get_context_data(form=form)).rendered_content
-        return JsonResponse({'success': False, 'html_form': html})
-
-    def form_valid(self, form):
-        # Guarda y asigna a self.object
-        self.object = form.save()
-        return JsonResponse({
-            'success': True,
-            'redirect_url': self.get_success_url()
-        })
-
 class EspacioCreateView(AjaxFormMixin, CreateView):
+    """
+    Crea un nuevo espacio
+    """
     model = Espacio
-    form_class = EspacioCreateForm
-    template_name = 'includes/ajax_form.html'
+    fields = '__all__'
+    template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
 
     def get_context_data(self, **kwargs):
@@ -76,28 +71,45 @@ class EspacioCreateView(AjaxFormMixin, CreateView):
         })
         return ctx
 
+
 class EspacioUpdateView(AjaxFormMixin, UpdateView):
+    """
+    Edita un espacio existente
+    """
     model = Espacio
     fields = '__all__'
-    template_name = 'includes/ajax_form.html'
+    template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx.update({
-            'title': f'Editar {self.object.nombre}',
+            'title': f'Editar {self.model.__name__.capitalize()}',
             'url': reverse_lazy('espacio_edit', args=[self.object.pk]),
         })
         return ctx
 
 
 class EspacioDetailView(DetailView):
+    """
+    Muestra los detalles de un espacio
+    """
     model = Espacio
     template_name = 'reservas/view.html'
 
 
-
 class EspacioDeleteView(DeleteView):
+    """
+    Elimina un espacio existente
+    """
     model = Espacio
     template_name = 'reservas/delete.html'
-    success_url = reverse_lazy('espacio')
+    success_url = reverse_lazy('espacio')  # o reverse_lazy(...) si prefieres
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'url': reverse_lazy('espacio_delete', args=[self.object.pk]),
+            'title': f'Eliminar {self.object.nombre}'
+        })
+        return context
