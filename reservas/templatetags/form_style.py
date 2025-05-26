@@ -87,16 +87,22 @@ def _get_widget_html(field):
 
 
 def _get_widget_classes(widget):
-    """Determina las clases CSS apropiadas según el tipo de widget."""
-    # Clases base usando solo las de DaisyUI sin conflictos
     base_classes = "input input-bordered w-full focus:input-primary transition-colors duration-200"
-    
+
     widget_type_classes = {
         Textarea: "textarea textarea-bordered w-full focus:textarea-primary transition-colors duration-200 min-h-[80px] resize-y",
         Select: "select select-bordered w-full focus:select-primary transition-colors duration-200",
         CheckboxInput: "checkbox checkbox-primary"
     }
-    
+
+    # Verifica si tiene un tipo específico como 'date', 'time', etc.
+    input_type = getattr(widget, 'input_type', None)
+
+    if input_type == 'date':
+        return "input input-bordered w-full focus:input-primary transition-colors duration-200 datepicker"
+    elif input_type == 'time':
+        return "input input-bordered w-full focus:input-primary transition-colors duration-200"
+
     return widget_type_classes.get(type(widget), base_classes)
 
 

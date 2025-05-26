@@ -88,7 +88,7 @@ class Espacio(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.nombre} ({self.get_tipo_display()}) — {self.ubicacion}/{self.piso}"
+        return f"{self.nombre}"
 
 
 # ——— 4. Reserva ————————————————————————————————————————————————
@@ -144,7 +144,7 @@ class Reserva(models.Model):
         super().clean()
 
         # 1) fecha en el futuro o hoy
-        if self.fecha_uso < timezone.now:
+        if self.fecha_uso < timezone.now().date():
             raise ValidationError("La fecha de uso debe ser hoy o en el futuro.")
 
         # 2) solapamiento de franjas horarias

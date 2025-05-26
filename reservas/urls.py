@@ -5,6 +5,7 @@ from django.contrib.auth.views import LogoutView, LoginView
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
+from reservas.library.views.reservas import *
 urlpatterns = [
     path('', LoginView.as_view(template_name='reservas/login.html', redirect_authenticated_user=True), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
@@ -24,9 +25,9 @@ urlpatterns = [
     path('usuario/edit/<int:pk>/', EspacioListView.as_view(), name='usuario_edit'),
     path('usuario/delete/<int:pk>/', EspacioListView.as_view(), name='usuario_delete'),
 
-    path('reserva/', EspacioListView.as_view(), name='reserva'),
-    path('reserva/create/', EspacioCreateView.as_view(), name='reserva_create'),
-    path('reserva/view/<int:pk>/', EspacioListView.as_view(), name='reserva_list'),
-    path('reserva/edit/<int:pk>/', EspacioListView.as_view(), name='reserva_edit'),
-    path('reserva/delete/<int:pk>/', EspacioListView.as_view(), name='reserva_delete'),
+    path('reserva/', ReservaListView.as_view(), name='reserva'),
+    path('reserva/create/', ReservaCreateView.as_view(), name='reserva_create'),
+    path('reserva/view/<int:pk>/', ReservaListView.as_view(), name='reserva_list'),
+    path('reserva/edit/<int:pk>/', ReservaListView.as_view(), name='reserva_edit'),
+    path('reserva/delete/<int:pk>/', ReservaListView.as_view(), name='reserva_delete'),
 ]
