@@ -57,10 +57,10 @@
         
     
         <!-- Modal Añadir -->
-        {% include 'includes/modal.html' with button_class='btn btn-outline btn-xs btn-success flex  items-center justify-center' button_text='Añadir ✚' modal_id='test' content_url=create_url   %}
+        {% include 'includes/modal.html' with button_class='btn btn-xs btn-success flex  items-center justify-center' button_text='Añadir ✚' modal_id='test' content_url=create_url   %}
 
         <!-- Filtros -->
-        <button @click="showFilters = !showFilters" class="btn btn-outline btn-xs btn-info flex  items-center justify-center ">
+        <button @click="showFilters = !showFilters" class="btn btn-xs btn-info flex  items-center justify-center ">
           <span class="text-xs">Filtros</span>
           
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -69,7 +69,7 @@
         </button>
       
         <!-- Limpiar -->
-        <a href="{{ request.path }}" class="btn btn-outline btn-xs btn-warning flex  items-center justify-center ">
+        <a href="{{ request.path }}" class="btn btn-xs btn-warning flex  items-center justify-center ">
           <span class="text-xs">Limpiar</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />

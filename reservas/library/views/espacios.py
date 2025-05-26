@@ -30,6 +30,7 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         ctx['cols'] = {
             'nombre': 'Nombre',
             'capacidad': 'Capacidad',
+            'ubicacion': 'Ubicación',
             'piso': 'Piso',
             'disponible': 'Disponible',
         }
@@ -44,39 +45,59 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
                 return [Lower(ordering)]
         return ['nombre']  # o lo que uses por defecto
 
-    
+
+# views.py
 
 
-class EspacioCreateView(CreateView):
-    model = Espacio
-    form_class = EspacioCreateForm
-    success_url = reverse_lazy('espacio')
-    template_name = 'reservas/create.html'   # Tu create.html
-
+class AjaxFormMixin:
     def form_invalid(self, form):
-        # Si viene por AJAX, devolvemos el HTML con errores (status 200)
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return self.render_to_response(self.get_context_data(form=form))
-        # Si no, comportamiento normal (redirecciona o renderiza full page)
-        return super().form_invalid(form)
+        html = self.render_to_response(self.get_context_data(form=form)).rendered_content
+        return JsonResponse({'success': False, 'html_form': html})
 
     def form_valid(self, form):
+        # Guarda y asigna a self.object
         self.object = form.save()
-        # Si viene por AJAX, devolvemos JSON con éxito y URL de redirect
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'redirect_url': self.success_url
-            })
-        # Si no, comportamiento normal
-        return super().form_valid(form)
+        return JsonResponse({
+            'success': True,
+            'redirect_url': self.get_success_url()
+        })
+
+class EspacioCreateView(AjaxFormMixin, CreateView):
+    model = Espacio
+    form_class = EspacioCreateForm
+    template_name = 'includes/ajax_form.html'
+    success_url = reverse_lazy('espacio')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['model'] = self.model.__name__.lower()
+        ctx.update({
+            'title': 'Crear Espacio',
+            'url': reverse_lazy('espacio_create'),
+        })
+        return ctx
+
+class EspacioUpdateView(AjaxFormMixin, UpdateView):
+    model = Espacio
+    fields = '__all__'
+    template_name = 'includes/ajax_form.html'
+    success_url = reverse_lazy('espacio')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'title': f'Editar {self.object.nombre}',
+            'url': reverse_lazy('espacio_edit', args=[self.object.pk]),
+        })
         return ctx
 
 
-class EspacioViewView(DetailView):
+class EspacioDetailView(DetailView):
     model = Espacio
     template_name = 'reservas/view.html'
+
+
+
+class EspacioDeleteView(DeleteView):
+    model = Espacio
+    template_name = 'reservas/delete.html'
+    success_url = reverse_lazy('espacio')

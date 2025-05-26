@@ -77,15 +77,23 @@
               </td>
           {% endfor %}
             <!-- Celda de acciones -->
-            <td class="text-center whitespace-nowrap">
-              <div class="inline-flex items-center space-x-1">
-                {% with obj.pk|stringformat:"s" as id %}
+            <td class="flex justify-center items-center gap-1">
 
-                {% url 'espacio_view' id  as view_url %}
-                {{view_url}}
-                {% include 'includes/modal.html' with button_class='btn btn-outline btn-xs btn-warning flex  items-center justify-center' button_text='Ver' modal_id='view_'|add:id content_url=view_url %} 
-                {% endwith %}
-              </div>
+
+                  {% with obj.pk|stringformat:"s" as id %}
+
+                  {% url 'espacio_view' id  as view_url %}
+                  {% include 'includes/modal.html' with button_class='  w-fit block w-10 btn btn-xs btn-info flex  items-center justify-center' button_text='Ver' modal_id='view_'|add:id content_url=view_url %} 
+                  
+                  {% url 'espacio_edit' id  as edit_url %}
+                  {% include 'includes/modal.html' with button_class='  w-fit block w-10 btn btn-xs btn-warning flex  items-center justify-center' button_text='Editar' modal_id='edit_'|add:id content_url=edit_url %} 
+                  
+                  {% url 'espacio_delete' id  as delete_url %}
+                  {% include 'includes/modal.html' with button_class='  w-fit block w-10 btn btn-xs btn-error flex  items-center justify-center' button_text='Eliminar' modal_id='delete_'|add:id content_url=delete_url %} 
+                  
+                  {% endwith %}
+
+
             </td>
           </tr>
         {% empty %}

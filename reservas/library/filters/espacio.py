@@ -1,5 +1,5 @@
 import django_filters
-from reservas.models import Espacio
+from reservas.models import Espacio, Ubicacion
 
 class EspacioFilter(django_filters.FilterSet):
     nombre = django_filters.CharFilter(
@@ -7,6 +7,12 @@ class EspacioFilter(django_filters.FilterSet):
         lookup_expr='icontains',
         label='Nombre',
 
+    )
+
+    ubicacion = django_filters.ModelChoiceFilter(
+        field_name='ubicacion',
+        queryset=Ubicacion.objects.all(),
+        label='Ubicación',
     )
     
     capacidad_min = django_filters.NumberFilter(

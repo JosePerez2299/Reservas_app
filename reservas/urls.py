@@ -14,9 +14,9 @@ urlpatterns = [
     # Espacio crud
     path('espacio/', EspacioListView.as_view(), name='espacio'),
     path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),
-    path('espacio/view/<int:pk>/', EspacioViewView.as_view(), name='espacio_view'),
-    path('espacio/edit/<int:pk>/', EspacioListView.as_view(), name='espacio_edit'),
-    path('espacio/delete/<int:pk>/', EspacioListView.as_view(), name='espacio_delete'),
+    path('espacio/view/<int:pk>/', EspacioDetailView.as_view(), name='espacio_view'),
+    path('espacio/edit/<int:pk>/', EspacioUpdateView.as_view(), name='espacio_edit'),
+    path('espacio/delete/<int:pk>/', EspacioDeleteView.as_view(), name='espacio_delete'),
 
     path('usuario/', EspacioListView.as_view(), name='usuario'),
     path('usuario/create/', EspacioCreateView.as_view(), name='usuario_create'),

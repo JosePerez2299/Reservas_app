@@ -33,11 +33,11 @@
     x-ref="form"
     @submit.prevent="submitForm"
     method="post"
-    action="{% url 'espacio_create' %}"
+    action="{{ url }}"
   >
-    <h3 class="text-2xl font-bold text-base-content text-center">Crear {{model|capfirst}}</h2>
+    <h3 class="text-2xl font-bold text-center">{{title}}</h2>
     {% csrf_token %}
     {{ form|mystyle }}
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="submit" class="btn btn-success">Guardar</button>
   </form>
 </div>

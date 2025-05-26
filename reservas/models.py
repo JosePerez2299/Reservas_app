@@ -57,10 +57,10 @@ class Espacio(models.Model):
     nombre      = models.CharField(max_length=20, unique=True, blank=False,
         validators=[
             RegexValidator(
-                r'^[a-zA-Z][a-zA-Z0-9_]*$',
-                message="El nombre del espacio debe comenzar con una letra y solo puede contener letras, números y guiones bajos."
+                r"^[^\s](?:[a-zA-Z0-9_\s]*[^\s])?$",
+                message="El nombre del espacio debe comenzar y terminar con una letra o número, y solo puede contener letras, números, guiones bajos y espacios."
             )
-        ])
+        ])  
     ubicacion   = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
     piso        = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
