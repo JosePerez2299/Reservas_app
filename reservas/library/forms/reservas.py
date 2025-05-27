@@ -8,6 +8,7 @@ class ReservaCreateForm(forms.ModelForm):
         fields = ['usuario', 'fecha_uso', 'hora_inicio', 'hora_fin', 'espacio', 'motivo']
         widgets = {
             'fecha_uso': forms.DateInput(
+                format='%Y-%m-%d',
                 attrs={'type': 'date'}
             ),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
@@ -33,3 +34,25 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
             
+
+class ReservaUpdateForm(ReservaCreateForm):
+    estado = forms.ChoiceField(choices=Reserva.ESTADO_CHOICES)
+
+    class Meta(ReservaCreateForm.Meta):
+        fields = ReservaCreateForm.Meta.fields + ['estado']
+    
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(request, *args, **kwargs)
+        self.fields['usuario'].disabled = True
+        self.fields['espacio'].disabled = True
+        # NO añadimos ni mostramos aprobado_por aquí
+
+    def save(self, commit=True):
+        # Primero, instancia sin guardar aún
+        instance = super().save(commit=False)
+        # Asignamos el usuario que aprueba automáticamente
+        instance.aprobado_por = self.request.user
+        # Ahora sí guardamos
+        if commit:
+            instance.save()
+        return instance

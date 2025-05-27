@@ -10,7 +10,7 @@ Views para los espacios
 """
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from reservas.models import Reserva
+from reservas.models import Reserva, Ubicacion
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.views import FilterView
 from reservas.library.mixins.helpers import AjaxFormMixin
@@ -18,7 +18,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from reservas.library.utils.utils import get_all_cols
 from reservas.library.filters.reservas import ReservaFilter
-from reservas.library.forms.reservas import ReservaCreateForm
+from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q
 
 class ReservaListView(PermissionRequiredMixin, FilterView):
@@ -47,6 +47,8 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
             'usuario': 'Usuario',
             'espacio': 'Espacio',
             'fecha_uso': 'Fecha de uso',
+            'espacio__ubicacion': 'Ubicación',
+            'espacio__piso': 'Piso',
             'hora_inicio': 'Hora de inicio',
             'hora_fin': 'Hora de fin',
             'estado': 'Estado',
@@ -59,9 +61,12 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
         if self.request.user.is_admin:
             return qs
         elif self.request.user.is_moderador:
-            return qs.filter(Q(usuario=self.request.user) | Q(aprobado_por=self.request.user))
+            return qs.filter(
+                Q(aprobado_por=self.request.user) | 
+                Q(espacio__ubicacion=self.request.user.ubicacion)
+            )
         elif self.request.user.is_usuario:
-            return qs.filter(Q(usuario=self.request.user) | Q(aprobado_por=self.request.user))
+            return qs.filter(Q(usuario=self.request.user))
         return qs.none()
     
 
@@ -97,7 +102,7 @@ class ReservaUpdateView(AjaxFormMixin, UpdateView):
     Edita una reserva existente
     """
     model = Reserva
-    form_class = ReservaCreateForm
+    form_class = ReservaUpdateForm  
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
 
