@@ -94,7 +94,7 @@ class Espacio(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.nombre}"
+        return f"{self.nombre}" + " - " + self.ubicacion.nombre + " - " + str(self.piso)
 
 
 # ——— 4. Reserva ————————————————————————————————————————————————
@@ -135,9 +135,11 @@ class Reserva(models.Model):
             models.UniqueConstraint(
                 fields=['usuario', 'espacio', 'fecha_uso'],
                 name='uniq_usuario_espacio_fecha'
+
             ),
             # Asegura hora_inicio < hora_fin
             models.CheckConstraint(
+                
                 check=Q(hora_inicio__lt=F('hora_fin')),
                 name='check_hora_inicio_menor_fin'
             ),

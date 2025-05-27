@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import Q
-from reservas.models import Reserva, Usuario
+from reservas.models import Reserva, Espacio, Usuario
 
 class ReservaCreateForm(forms.ModelForm):
     class Meta:
@@ -25,7 +25,15 @@ class ReservaCreateForm(forms.ModelForm):
         
         # Si es moderador, mostrar selector de usuarios
         elif self.request.user.is_moderador:
-            self.fields['usuario'].queryset = Usuario.objects.filter(groups__name='usuario')
+            self.fields['usuario'].queryset = Usuario.objects.filter(
+                Q(groups__name='usuario') & 
+                Q(ubicacion=self.request.user.ubicacion) & 
+                Q(piso=self.request.user.piso)
+            )
+            self.fields['espacio'].queryset = Espacio.objects.filter(
+                Q(ubicacion=self.request.user.ubicacion) & 
+                Q(piso=self.request.user.piso)
+            )
         
         # Si es usuario, mostrar selector de su usuario
         elif self.request.user.is_usuario:

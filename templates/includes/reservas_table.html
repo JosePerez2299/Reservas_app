@@ -14,16 +14,8 @@
         {% include 'includes/modal.html' with button_class='w-fit block w-10 btn btn-xs btn-warning flex items-center justify-center' button_text='Editar' modal_id='edit_'|add:id content_url=edit_url_id %}
         {% endif %}
 
-        {% comment %} Aprobar {% endcomment %}
-        {% if obj.estado == 'pendiente'%}
-            {% if request.user.is_moderador or request.user.is_admin %}
-            {% url delete_url id as delete_url_id %}
-            {% include 'includes/modal.html' with button_class='w-fit block w-10 btn btn-xs btn-success flex items-center justify-center' button_text='Aprobar' modal_id='delete_'|add:id content_url=delete_url_id %}
-            {% endif %}
-        {% endif %}
-        
         {% comment %} Eliminar {% endcomment %}
-        {% if obj.estado == 'pendiente' %}
+        {% if user.is_admin %}
         {% url delete_url id as delete_url_id %}
         {% include 'includes/modal.html' with button_class='w-fit block w-10 btn btn-xs btn-error flex items-center justify-center' button_text='Eliminar' modal_id='delete_'|add:id content_url=delete_url_id %}
         {% endif %}

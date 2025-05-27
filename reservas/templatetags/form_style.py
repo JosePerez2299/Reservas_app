@@ -8,32 +8,23 @@ register = template.Library()
 
 @register.filter(name='mystyle')
 def mystyle(obj):
-    """
-    Aplica estilos personalizados a formularios de Django optimizado para modales.
-    Uso: {{ form|mystyle }} o {{ form.field_name|mystyle }}
-    """
-    
     if isinstance(obj, BoundField):
         return _render_field(obj)
-    
     if hasattr(obj, 'visible_fields'):
         return _render_form(obj)
-    
     return str(obj)
 
 
 def _render_field(field):
-    """Renderiza un campo individual con estilos aplicados."""
     label_html = _get_label_html(field)
     widget_html = _get_widget_html(field)
     help_html = _get_help_html(field)
     error_html = _get_error_html(field.errors)
-    
-    # Agregar clase de error al contenedor si hay errores
+
     container_class = "form-control mb-4 max-w-full overflow-hidden"
     if field.errors:
         container_class += " has-error"
-    
+
     return mark_safe(
         f"<div class='{container_class}'>"
         f"{label_html}"
@@ -68,18 +59,27 @@ def _get_label_html(field):
 
 
 def _get_widget_html(field):
-    """Genera el HTML del widget del campo con las clases CSS apropiadas."""
-    widget_classes = _get_widget_classes(field.field.widget)
-    
-    # Para errores, agregar clase de error específica de DaisyUI
+    widget = field.field.widget
+    widget_classes = _get_widget_classes(widget)
+
+    # Si hay errores, marcar el widget como error
     if field.errors:
-        if isinstance(field.field.widget, Textarea):
-            widget_classes = widget_classes.replace("textarea-bordered", "textarea-bordered textarea-error")
-        elif isinstance(field.field.widget, Select):
-            widget_classes = widget_classes.replace("select-bordered", "select-bordered select-error")
+        if isinstance(widget, Textarea):
+            widget_classes = widget_classes.replace(
+                "textarea-bordered",
+                "textarea-bordered textarea-error"
+            )
+        elif isinstance(widget, Select):
+            widget_classes = widget_classes.replace(
+                "select-bordered",
+                "select-bordered select-error"
+            )
         else:
-            widget_classes = widget_classes.replace("input-bordered", "input-bordered input-error")
-    
+            widget_classes = widget_classes.replace(
+                "input-bordered",
+                "input-bordered input-error"
+            )
+
     return field.as_widget(attrs={
         "class": widget_classes,
         "id": field.auto_id
@@ -87,23 +87,44 @@ def _get_widget_html(field):
 
 
 def _get_widget_classes(widget):
-    base_classes = "input input-bordered w-full focus:input-primary transition-colors duration-200"
-
-    widget_type_classes = {
-        Textarea: "textarea textarea-bordered w-full focus:textarea-primary transition-colors duration-200 min-h-[80px] resize-y",
-        Select: "select select-bordered w-full focus:select-primary transition-colors duration-200",
+    base = (
+        "input input-bordered w-full "
+        "focus:input-primary transition-colors duration-200"
+    )
+    mapping = {
+        # Textareas con alto fijo y scroll interno
+        Textarea: (
+            "textarea textarea-bordered w-full "
+            "focus:textarea-primary transition-colors duration-200 "
+            "h-32 overflow-y-auto resize-none"
+        ),
+        Select: (
+            "select select-bordered w-full "
+            "focus:select-primary transition-colors duration-200"
+        ),
         CheckboxInput: "checkbox checkbox-primary"
     }
 
-    # Verifica si tiene un tipo específico como 'date', 'time', etc.
-    input_type = getattr(widget, 'input_type', None)
+    # Widgets de tipo date/time
+    t = getattr(widget, 'input_type', None)
+    if t == 'date':
+        return base + " datepicker"
+    if t == 'time':
+        return base
 
-    if input_type == 'date':
-        return "input input-bordered w-full focus:input-primary transition-colors duration-200 datepicker"
-    elif input_type == 'time':
-        return "input input-bordered w-full focus:input-primary transition-colors duration-200"
+    return mapping.get(type(widget), base)
 
-    return widget_type_classes.get(type(widget), base_classes)
+
+def _get_label_html(field):
+    if not field.label:
+        return ""
+    req = "<span class='text-error ml-1'>*</span>" if field.field.required else ""
+    return (
+        f"<div class='mb-2'>"
+        f"<span class='text-sm font-semibold text-base-content'>{field.label}</span>"
+        f"{req}"
+        f"</div>"
+    )
 
 
 def _get_help_html(field):
@@ -142,21 +163,16 @@ def _get_error_html(errors):
 
 
 def _get_non_field_errors_html(form):
-    """Genera el HTML de errores no relacionados con campos específicos."""
     if not form.non_field_errors():
         return ""
-    
-    errors_html = ""
-    for error in form.non_field_errors():
-        errors_html += (
+    html = ""
+    for err in form.non_field_errors():
+        html += (
             f"<div class='alert alert-error shadow-lg mb-4'>"
             f"<div class='flex items-start'>"
-            f"<svg class='w-5 h-5 text-error-content flex-shrink-0 mr-3' fill='currentColor' viewBox='0 0 20 20'>"
-            f"<path fill-rule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'/>"
-            f"</svg>"
-            f"<span class='text-sm text-error-content w-full break-words overflow-wrap-anywhere whitespace-normal'>{error}</span>"
-            f"</div>"
-            f"</div>"
+            f"<svg class='w-5 h-5 text-error-content mr-3' fill='currentColor' viewBox='0 0 20 20'>"
+            f"...</svg>"
+            f"<span class='text-sm text-error-content'>{err}</span>"
+            f"</div></div>"
         )
-    
-    return errors_html
+    return html

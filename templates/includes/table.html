@@ -69,7 +69,13 @@
                       <div class="status status-error"></div>
                     </div>
                     <span>No</span>
-
+                  
+                  {% elif value == 'pendiente' %}
+                  <div class="text-xs badge badge-dash badge-warning">Pendiente</div>
+                  {% elif value == 'aprobada' %}
+                  <div class="text-xs badge badge-dash badge-success">Aprobada</div>
+                  {% elif value == 'rechazada' %}
+                  <div class="text-xs badge badge-dash badge-error">Rechazada</div>
                   {% else %}
                     {{ value }}
                   {% endif %}

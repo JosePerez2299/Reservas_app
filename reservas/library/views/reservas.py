@@ -30,7 +30,6 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
     template_name = 'reservas/table_view.html'
     paginate_by = 10
     filterset_class = ReservaFilter 
-    form_class = ReservaCreateForm
 
 
     def get_context_data(self, **kwargs):
@@ -45,9 +44,9 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
         ctx['cols'] = {
             'usuario': 'Usuario',
             'espacio': 'Espacio',
-            'fecha_uso': 'Fecha de uso',
             'espacio__ubicacion': 'Ubicación',
             'espacio__piso': 'Piso',
+            'fecha_uso': 'Fecha de uso',
             'hora_inicio': 'Hora de inicio',
             'hora_fin': 'Hora de fin',
             'estado': 'Estado',
@@ -69,6 +68,14 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
             return qs.filter(Q(usuario=self.request.user))
         return qs.none()
     
+    def get_ordering(self):
+        ordering = self.request.GET.get('ordering')
+        if ordering:
+            if ordering.startswith('-'):
+                return [Lower(ordering[1:]).desc()]
+            else:
+                return [Lower(ordering)]
+
 
 class ReservaCreateView(AjaxFormMixin, CreateView):
     """

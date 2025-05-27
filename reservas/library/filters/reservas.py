@@ -2,16 +2,16 @@ import django_filters
 from reservas.models import Reserva, Espacio, Ubicacion
 from django.forms.widgets import DateInput, TimeInput
 class ReservaFilter(django_filters.FilterSet):
-    nombre = django_filters.CharFilter(
-        field_name='nombre',
-        lookup_expr='icontains',
-        label='Nombre',
+    usuario = django_filters.CharFilter(
+        field_name='usuario__username',
+        lookup_expr='exact',
+        label='Usuario',
 
     )
 
-    espacio = django_filters.ModelChoiceFilter(
-        field_name='espacio',
-        queryset=Espacio.objects.all(),
+    espacio = django_filters.CharFilter(
+        field_name='espacio__nombre',
+        lookup_expr='icontains',
         label='Espacio',
     )
     

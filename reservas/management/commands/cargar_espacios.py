@@ -20,14 +20,13 @@ class Command(BaseCommand):
         espacios = []
         for i in range(1000):
             ubic = random.choice(ubicaciones)
-            piso_random = random.randint(0, 40)
 
             nombres_opciones = ["Sala", "Oficina", "Auditorio", "Laboratorio", "Aula", "Estudio"]
             nombre_random = f"{random.choice(nombres_opciones)} {i+1}"
             espacio = Espacio(
                 nombre     = nombre_random,
                 ubicacion  = ubic,
-                piso       = piso_random,
+                piso       = 1,
                 capacidad  = random.randint(10, 200),
                 tipo       = random.choice(tipos),
                 disponible = random.choice([True, False]),

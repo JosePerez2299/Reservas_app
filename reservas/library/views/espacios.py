@@ -56,7 +56,6 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
                 return [Lower(ordering[1:]).desc()]
             else:
                 return [Lower(ordering)]
-        return ['nombre']  # o lo que uses por defecto
 
 
 class EspacioCreateView(AjaxFormMixin, CreateView):
