@@ -31,8 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'crispy_forms',
-    'crispy_tailwind',
     'django_filters',
     'widget_tweaks',
     'compressor',

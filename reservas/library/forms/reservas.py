@@ -18,10 +18,15 @@ class ReservaCreateForm(forms.ModelForm):
         self.request = request
         super().__init__(*args, **kwargs)
 
-        # Si es moderador o administrador, mostrar selector de usuarios
-        if self.request.user.is_moderador or self.request.user.is_admin:
-            self.fields['usuario'].queryset = Usuario.objects.all()
-        # Si es usuario normal, mostrar campo deshabilitado con su usuario
+        # Si es administrador, mostrar selector de usuarios
+        if self.request.user.is_admin:
+            self.fields['usuario'].queryset = Usuario.objects.filter(Q(groups__name='usuario') | Q(groups__name='moderador'))
+        
+        # Si es moderador, mostrar selector de usuarios
+        elif self.request.user.is_moderador:
+            self.fields['usuario'].queryset = Usuario.objects.filter(groups__name='usuario')
+        
+        # Si es usuario, mostrar selector de su usuario
         elif self.request.user.is_usuario:
             self.fields['usuario'].queryset = Usuario.objects.filter(pk=self.request.user.pk)
             self.fields['usuario'].initial = self.request.user

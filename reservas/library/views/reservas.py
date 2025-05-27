@@ -19,6 +19,7 @@ from django.urls import reverse_lazy
 from reservas.library.utils.utils import get_all_cols
 from reservas.library.filters.reservas import ReservaFilter
 from reservas.library.forms.reservas import ReservaCreateForm
+from django.db.models import Q
 
 class ReservaListView(PermissionRequiredMixin, FilterView):
     """
@@ -52,6 +53,17 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
         }   
         return ctx
 
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_admin:
+            return qs
+        elif self.request.user.is_moderador:
+            return qs.filter(Q(usuario=self.request.user) | Q(aprobado_por=self.request.user))
+        elif self.request.user.is_usuario:
+            return qs.filter(Q(usuario=self.request.user) | Q(aprobado_por=self.request.user))
+        return qs.none()
+    
 
 class ReservaCreateView(AjaxFormMixin, CreateView):
     """

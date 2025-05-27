@@ -7,7 +7,6 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -1593,6 +1592,38 @@
   .table {
     display: table;
   }
+  .divider-horizontal {
+    --divider-m: 0 1rem;
+    &.divider {
+      height: auto;
+      width: calc(0.25rem * 4);
+      flex-direction: column;
+      &:before {
+        height: 100%;
+        width: calc(0.25rem * 0.5);
+      }
+      &:after {
+        height: 100%;
+        width: calc(0.25rem * 0.5);
+      }
+    }
+  }
+  .divider-vertical {
+    --divider-m: 1rem 0;
+    &.divider {
+      height: calc(0.25rem * 4);
+      width: auto;
+      flex-direction: row;
+      &:before {
+        height: calc(0.25rem * 0.5);
+        width: 100%;
+      }
+      &:after {
+        height: calc(0.25rem * 0.5);
+        width: 100%;
+      }
+    }
+  }
   .btn-circle {
     border-radius: calc(infinity * 1px);
     padding-inline: calc(0.25rem * 0);
@@ -1945,14 +1976,14 @@
   .text-error-content {
     color: var(--color-error-content);
   }
-  .text-gray-600 {
-    color: var(--color-gray-600);
-  }
   .text-info {
     color: var(--color-info);
   }
   .text-neutral-content {
     color: var(--color-neutral-content);
+  }
+  .text-primary {
+    color: var(--color-primary);
   }
   .text-transparent {
     color: transparent;
@@ -2062,10 +2093,6 @@
     --btn-color: var(--color-primary);
     --btn-fg: var(--color-primary-content);
   }
-  .btn-secondary {
-    --btn-color: var(--color-secondary);
-    --btn-fg: var(--color-secondary-content);
-  }
   .btn-success {
     --btn-color: var(--color-success);
     --btn-fg: var(--color-success-content);
@@ -2082,6 +2109,12 @@
   .select-error {
     &, &:focus, &:focus-within {
       --input-color: var(--color-error);
+    }
+  }
+  .text-shadow-accent-content {
+    --tw-text-shadow-color: var(--color-accent-content);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-text-shadow-color: color-mix(in oklab, var(--color-accent-content) var(--tw-text-shadow-alpha), transparent);
     }
   }
   .textarea-error {
@@ -2146,6 +2179,11 @@
   .lg\:block {
     @media (width >= 64rem) {
       display: block;
+    }
+  }
+  .lg\:flex {
+    @media (width >= 64rem) {
+      display: flex;
     }
   }
   .lg\:hidden {
@@ -2579,6 +2617,15 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-text-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-text-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
 @property --tw-scale-x {
   syntax: "*";
   inherits: false;
@@ -2652,6 +2699,8 @@
       --tw-drop-shadow-size: initial;
       --tw-duration: initial;
       --tw-ease: initial;
+      --tw-text-shadow-color: initial;
+      --tw-text-shadow-alpha: 100%;
       --tw-scale-x: 1;
       --tw-scale-y: 1;
       --tw-scale-z: 1;

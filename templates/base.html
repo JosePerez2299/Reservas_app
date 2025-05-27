@@ -25,8 +25,10 @@
             </label>
           </div>
           <div class="mx-2 flex-1 px-2">
-            <div>
+            <div class="flex gap-2 items-center">
               <a href="{% url 'dashboard' %}" class="inline-block transition-transform duration-300 hover:scale-110">{% include 'includes/logo.html' %}</a>
+              <div class="hidden lg:flex divider divider-horizontal"></div>
+              <p class="text-base-content text-sm hidden lg:block">Panel de <span class="font-bold">{{ group }}</span> / <span class="font-bold text-primary text-shadow-accent-content">{{ request.user.username }}</span></p>
             </div>
           </div>
           <div class="hidden flex-none lg:block">
@@ -76,7 +78,7 @@
 
         <ul class="menu bg-base-200 min-h-full w-80 p-4">
           <li class="menu-title text-base-content">
-            <p>Panel de {{ group }}</p>
+            <p>Panel de <span class="font-bold">{{ group }}</span> / <span class="font-bold">{{ request.user.username }}</span></p>
           </li>
           <div class="divider"></div>
           <!-- Sidebar content here -->
