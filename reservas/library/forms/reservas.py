@@ -41,6 +41,11 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].initial = self.request.user
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
+
+            self.fields['espacio'].queryset = Espacio.objects.filter(
+                Q(ubicacion=self.request.user.ubicacion) & 
+                Q(piso=self.request.user.piso)
+            )   
             
 
 class ReservaUpdateForm(ReservaCreateForm):
