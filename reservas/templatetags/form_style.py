@@ -110,7 +110,6 @@ def _get_help_html(field):
     """Genera el HTML del texto de ayuda si existe."""
     if not field.help_text:
         return ""
-    
     return (
         f"<div class='flex items-start mt-2'>"
         f"<svg class='w-4 h-4 text-info mt-0.5 mr-2 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>"
