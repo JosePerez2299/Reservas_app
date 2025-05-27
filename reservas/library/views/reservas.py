@@ -33,7 +33,6 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
     form_class = ReservaCreateForm
 
 
-
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__.lower()
@@ -63,7 +62,8 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
         elif self.request.user.is_moderador:
             return qs.filter(
                 Q(aprobado_por=self.request.user) | 
-                Q(espacio__ubicacion=self.request.user.ubicacion)
+                (Q(espacio__ubicacion=self.request.user.ubicacion)  & 
+                Q(espacio__piso=self.request.user.piso))
             )
         elif self.request.user.is_usuario:
             return qs.filter(Q(usuario=self.request.user))

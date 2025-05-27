@@ -164,19 +164,18 @@ class Reserva(models.Model):
         if qs.exists():
             raise ValidationError("Ya existe otra reserva solapada para este espacio.")
 
-        print("self.estado", self.estado)
 
-        # 3) si alguien aprueba o rechaza, debe ser moderador de ese mismo piso y ubicación
+        # 3) si alguien aprueba o rechaza, debe ser administrador o moderador de ese mismo piso y ubicación
         if self.estado in ['aprobada', 'rechazada'] and self.aprobado_por:
 
             if self.aprobado_por.is_admin:
                 return
 
             if not self.aprobado_por.is_moderador:
-                raise ValidationError("Solo un moderador puede aprobar o rechazar reservas.")
+                raise ValidationError("Solo un administrador o moderador puede aprobar o rechazar reservas.")
             
             if (self.aprobado_por.ubicacion_id != self.espacio.ubicacion_id or
                 self.aprobado_por.piso        != self.espacio.piso):
                 raise ValidationError(
-                    "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
+                    "El administrador o moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
                 )

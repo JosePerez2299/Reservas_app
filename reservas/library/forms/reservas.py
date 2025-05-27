@@ -45,7 +45,6 @@ class ReservaUpdateForm(ReservaCreateForm):
         super().__init__(request, *args, **kwargs)
         self.fields['usuario'].disabled = True
         self.fields['espacio'].disabled = True
-        # NO añadimos ni mostramos aprobado_por aquí
 
     def save(self, commit=True):
         # Primero, instancia sin guardar aún
