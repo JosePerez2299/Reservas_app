@@ -1,6 +1,7 @@
 from django import forms
 from django.db.models import Q
 from reservas.models import Reserva, Espacio, Usuario
+from datetime import date, timedelta
 
 class ReservaCreateForm(forms.ModelForm):
     class Meta:
@@ -9,7 +10,7 @@ class ReservaCreateForm(forms.ModelForm):
         widgets = {
             'fecha_uso': forms.DateInput(
                 format='%Y-%m-%d',
-                attrs={'type': 'date'}
+                attrs={'type': 'date', 'min': date.today().isoformat(), 'max': (date.today() + timedelta(days=90)).isoformat()}
             ),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
             'hora_fin': forms.TimeInput(attrs={'type': 'time'}),

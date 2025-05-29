@@ -1,18 +1,18 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import path, reverse
 from django.contrib.auth.views import LogoutView, LoginView
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
 from reservas.library.views.reservas import *
+
+
 urlpatterns = [
     path('', LoginView.as_view(template_name='reservas/login.html', redirect_authenticated_user=True), name='login'),
     path('dashboard/', Dashboard.as_view(), name='dashboard'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
-    # TODO Logout
-    # Espacio crud
     path('espacio/', EspacioListView.as_view(), name='espacio'),
     path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),
     path('espacio/view/<int:pk>/', EspacioDetailView.as_view(), name='espacio_view'),
@@ -31,3 +31,5 @@ urlpatterns = [
     path('reserva/edit/<int:pk>/', ReservaUpdateView.as_view(), name='reserva_edit'),
     path('reserva/delete/<int:pk>/', ReservaDeleteView.as_view(), name='reserva_delete'),
 ]
+
+# Manejador de error 404

@@ -22,3 +22,5 @@ urlpatterns = [
     path('', include('reservas.urls')),
     
 ]
+handler404 = 'reservas.views.custom_404_view'
+handler403 = 'reservas.views.custom_404_view'
