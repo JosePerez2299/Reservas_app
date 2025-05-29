@@ -19,11 +19,11 @@ urlpatterns = [
     path('espacio/edit/<int:pk>/', EspacioUpdateView.as_view(), name='espacio_edit'),
     path('espacio/delete/<int:pk>/', EspacioDeleteView.as_view(), name='espacio_delete'),
 
-    path('usuario/', EspacioListView.as_view(), name='usuario'),
-    path('usuario/create/', EspacioCreateView.as_view(), name='usuario_create'),
-    path('usuario/view/<int:pk>/', EspacioListView.as_view(), name='usuario_list'),
-    path('usuario/edit/<int:pk>/', EspacioListView.as_view(), name='usuario_edit'),
-    path('usuario/delete/<int:pk>/', EspacioListView.as_view(), name='usuario_delete'),
+    path('usuario/', UsuarioListView.as_view(), name='usuario'),
+    path('usuario/create/', UsuarioCreateView.as_view(), name='usuario_create'),
+    path('usuario/view/<int:pk>/', UsuarioDetailView.as_view(), name='usuario_view'),
+    path('usuario/edit/<int:pk>/', UsuarioUpdateView.as_view(), name='usuario_edit'),
+    path('usuario/delete/<int:pk>/', UsuarioDeleteView.as_view(), name='usuario_delete'),
 
     path('reserva/', ReservaListView.as_view(), name='reserva'),
     path('reserva/create/', ReservaCreateView.as_view(), name='reserva_create'),

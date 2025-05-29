@@ -20,15 +20,59 @@ class Ubicacion(models.Model):
 
 
 # ——— 2. Usuario personalizado ————————————————————————————————————
+import re
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+def validate_username(value):
+    """
+    Validador personalizado para username:
+    - Mínimo 3 caracteres
+    - Máximo 20 caracteres  
+    - No puede comenzar con número o carácter especial
+    - Solo permite letras, números y guiones bajos
+    """
+    # Verificar longitud mínima
+    if len(value) < 3:
+        raise ValidationError('El nombre de usuario debe tener al menos 3 caracteres.')
+    
+    # Verificar longitud máxima
+    if len(value) > 20:
+        raise ValidationError('El nombre de usuario no puede exceder 20 caracteres.')
+    
+    # Verificar que no comience con número o carácter especial
+    if not value[0].isalpha():
+        raise ValidationError('El nombre de usuario debe comenzar con una letra.')
+    
+    # Verificar que solo contenga caracteres permitidos (letras, números, guiones bajos)
+    if not re.match(r'^[a-zA-Z][a-zA-Z0-9_]*$', value):
+        raise ValidationError(
+            'El nombre de usuario solo puede contener letras, números y guiones bajos, '
+            'y debe comenzar con una letra.'
+        )
+
 class Usuario(AbstractUser):
-    email = models.EmailField('email address', unique=True)
+    # Sobrescribir el campo username con el validador personalizado
+    username = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[validate_username],
+        help_text='Nombre de usuario único. 3-20 caracteres. Debe comenzar con letra.',
+        error_messages={
+            'unique': "Ya existe un usuario con este nombre.",
+        }
+    )
+    
+    email = models.EmailField(unique=True)
     ubicacion = models.ForeignKey(
-        Ubicacion, on_delete=models.SET_NULL, 
-        null= True,
+        'Ubicacion', on_delete=models.SET_NULL, 
+        null=True,
         help_text="La sede/edificio al que pertenece el usuario", 
     )
     piso = models.PositiveSmallIntegerField(
-        null = True,
+        null=True,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(40)],
         help_text="Piso en el que puede moderar o reservar"
@@ -52,6 +96,9 @@ class Usuario(AbstractUser):
     @property
     def is_admin(self):
         return self.groups.filter(name='administrador').exists()
+
+    def group_name(self):
+        return self.groups.first()
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
     TIPO_CHOICES = [
@@ -66,7 +113,7 @@ class Espacio(models.Model):
                    r"^[a-zA-Z][a-zA-Z0-9_ ]*[a-zA-Z0-9]$",
                     message="El nombre del espacio debe comenzar y terminar con una letra o número, y solo puede contener letras, números, guiones bajos y espacios."
                 )
-        ])  
+        ]) 
     ubicacion   = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)
     piso        = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
