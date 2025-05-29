@@ -22,8 +22,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
-from django.db.models import Case, When, Value, CharField, Q
-from django.db.models.functions import Lower, Coalesce
+from reservas.library.filters.usuarios import UsuarioFilter
 
 class UsuarioListView(PermissionRequiredMixin, FilterView):
     """
@@ -33,7 +32,7 @@ class UsuarioListView(PermissionRequiredMixin, FilterView):
     permission_required = 'reservas.view_usuario'
     template_name = 'reservas/table_view.html'
     paginate_by = 10
-    filterset_fields = ['username', 'email', 'ubicacion', 'piso']
+    filterset_class = UsuarioFilter
     
     def get_queryset(self):
         qs = super().get_queryset()

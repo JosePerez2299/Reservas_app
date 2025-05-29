@@ -31,7 +31,7 @@ class Command(BaseCommand):
         for ubicacion in ubicaciones:
             for grupo in grupos:
                 for i in range(1, 3):  # Crear dos usuarios
-                    base_username = f"{grupo.name.lower()}_{ubicacion.nombre.lower()}_{i}"
+                    base_username = f"{grupo.name.lower()}{i}_{ubicacion.nombre.lower()}"
                     username = base_username
                     suffix = 1
 

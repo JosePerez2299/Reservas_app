@@ -18,20 +18,18 @@ class Command(BaseCommand):
             return
 
         espacios = []
-        for i in range(1000):
-            ubic = random.choice(ubicaciones)
-
-            nombres_opciones = ["Sala", "Oficina", "Auditorio", "Laboratorio", "Aula", "Estudio"]
-            nombre_random = f"{random.choice(nombres_opciones)} {i+1}"
-            espacio = Espacio(
-                nombre     = nombre_random,
-                ubicacion  = ubic,
-                piso       = 1,
-                capacidad  = random.randint(10, 200),
-                tipo       = random.choice(tipos),
-                disponible = random.choice([True, False]),
-            )
-            espacios.append(espacio)
+        for ubic in ubicaciones:
+            for i in range(10):
+                nombre_random = f"Espacio en {ubic.nombre}-{i+1}"
+                espacio = Espacio(
+                    nombre     = nombre_random,
+                    ubicacion  = ubic,
+                    piso       = 1,
+                    capacidad  = random.randint(10, 200),
+                    tipo       = random.choice(tipos),
+                    disponible = random.choice([True, False]),
+                )
+                espacios.append(espacio)
 
         Espacio.objects.bulk_create(espacios)
         self.stdout.write(self.style.SUCCESS(

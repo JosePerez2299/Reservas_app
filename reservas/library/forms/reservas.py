@@ -21,14 +21,14 @@ class ReservaCreateForm(forms.ModelForm):
 
         # Si es administrador, mostrar selector de usuarios
         if self.request.user.is_admin:
-            self.fields['usuario'].queryset = Usuario.objects.filter(Q(groups__name='usuario') | Q(groups__name='moderador'))
+            self.fields['usuario'].queryset = Usuario.objects.filter(Q(groups__name='usuario') | Q(groups__name='moderador') | Q(id=self.request.user.id))
         
         # Si es moderador, mostrar selector de usuarios
         elif self.request.user.is_moderador:
             self.fields['usuario'].queryset = Usuario.objects.filter(
                 Q(groups__name='usuario') & 
                 Q(ubicacion=self.request.user.ubicacion) & 
-                Q(piso=self.request.user.piso)
+                Q(piso=self.request.user.piso) | Q(id=self.request.user.id)
             )
             self.fields['espacio'].queryset = Espacio.objects.filter(
                 Q(ubicacion=self.request.user.ubicacion) & 
