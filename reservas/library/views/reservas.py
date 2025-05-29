@@ -44,11 +44,7 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
         ctx['cols'] = {
             'usuario': 'Usuario',
             'espacio': 'Espacio',
-            'espacio__ubicacion': 'Ubicación',
-            'espacio__piso': 'Piso',
             'fecha_uso': 'Fecha de uso',
-            'hora_inicio': 'Hora de inicio',
-            'hora_fin': 'Hora de fin',
             'estado': 'Estado',
         }   
         return ctx

@@ -11,15 +11,16 @@ Views para los espacios
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from reservas.models import Espacio
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
 from reservas.library.filters.espacio import EspacioFilter
 from reservas.library.mixins.helpers import AjaxFormMixin
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
+from reservas.library.forms.espacios import EspacioCreateForm
 
 
-class EspacioListView(PermissionRequiredMixin, FilterView):
+class EspacioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -37,8 +38,6 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
         ctx['edit_url'] = 'espacio_edit'
         ctx['delete_url'] = 'espacio_delete'
 
-
-        
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',
@@ -51,19 +50,38 @@ class EspacioListView(PermissionRequiredMixin, FilterView):
 
     def get_ordering(self):
         ordering = self.request.GET.get('ordering')
-        if ordering:
-            if ordering.startswith('-'):
-                return [Lower(ordering[1:]).desc()]
-            else:
-                return [Lower(ordering)]
+        if not ordering:
+            return None
+            
+        # Lista de campos numéricos que deben ordenarse como enteros
+        numeric_fields = ['capacidad', 'piso']
+        
+        # Eliminar el signo de ordenación temporalmente
+        is_desc = ordering.startswith('-')
+        field_name = ordering[1:] if is_desc else ordering
+        
+        # Aplicar el tipo de ordenación apropiado según el campo
+        if field_name in numeric_fields:
+            # Para campos numéricos, ordenar como enteros
+            order_field = field_name
+        else:
+            # Para campos de texto, ordenar sin distinguir mayúsculas/minúsculas
+            order_field = f'lower({field_name})'
+        
+        # Aplicar orden descendente si es necesario
+        if is_desc:
+            order_field = f'-{order_field}'
+            
+        return [order_field]
 
 
-class EspacioCreateView(AjaxFormMixin, CreateView):
+class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     """
     Crea un nuevo espacio
     """
     model = Espacio
-    fields = '__all__'
+    form_class = EspacioCreateForm
+    permission_required = 'reservas.add_espacio'
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
 
@@ -76,11 +94,12 @@ class EspacioCreateView(AjaxFormMixin, CreateView):
         return ctx
 
 
-class EspacioUpdateView(AjaxFormMixin, UpdateView):
+class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
     """
     Edita un espacio existente
     """
     model = Espacio
+    permission_required = 'reservas.change_espacio'
     fields = '__all__'
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
@@ -94,19 +113,21 @@ class EspacioUpdateView(AjaxFormMixin, UpdateView):
         return ctx
 
 
-class EspacioDetailView(DetailView):
+class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     """
     Muestra los detalles de un espacio
     """
     model = Espacio
+    permission_required = 'reservas.view_espacio'
     template_name = 'reservas/view.html'
 
 
-class EspacioDeleteView(DeleteView):
+class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Elimina un espacio existente
     """
     model = Espacio
+    permission_required = 'reservas.delete_espacio'
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('espacio') 
 
