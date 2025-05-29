@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 
-<div class="container max-w-3/4 mx-auto px-4 ">
+<div class="container max-w-3/4 mx-auto px-4">
 
     <div class="w-full" x-data="{ showFilters: false }" @click.away="showFilters = false">
 
@@ -51,7 +51,7 @@
     {# —————— ACCIONES —————— #}
     
     <div class="mb-5 flex justify-between items-baseline">
-      <h1 class="text-3xl font-extrabold text-base-content md:text-5xl lg:text-5xl"><span class="text-transparent bg-clip-text bg-gradient-to-r to-base-content from-secondary">{{model|capfirst}}s</span> </h1>
+      <h1 class="text-4xl font-extrabold text-base-content/80">Gestion de {{model|capfirst}}s</h1>
       
       <div class="flex gap-4 mb-2">
 
