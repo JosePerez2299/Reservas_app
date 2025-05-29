@@ -11,7 +11,7 @@ Views para los espacios
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from reservas.models import Reserva, Ubicacion
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
 from reservas.library.mixins.helpers import AjaxFormMixin
 from django.db.models.functions import Lower
@@ -21,7 +21,7 @@ from reservas.library.filters.reservas import ReservaFilter
 from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q
 
-class ReservaListView(PermissionRequiredMixin, FilterView):
+class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -73,7 +73,7 @@ class ReservaListView(PermissionRequiredMixin, FilterView):
                 return [Lower(ordering)]
 
 
-class ReservaCreateView(AjaxFormMixin, CreateView):
+class ReservaCreateView(LoginRequiredMixin, AjaxFormMixin, CreateView):
     """
     Crea una nueva reserva
     """
@@ -81,6 +81,7 @@ class ReservaCreateView(AjaxFormMixin, CreateView):
     form_class = ReservaCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
+    permission_required = 'reservas.add_reserva'
 
     def get_form_kwargs(self):
         """
@@ -100,7 +101,7 @@ class ReservaCreateView(AjaxFormMixin, CreateView):
         
 
 
-class ReservaUpdateView(AjaxFormMixin, UpdateView):
+class ReservaUpdateView(LoginRequiredMixin, AjaxFormMixin, UpdateView):
     """
     Edita una reserva existente
     """
@@ -108,6 +109,7 @@ class ReservaUpdateView(AjaxFormMixin, UpdateView):
     form_class = ReservaUpdateForm  
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
+    permission_required = 'reservas.change_reserva'
 
     def get_form_kwargs(self):
         """
@@ -126,21 +128,23 @@ class ReservaUpdateView(AjaxFormMixin, UpdateView):
         return ctx
 
 
-class ReservaDetailView(DetailView):
+class ReservaDetailView(LoginRequiredMixin, DetailView):
     """
     Muestra los detalles de un espacio
     """
     model = Reserva
     template_name = 'reservas/reservas_detail.html'
+    permission_required = 'reservas.view_reserva'
 
 
-class ReservaDeleteView(DeleteView):
+class ReservaDeleteView(LoginRequiredMixin, DeleteView):
     """
     Elimina un espacio existente
     """
     model = Reserva
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('reserva') 
+    permission_required = 'reservas.delete_reserva'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -17,14 +17,12 @@ from django.urls import reverse_lazy
 from reservas.models import Usuario
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.db.models import Q
-from django.contrib.auth.mixins import PermissionRequiredMixin
-
-
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
 
-class UsuarioListView(PermissionRequiredMixin, FilterView):
+class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de usuarios con un formulario de filtrado
     """
@@ -99,7 +97,7 @@ class UsuarioListView(PermissionRequiredMixin, FilterView):
         # El ordenamiento lo manejamos en get_queryset()
         return None
 
-class UsuarioCreateView(AjaxFormMixin, CreateView):
+class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     """
     Crea un nuevo usuario
     """
@@ -107,6 +105,7 @@ class UsuarioCreateView(AjaxFormMixin, CreateView):
     form_class = UsuarioCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('usuario')
+    permission_required = 'reservas.add_usuario'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -122,7 +121,7 @@ class UsuarioCreateView(AjaxFormMixin, CreateView):
         return ctx
 
 
-class UsuarioUpdateView(AjaxFormMixin, UpdateView):
+class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
     """
     Edita un usuario existente
     """
@@ -130,6 +129,7 @@ class UsuarioUpdateView(AjaxFormMixin, UpdateView):
     form_class = UsuarioUpdateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('usuario')
+    permission_required = 'reservas.change_usuario'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -145,21 +145,23 @@ class UsuarioUpdateView(AjaxFormMixin, UpdateView):
         return ctx
 
 
-class UsuarioDetailView(DetailView):
+class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     """
     Muestra los detalles de un usuario
     """
-    model = Usuario
+    model = Usuario 
     template_name = 'reservas/view.html'
+    permission_required = 'reservas.view_usuario'
 
 
-class UsuarioDeleteView(DeleteView):
+class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """
     Elimina un usuario existente
     """
     model = Usuario
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('usuario') 
+    permission_required = 'reservas.delete_usuario'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
