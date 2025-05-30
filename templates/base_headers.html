@@ -53,7 +53,7 @@
     
       // Intercepta el submit y lo muestra en consola
       function bindForm() {
-        const form = content.querySelector('form');
+        const form = content.querySelector('form.ajax-form');
         if (!form || form._bound) return;
     
         form._bound = true;

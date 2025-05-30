@@ -24,7 +24,7 @@ class UsuarioWidget(Select2Widget):
 class ReservaCreateForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = ['usuario', 'fecha_uso', 'hora_inicio', 'hora_fin', 'espacio', 'motivo']
+        fields = ['usuario', 'fecha_uso', 'hora_inicio', 'hora_fin', 'espacio', 'motivo', 'estado']
         widgets = {
             'fecha_uso': forms.DateInput(
                 format='%Y-%m-%d',
@@ -50,10 +50,7 @@ class ReservaCreateForm(forms.ModelForm):
                 Q(ubicacion=self.request.user.ubicacion) & 
                 Q(piso=self.request.user.piso) | Q(id=self.request.user.id)
             )
-            self.fields['espacio'].queryset = Espacio.objects.filter(
-                Q(ubicacion=self.request.user.ubicacion) & 
-                Q(piso=self.request.user.piso)
-            )
+
         
         # Si es usuario, mostrar selector de su usuario
         elif self.request.user.is_usuario:
@@ -61,12 +58,11 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].initial = self.request.user
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
+            self.fields['estado'].widget = forms.HiddenInput()
+            self.fields['estado'].disabled = True
+            self.fields['estado'].initial = 'pendiente'
 
-            self.fields['espacio'].queryset = Espacio.objects.filter(
-                Q(ubicacion=self.request.user.ubicacion) & 
-                Q(piso=self.request.user.piso)
-            )   
-            
+ 
 
 class ReservaUpdateForm(ReservaCreateForm):
     estado = forms.ChoiceField(choices=Reserva.ESTADO_CHOICES)
@@ -76,8 +72,21 @@ class ReservaUpdateForm(ReservaCreateForm):
     
     def __init__(self, request, *args, **kwargs):
         super().__init__(request, *args, **kwargs)
-        self.fields['usuario'].disabled = True
         self.fields['espacio'].disabled = True
+        
+        # Garantiza que, además de lo que ya filtraste,
+        # también esté el usuario que figura en la reserva:
+        if self.instance and self.instance.pk:
+            qs = self.fields['usuario'].queryset
+            self.fields['usuario'].queryset = (
+                qs | Usuario.objects.filter(pk=self.instance.usuario.pk)
+            )
+
+        if self.request.user.is_usuario:
+            self.fields['estado'].widget = forms.HiddenInput()
+            self.fields['estado'].disabled = True
+
+
 
     def save(self, commit=True):
         # Primero, instancia sin guardar aún
@@ -88,3 +97,5 @@ class ReservaUpdateForm(ReservaCreateForm):
         if commit:
             instance.save()
         return instance
+
+   
