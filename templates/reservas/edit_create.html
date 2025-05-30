@@ -1,43 +1,14 @@
+{% extends "base_headers.html" %}
 {% load form_style %}
-<div 
-  x-data="{
-    submitForm() {
-      const formEl = this.$refs.form;
-      const data   = new FormData(formEl);
 
-      fetch(formEl.action, {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        body: data,
-      })
-      .then(res => {
-        const ct = res.headers.get('content-type') || '';
-        return ct.includes('application/json')
-          ? res.json()
-          : res.text();
-      })
-      .then(payload => {
-        if (payload.success) {
-          return window.location.href = payload.redirect_url;
-        }
-        // recargamos todo el <div> actual con el HTML que vino (con errores)
-        this.$el.innerHTML = typeof payload === 'string'
-          ? payload
-          : payload.html_form;
-      })
-      .catch(console.error);
-    }
-  }" 
->
-  <form 
-    x-ref="form"
-    @submit.prevent="submitForm"
-    method="post"
-    action="{{ url }}"
-  >
-    <h3 class="text-2xl font-bold text-center">{{title}}</h2>
-    {% csrf_token %}
-    {{ form|mystyle }}
-    <button type="submit" class="btn btn-success">Guardar</button>
-  </form>
-</div>
+{% block body %}
+  <h2 class="text-2xl text-base-content/80 font-bold">{{title}}</h2>
+  <div class="p-4 border border-info/20 bg-base-300 rounded-box ">
+    <form id="form-modal"  method="POST" action="{{url}}">
+      {% csrf_token %}
+      {{ form|mystyle }}
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+
+{% endblock %}
+

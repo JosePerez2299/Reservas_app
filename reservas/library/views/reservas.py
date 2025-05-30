@@ -137,7 +137,7 @@ class ReservaDetailView(LoginRequiredMixin, DetailView):
     permission_required = 'reservas.view_reserva'
 
 
-class ReservaDeleteView(LoginRequiredMixin, DeleteView):
+class ReservaDeleteView(LoginRequiredMixin, AjaxFormMixin, DeleteView):
     """
     Elimina un espacio existente
     """

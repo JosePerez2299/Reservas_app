@@ -20,6 +20,7 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('reservas.urls')),
+    path("select2/", include("django_select2.urls")),
     
 ]
 handler404 = 'reservas.views.custom_404_view'

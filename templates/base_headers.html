@@ -1,0 +1,149 @@
+{% load compress %} {% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en" x-data="themeSwitcher()" x-init="init()" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas CANTV</title>
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'src/css/output.css' %}" />
+    {% endcompress %}
+    {{ form.media.css }}
+  </head>
+
+
+  {% block body %}
+
+  {% endblock %}
+
+  <script>
+    ;(function() {
+      const modal   = document.getElementById('generic_modal');
+      const content = document.getElementById('generic_modal_content');
+    
+      // Abre el modal cargando el formulario por AJAX
+      async function openModal(url) {
+        content.innerHTML = '';
+        modal.showModal();
+        try {
+          const resp = await fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+          const html = await resp.text();
+          content.innerHTML = html;
+          
+          // Initialize Select2 for any select elements
+          const selectElements = content.querySelectorAll('select.django-select2');
+          selectElements.forEach(select => {
+            $(select).select2({
+              theme: 'default',
+              width: '100%',
+              dropdownParent: modal
+            });
+          });
+          
+          bindForm();
+        } catch (err) {
+          console.error('Error cargando formulario:', err);
+          content.innerHTML = '<p class="p-4 text-red-600">Error cargando el formulario.</p>';
+        }
+      }
+    
+      // Intercepta el submit y lo muestra en consola
+      function bindForm() {
+        const form = content.querySelector('form');
+        if (!form || form._bound) return;
+    
+        form._bound = true;
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const fd = new FormData(form);
+    
+          // Imprime cada campo
+          for (const [key, value] of fd.entries()) {
+            console.log(`${key} →`, value);
+          }
+          console.log('FormData completo:', Object.fromEntries(fd.entries()));
+
+          fetch(form.action, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: fd
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.success) {
+              modal.close();
+              if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+              }
+            }
+            else {
+              content.innerHTML = data.html;
+              bindForm();
+            }
+          })
+          .catch(err => {
+            console.error('Error al enviar el formulario:', err);
+          });
+          // NO enviamos ni redirigimos
+        });
+      }
+    
+      // Delegación de clicks para botones .open-modal-btn
+      document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.open-modal-btn');
+        if (!btn) return;
+        e.preventDefault();
+        openModal(btn.dataset.url);
+      });
+    })();
+
+
+    </script>
+    
+    
+  <script>
+      function themeSwitcher() {
+        return {
+          // usamos booleano para simplificar el binding con el checkbox
+          dark: localStorage.getItem('theme') === 'dark',
+      
+          init() {
+            // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
+            this.applyTheme(this.dark)
+          },
+      
+          toggle() {
+            // invocado al hacer click sobre el swap
+            this.dark = !this.dark
+            this.applyTheme(this.dark)
+          },
+      
+          applyTheme(isDark) {
+            // ponemos el atributo data-theme que DaisyUI utiliza
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+            // guardamos la preferencia
+            localStorage.setItem('theme', isDark ? 'dark' : 'light')
+          }
+        }
+      }
+    </script>
+
+    <!-- Alpine Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Alpine Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+ 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {{ form.media.js }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>       
+  </body>
+</html>

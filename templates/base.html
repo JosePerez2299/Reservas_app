@@ -1,18 +1,5 @@
-{% load compress %} {% load static %}
-{%load crispy_forms_tags %}
-
-
-<!DOCTYPE html>
-<html lang="en" x-data="themeSwitcher()" x-init="init()" class="h-full">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Reservas CANTV</title>
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'src/css/output.css' %}" />
-    {% endcompress %}
-  </head>
-
+{% extends "base_headers.html" %}
+{% block body %}
   <body class="flex flex-col min-h-screen bg-base-100">
   <div class="flex flex-col min-h-screen">
     <div class="flex-grow">
@@ -76,6 +63,8 @@
           {% block content %}
 
           {% endblock %}
+
+          {% comment %} Modal {% endcomment %}
           <dialog id="generic_modal" class="modal">
             <div class="modal-box">
               <form method="dialog">
@@ -87,7 +76,7 @@
               <button>close</button>
             </form>
           </dialog>
-
+          {% comment %} Fin Modal {% endcomment %}
         </div>
 
       </div>
@@ -134,7 +123,7 @@
     </div>
     <footer class="footer sm:footer-horizontal bg-gradient-to-b from-base-100 via-base-100 to-primary/40  text-base-content items-center p-4">
       <aside class="grid-flow-col items-center">
-{% include 'includes/logo.html' %}
+    {% include 'includes/logo.html' %}
         <p>Copyright © 2025 - Todos los derechos reservados</p>
       </aside>
       <nav class="grid-flow-col gap-4 md:place-self-center md:justify-self-end">
@@ -174,114 +163,4 @@
       </nav>
     </footer>
   </div>
-  <script>
-    ;(function() {
-      const modal   = document.getElementById('generic_modal');
-      const content = document.getElementById('generic_modal_content');
-    
-      // Función que abre el modal para cualquier botón .open-modal-btn
-      async function openModal(url, callbackName) {
-        content.innerHTML = '';      // limpia contenido previo
-        modal.showModal();
-    
-        try {
-          const resp = await fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-          });
-          const html = await resp.text();
-          content.innerHTML = html;
-          bindForm(callbackName);
-        } catch (err) {
-          console.error(err);
-          content.innerHTML = '<p class="p-4 text-red-600">Error cargando el formulario.</p>';
-        }
-      }
-    
-      // Función que enlaza el submit del formulario actualmente inyectado
-      function bindForm(callbackName) {
-        const form = content.querySelector('form');
-        if (!form) return;
-    
-        // Guárdate la acción original y el callback en data-attrs, si no vienen en form.action
-        const action = form.action;
-        form.removeEventListener('submit', handleSubmit);
-        form.addEventListener('submit', handleSubmit);
-    
-        async function handleSubmit(e) {
-          e.preventDefault();
-          const fd = new FormData(form);
-    
-          const resp = await fetch(action, {
-            method: 'POST',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            body:     fd
-          });
-    
-          // Django responde JSON siempre
-          const data = await resp.json();
-    
-          if (data.success) {
-            modal.close();
-            if (callbackName && typeof window[callbackName] === 'function') {
-              window[callbackName](data);
-            } else {
-              // por defecto, recarga la página
-              location.reload();
-            }
-          } else {
-            // reinyecta el formulario con los errores
-            content.innerHTML = data.html;
-            // y vuelve a enlazar el handler sobre el nuevo <form>
-            bindForm(callbackName);
-          }
-        }
-      }
-    
-      // Delegación de clicks en botones que abran el modal
-      document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.open-modal-btn');
-        if (!btn) return;
-    
-        e.preventDefault();
-        const url = btn.dataset.url;
-        const callbackName = btn.dataset.successCallback;  // opcional
-        openModal(url, callbackName);
-      });
-    })();
-    </script>
-    
-  <script>
-      function themeSwitcher() {
-        return {
-          // usamos booleano para simplificar el binding con el checkbox
-          dark: localStorage.getItem('theme') === 'dark',
-      
-          init() {
-            // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
-            this.applyTheme(this.dark)
-          },
-      
-          toggle() {
-            // invocado al hacer click sobre el swap
-            this.dark = !this.dark
-            this.applyTheme(this.dark)
-          },
-      
-          applyTheme(isDark) {
-            // ponemos el atributo data-theme que DaisyUI utiliza
-            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-            // guardamos la preferencia
-            localStorage.setItem('theme', isDark ? 'dark' : 'light')
-          }
-        }
-      }
-    </script>
-
-    <!-- Alpine Plugins -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Alpine Core -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  </body>
-</html>
+ {% endblock %}

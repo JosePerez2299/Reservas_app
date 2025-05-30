@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_select2',
     'django_filters',
     'widget_tweaks',
     'compressor',
