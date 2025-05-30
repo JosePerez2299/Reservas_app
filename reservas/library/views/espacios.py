@@ -41,6 +41,7 @@ class EspacioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
         # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'nombre': 'Nombre',
+            'tipo': 'Tipo',
             'capacidad': 'Capacidad',
             'ubicacion': 'Ubicación',
             'piso': 'Piso',
@@ -100,7 +101,7 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     model = Espacio
     permission_required = 'reservas.change_espacio'
-    fields = '__all__'
+    form_class = EspacioCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
 
