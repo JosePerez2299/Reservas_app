@@ -96,15 +96,6 @@
       {# ——————————————————————————————— #}
     </div>
 
-    {% if model == 'reserva' %}
-    {% include 'includes/reservas_table.html' %}
-
-    {% elif model == 'espacio' %}
-    {% include 'includes/espacios_table.html' %}
-    
-    {% elif model == 'usuario' %}
-    {% include 'includes/usuarios_table.html' %}
-    
-    {% endif %}
+    {% include 'includes/table_with_actions.html' %}
   </div>
 {% endblock %}
