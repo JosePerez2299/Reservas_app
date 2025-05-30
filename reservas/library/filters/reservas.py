@@ -4,7 +4,7 @@ from django.forms.widgets import DateInput, TimeInput
 class ReservaFilter(django_filters.FilterSet):
     usuario = django_filters.CharFilter(
         field_name='usuario__username',
-        lookup_expr='exact',
+        lookup_expr='icontains',
         label='Usuario',
 
     )

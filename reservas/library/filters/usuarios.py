@@ -34,12 +34,19 @@ class UsuarioFilter(django_filters.FilterSet):
         })
     )
     
+    def filter_by_group(self, queryset, name, value):
+        if value == 'usuario':
+            return queryset.filter(groups__name='usuario')
+        elif value == 'moderador':
+            return queryset.filter(groups__name='moderador')
+        return queryset
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if hasattr(self.request, 'user') and self.request.user.is_admin:
+        if hasattr(self, 'request') and hasattr(self.request, 'user') and self.request.user.is_admin:
             self.filters['group_name'] = django_filters.ChoiceFilter(
                 label='Grupo',
-                method='filter_by_group',
+                method=self.filter_by_group,
                 choices=[
                     ('usuario', 'Usuario'),
                     ('moderador', 'Moderador'),
@@ -47,13 +54,6 @@ class UsuarioFilter(django_filters.FilterSet):
                 widget=forms.Select(attrs={'class': 'form-select'}),
                 empty_label='Todos los grupos'
             )
-    
-    def filter_by_group(self, queryset, name, value):
-        if value == 'usuario':
-            return queryset.filter(groups__name='usuario')
-        elif value == 'moderador':
-            return queryset.filter(groups__name='moderador')
-        return queryset
 
     class Meta:
         model = Usuario
