@@ -40,7 +40,8 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
         ctx['edit_url'] = 'reserva_edit'
         ctx['delete_url'] = 'reserva_delete'      
         
-        # Definir las columnas que se mostrarán en la tabla
+
+            # Definir las columnas que se mostrarán en la tabla
         ctx['cols'] = {
             'usuario': 'Usuario',
             'espacio': 'Espacio',
@@ -56,6 +57,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
             return qs
         elif self.request.user.is_moderador:
             return qs.filter(
+                Q(usuario=self.request.user) | 
                 Q(aprobado_por=self.request.user) | 
                 (Q(espacio__ubicacion=self.request.user.ubicacion)  & 
                 Q(espacio__piso=self.request.user.piso))

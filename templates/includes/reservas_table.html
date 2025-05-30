@@ -1,4 +1,5 @@
 {% extends 'includes/table.html' %}
+{% load table_actions %}
 {% block actions %}
   <td>
 
@@ -16,7 +17,8 @@
       
       </button>
 
-      {% if   obj.estado == 'pendiente' %}
+      {% puede_editar obj request.user as permiso_editar %}
+      {% if permiso_editar %}
       <button
         class="btn btn-xs rounded-full btn-warning open-modal-btn w-8 h-8 p-1"
         data-url="{% url edit_url obj.pk %}?parent={{ obj.pk }}"
@@ -28,9 +30,10 @@
       
       
       </button>
-      {% endif %}
+        {% endif %}
 
-      {% if obj.estado == 'pendiente' %}
+      {% puede_eliminar obj request.user as permiso_eliminar %}
+      {% if permiso_eliminar %}
       <button
         class="btn btn-xs btn-error rounded-full open-modal-btn w-8 h-8 p-1"
         data-url="{% url delete_url obj.pk %}?parent={{ obj.pk }}"
