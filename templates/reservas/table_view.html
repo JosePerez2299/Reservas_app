@@ -16,7 +16,7 @@
         <span class="mt-1 text-base-content/50 text-sm hidden lg:block">Listado de {{model|capfirst}}s</span>
       </div>
       
-      <div class="flex gap-2 mb-2">
+      <div class="grid grid-cols-2 gap-2">
 
         {% url create_url as create_url %}
     
@@ -31,7 +31,17 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
         </button>
-      
+          
+        <!-- Modal exportar -->
+
+        <a href="{% url 'usuario_export' %}" class="btn btn-xs btn-primary">
+          <span class="text-xs">Exportar</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </a>
+       
+
       <!-- Modal Filtrar -->
       <button class="btn btn-warning btn-xs" onclick="filter_modal.showModal()">
         

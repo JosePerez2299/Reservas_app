@@ -24,6 +24,7 @@ urlpatterns = [
     path('usuario/view/<int:pk>/', UsuarioDetailView.as_view(), name='usuario_view'),
     path('usuario/edit/<int:pk>/', UsuarioUpdateView.as_view(), name='usuario_edit'),
     path('usuario/delete/<int:pk>/', UsuarioDeleteView.as_view(), name='usuario_delete'),
+    path('usuario/export/', UsuarioExportExcel.as_view(), name='usuario_export'),
 
     path('reserva/', ReservaListView.as_view(), name='reserva'),
     path('reserva/create/', ReservaCreateView.as_view(), name='reserva_create'),

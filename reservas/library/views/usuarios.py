@@ -9,6 +9,7 @@ Views para los usuarios
 
 """
 
+from django.views import View
 from django_filters.views import FilterView
 from reservas.library.forms.usuarios import UsuarioCreateForm, UsuarioUpdateForm
 from reservas.library.mixins.helpers import AjaxFormMixin
@@ -21,6 +22,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
+from reservas.resources import UsuarioResource
+from django.http import HttpResponse
+from datetime import datetime
 
 class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     """
@@ -170,3 +174,21 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
             'title': f'Eliminar {self.object.pk}'
         })
         return context
+
+class UsuarioExportExcel(View):
+    def get(self, request, *args, **kwargs):
+        # Filtra o adapta tu QuerySet según necesidad. Aquí obj obtendrá todas las usuarios.
+        queryset =  Usuario.objects.all()
+
+        # Instancia el Resource y conviértelo a formato Excel
+        resource = UsuarioResource()
+        dataset = resource.export(queryset)  # dataset es un tablib.Dataset
+
+        # Construimos la respuesta HTTP con el contenido Excel
+        response = HttpResponse(
+            dataset
+            ,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="usuarios_{datetime.now().strftime("%d/%m/%Y_%H:%M:%S")}.xlsx"'
+        return response

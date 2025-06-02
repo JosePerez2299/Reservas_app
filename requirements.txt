@@ -3,4 +3,4 @@ django-filter
 django-widget-tweaks
 django-compressor
 django-select2
-
+django-import-export
