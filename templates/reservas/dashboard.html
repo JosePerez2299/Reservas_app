@@ -1,17 +1,327 @@
-{% extends 'base.html' %} 
-
+{% extends "base.html" %}
 {% block content %}
 
-  <div class="hero h-[calc(100vh-4rem)] bg-cover bg-center" style="background-image: url('https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp');">
-    <div class="hero-overlay"></div>
-    <div class="hero-content text-base-content text-center">
-      <div class="-mt-6 max-w-md ">
-        <h1 class="mb-5 text-5xl font-bold">Panel de {{ group }}</h1>
-
-        <h2 class="text-center">Bienvenido, {{ request.user.username }}</h2>
-        <p class="mb-5">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-        <button class="btn btn-primary">Get Started</button>
-      </div>
+ <!-- Header Hero Section -->
+<header class="relative overflow-hidden">
+    <div class="gradient-bg relative z-10">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative z-20 px-6 py-16 lg:py-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                    <div class="animate-fade-in">
+                        <h1 class="text-3xl lg:text-5xl font-extrabold text-base-100 mb-4">
+                            ¡Hola, <span class="text-yellow-300"> {% if user.first_name %}{{user.first_name}}{% else %}{{user.username}}{% endif %}</span>! 👋
+                        </h1>
+                        <p class="text-xl text-base-100/90 mb-6 lg:mb-0">
+                            Bienvenida de vuelta. Aquí tienes un resumen de tu actividad.
+                        </p>
+                        <div class="flex items-center space-x-4 text-white/80">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </span>
+                            <span class="flex items-center">
+                                <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                                En línea
+                            </span>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block animate-bounce-subtle">
+                        <div class="avatar online">
+                            <div class="w-24 rounded-full ring ring-white ring-offset-4 ring-offset-transparent shadow-2xl">
+                                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="Avatar" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+</header>
+
+<!-- Main Dashboard Content -->
+<main class="flex-1 px-6 py-8 space-y-8">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            
+            <!-- Card 1: Usuarios Activos -->
+            <div class="card bg-white shadow-xl card-hover animate-slide-up border-l-4 border-l-blue-500" style="animation-delay: 0.1s">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Usuarios Activos</p>
+                            <p class="text-3xl font-bold text-blue-600">2,847</p>
+                            <p class="text-xs text-green-600 mt-1">↗ +12% vs ayer</p>
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Ventas -->
+            <div class="card bg-white shadow-xl card-hover animate-slide-up border-l-4 border-l-green-500" style="animation-delay: 0.2s">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Ventas Hoy</p>
+                            <p class="text-3xl font-bold text-green-600">$34,567</p>
+                            <p class="text-xs text-green-600 mt-1">↗ +8% vs ayer</p>
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-full">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Tareas Pendientes -->
+            <div class="card bg-white shadow-xl card-hover animate-slide-up border-l-4 border-l-orange-500" style="animation-delay: 0.3s">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Tareas Pendientes</p>
+                            <p class="text-3xl font-bold text-orange-600">23</p>
+                            <p class="text-xs text-red-600 mt-1">↗ +3 nuevas</p>
+                        </div>
+                        <div class="p-3 bg-orange-100 rounded-full">
+                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Notificaciones -->
+            <div class="card bg-white shadow-xl card-hover animate-slide-up border-l-4 border-l-purple-500" style="animation-delay: 0.4s">
+                <div class="card-body">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Notificaciones</p>
+                            <p class="text-3xl font-bold text-purple-600">7</p>
+                            <p class="text-xs text-blue-600 mt-1">2 sin leer</p>
+                        </div>
+                        <div class="p-3 bg-purple-100 rounded-full relative">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM19 3H5a2 2 0 00-2 2v14l4-4h12a2 2 0 002-2V5a2 2 0 00-2-2z"></path>
+                            </svg>
+                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                <span class="text-xs text-white font-bold">2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Sections Grid -->
+        <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Activity Feed -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Recent Activity -->
+                <div class="card bg-white shadow-xl animate-slide-up" style="animation-delay: 0.5s">
+                    <div class="card-body">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="card-title text-2xl font-bold">Actividad Reciente</h2>
+                            <button class="btn btn-outline btn-primary btn-sm">Ver Todo</button>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg">
+                                <div class="avatar">
+                                    <div class="w-10 rounded-full">
+                                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="user" />
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold">Ana García completó la tarea "Revisión de presupuesto"</p>
+                                    <p class="text-sm text-gray-500">Hace 2 minutos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 p-4 bg-green-50 rounded-lg">
+                                <div class="avatar">
+                                    <div class="w-10 rounded-full">
+                                        <img src="https://img.daisyui.com/images/stock/photo-1535713875002-d1d0cf7a7d4d.jpg" alt="user" />
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold">Carlos López creó un nuevo proyecto "Website Redesign"</p>
+                                    <p class="text-sm text-gray-500">Hace 15 minutos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 p-4 bg-purple-50 rounded-lg">
+                                <div class="avatar">
+                                    <div class="w-10 rounded-full">
+                                        <img src="https://img.daisyui.com/images/stock/photo-1494790108755-2616c4dd6525.jpg" alt="user" />
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold">Elena Martín subió 3 archivos al proyecto "Marketing Q2"</p>
+                                    <p class="text-sm text-gray-500">Hace 1 hora</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-xl animate-slide-up" style="animation-delay: 0.6s">
+                    <div class="card-body">
+                        <h2 class="card-title text-2xl font-bold mb-6">Acciones Rápidas</h2>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            <button class="btn bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Nueva Tarea
+                            </button>
+                            <button class="btn bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a8 8 0 10-16 0v2h5m6 0v-9a6 6 0 00-12 0v9"></path>
+                                </svg>
+                                Añadir Usuario
+                            </button>
+                            <button class="btn bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Reporte
+                            </button>
+                            <button class="btn bg-white/20 hover:bg-white/30 border-white/30 text-white">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Configurar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Side Info -->
+            <div class="space-y-6">
+                
+                <!-- Progress Card -->
+                <div class="card bg-white shadow-xl animate-slide-up" style="animation-delay: 0.7s">
+                    <div class="card-body">
+                        <h3 class="font-bold text-lg mb-4">Progreso del Mes</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Objetivos Completados</span>
+                                    <span>75%</span>
+                                </div>
+                                <progress class="progress progress-primary" value="75" max="100"></progress>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Tareas Finalizadas</span>
+                                    <span>92%</span>
+                                </div>
+                                <progress class="progress progress-success" value="92" max="100"></progress>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Proyectos Activos</span>
+                                    <span>60%</span>
+                                </div>
+                                <progress class="progress progress-warning" value="60" max="100"></progress>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Widget -->
+                <div class="card bg-white shadow-xl animate-slide-up" style="animation-delay: 0.8s">
+                    <div class="card-body">
+                        <h3 class="font-bold text-lg mb-4">Próximos Eventos</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                                <div class="w-12 h-12 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
+                                    05
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Reunión de Equipo</p>
+                                    <p class="text-sm text-gray-500">10:00 AM - 11:30 AM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                                <div class="w-12 h-12 bg-green-500 text-white rounded-lg flex items-center justify-center font-bold">
+                                    07
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Presentación Cliente</p>
+                                    <p class="text-sm text-gray-500">2:00 PM - 3:00 PM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                                <div class="w-12 h-12 bg-purple-500 text-white rounded-lg flex items-center justify-center font-bold">
+                                    10
+                                </div>
+                                <div>
+                                    <p class="font-semibold">Workshop UX/UI</p>
+                                    <p class="text-sm text-gray-500">9:00 AM - 5:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Status -->
+                <div class="card bg-white shadow-xl animate-slide-up" style="animation-delay: 0.9s">
+                    <div class="card-body">
+                        <h3 class="font-bold text-lg mb-4">Estado del Equipo</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="avatar online">
+                                        <div class="w-8 rounded-full">
+                                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="Ana" />
+                                        </div>
+                                    </div>
+                                    <span class="font-medium">Ana García</span>
+                                </div>
+                                <div class="badge badge-success">Disponible</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="avatar offline">
+                                        <div class="w-8 rounded-full">
+                                            <img src="https://img.daisyui.com/images/stock/photo-1535713875002-d1d0cf7a7d4d.jpg" alt="Carlos" />
+                                        </div>
+                                    </div>
+                                    <span class="font-medium">Carlos López</span>
+                                </div>
+                                <div class="badge badge-warning">Ocupado</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="avatar online">
+                                        <div class="w-8 rounded-full">
+                                            <img src="https://img.daisyui.com/images/stock/photo-1494790108755-2616c4dd6525.jpg" alt="Elena" />
+                                        </div>
+                                    </div>
+                                    <span class="font-medium">Elena Martín</span>
+                                </div>
+                                <div class="badge badge-success">Disponible</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
 {% endblock %}

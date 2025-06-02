@@ -11,6 +11,55 @@
     <link rel="stylesheet" href="{% static 'src/css/output.css' %}" />
     {% endcompress %}
     {{ form.media.css }}
+    <script>
+      tailwind.config = {
+          theme: {
+              extend: {
+                  animation: {
+                      'fade-in': 'fadeIn 0.5s ease-in-out',
+                      'slide-up': 'slideUp 0.6s ease-out',
+                      'bounce-subtle': 'bounceSubtle 2s infinite',
+                      'pulse-glow': 'pulseGlow 2s ease-in-out infinite alternate',
+                  },
+                  keyframes: {
+                      fadeIn: {
+                          '0%': { opacity: '0', transform: 'translateY(10px)' },
+                          '100%': { opacity: '1', transform: 'translateY(0)' }
+                      },
+                      slideUp: {
+                          '0%': { opacity: '0', transform: 'translateY(30px)' },
+                          '100%': { opacity: '1', transform: 'translateY(0)' }
+                      },
+                      bounceSubtle: {
+                          '0%, 100%': { transform: 'translateY(0)' },
+                          '50%': { transform: 'translateY(-3px)' }
+                      },
+                      pulseGlow: {
+                          '0%': { boxShadow: '0 0 5px rgba(168, 85, 247, 0.4)' },
+                          '100%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.8), 0 0 30px rgba(168, 85, 247, 0.4)' }
+                      }
+                  }
+              }
+          }
+      }
+  </script>
+  <style>
+      .gradient-bg {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      }
+      .card-hover {
+          transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      }
+      .glass-effect {
+          backdrop-filter: blur(16px) saturate(180%);
+          background-color: rgba(255, 255, 255, 0.75);
+          border: 1px solid rgba(255, 255, 255, 0.125);
+      }
+  </style>
   </head>
 
 
@@ -144,6 +193,73 @@
  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form.media.js }}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>       
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>     
+    
+    <script>
+      // Animaciones y interactividad adicional
+      document.addEventListener('DOMContentLoaded', function() {
+          // Agregar efectos de hover dinámicos
+          const cards = document.querySelectorAll('.card-hover');
+          cards.forEach(card => {
+              card.addEventListener('mouseenter', function() {
+                  this.style.transform = 'translateY(-8px) scale(1.02)';
+              });
+              
+              card.addEventListener('mouseleave', function() {
+                  this.style.transform = 'translateY(0) scale(1)';
+              });
+          });
+
+        
+          // Efecto de escritura para el título de bienvenida
+          const welcomeText = document.querySelector('h1');
+          if (welcomeText) {
+              welcomeText.style.opacity = '0';
+              setTimeout(() => {
+                  welcomeText.style.transition = 'opacity 1s ease-in-out';
+                  welcomeText.style.opacity = '1';
+              }, 500);
+          }
+
+          // Notificación de bienvenida
+          setTimeout(() => {
+              showWelcomeNotification();
+          }, 2000);
+      });
+
+      function showWelcomeNotification() {
+          const notification = document.createElement('div');
+          notification.className = 'fixed top-4 right-4 bg-white shadow-xl rounded-lg p-4 border-l-4 border-l-green-500 z-50 animate-slide-up';
+          notification.innerHTML = `
+              <div class="flex items-center space-x-3">
+                  <div class="flex-shrink-0">
+                      <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                  </div>
+                  <div>
+                      <p class="font-semibold text-gray-900">¡Bienvenida de vuelta!</p>
+                      <p class="text-sm text-gray-600">Todo está funcionando correctamente.</p>
+                  </div>
+                  <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                  </button>
+              </div>
+          `;
+          
+          document.body.appendChild(notification);
+          
+          // Auto-remover después de 5 segundos
+          setTimeout(() => {
+              if (notification.parentElement) {
+                  notification.style.opacity = '0';
+                  notification.style.transform = 'translateX(100%)';
+                  setTimeout(() => notification.remove(), 300);
+              }
+          }, 5000);
+      }
+  </script>
   </body>
 </html>

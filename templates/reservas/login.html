@@ -1,31 +1,71 @@
-{% extends 'base.html' %}
-{% load form_style %}
+{# templates/login.html #}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
-  <div class="hero h-[calc(100vh-4rem)] bg-cover bg-center" ">
-    <div class="hero-overlay bg-opacity-80"></div>
-    <div class="hero-content text-neutral-content">
-      <div class="flex flex-col lg:flex-row-reverse items-center justify-center w-full max-w-6xl mx-auto px-4">
-        <div class="text-center lg:text-left lg:ml-12">
-          <h1 class="text-5xl font-bold text-black mb-6">Iniciar Sesión</h1>
-          <div class="divider divider-primary"></div>
-          <p class="mb-8 text-lg text-secondary font-bold max-w-md">
-            Inicia sesión para acceder a tus reservas y gestionar tus espacios.
-          </p>
-        </div>
-        <div class="card bg-base-100 w-full text-base-content max-w-sm shadow-2xl">
-          <div class="card-body">
-            <form method="post" class="w-full">
-              {% csrf_token %}
-              {{ form|mystyle }}
-              <button class="btn btn-accent w-full mt-4" type="submit">
-                <span class="text-white">Iniciar Sesión</span>
-              </button>
-            </form>
+<div class=" gradient-bg flex items-center justify-center min-h-screen bg-base-100">
+
+  <div class="w-full max-w-md px-6 py-8 glass-effect rounded-2xl shadow-xl">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
+    
+    {% if messages %}
+      <div class="mb-4">
+        {% for message in messages %}
+          <div class="alert alert-error shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6"
+                 fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M18.364 5.636l-1.414 1.414M5.636 18.364l-1.414-1.414M6.343 
+                        6.343l1.414 1.414m10.607 10.607l1.414-1.414M17 
+                        12a5 5 0 11-10 0 5 5 0 0110 0z" />
+            </svg>
+            <span>{{ message }}</span>
           </div>
-        </div>
+        {% endfor %}
       </div>
-    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label for="id_username" class="block text-gray-700 font-medium">Usuario</label>
+        <input
+          type="text"
+          name="username"
+          id="id_username"
+          required
+          class="input input-bordered w-full mt-1"
+          placeholder="Tu usuario"
+          autofocus
+        />
+      </div>
+
+      <div>
+        <label for="id_password" class="block text-gray-700 font-medium">Contraseña</label>
+        <input
+          type="password"
+          name="password"
+          id="id_password"
+          required
+          class="input input-bordered w-full mt-1"
+          placeholder="Tu contraseña"
+        />
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="flex items-center">
+          <input type="checkbox" name="remember" class="checkbox checkbox-sm mr-2" />
+          <span class="text-gray-600 text-sm">Recordarme</span>
+        </label>
+        <a href="#" class="text-sm text-primary hover:underline">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full mt-4">
+        Entrar
+      </button>
+    </form>
+
+    
   </div>
+</div>
 {% endblock %}
