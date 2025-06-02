@@ -25,6 +25,7 @@ from reservas.library.filters.usuarios import UsuarioFilter
 from reservas.resources import UsuarioResource
 from django.http import HttpResponse
 from datetime import datetime
+import pandas as pd
 
 class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     """
@@ -180,15 +181,11 @@ class UsuarioExportExcel(View):
         # Filtra o adapta tu QuerySet según necesidad. Aquí obj obtendrá todas las usuarios.
         queryset =  Usuario.objects.all()
 
-        # Instancia el Resource y conviértelo a formato Excel
-        resource = UsuarioResource()
-        dataset = resource.export(queryset)  # dataset es un tablib.Dataset
+        # Instancia el Resource y conviértelo a formato csv
+        df = pd.DataFrame(list(queryset))
+        # Construimos la respuesta HTTP con el contenido csv
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="usuarios_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv"'
 
-        # Construimos la respuesta HTTP con el contenido Excel
-        response = HttpResponse(
-            dataset
-            ,
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = f'attachment; filename="usuarios_{datetime.now().strftime("%d/%m/%Y_%H:%M:%S")}.xlsx"'
+        df.to_csv(response, index=False)
         return response
