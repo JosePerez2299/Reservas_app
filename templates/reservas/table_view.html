@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 
-<div class=" m-4 p-4" >
+<div class=" m-4 py-4 px-6" >
   
 
     {# —————— ACCIONES —————— #}
@@ -32,23 +32,42 @@
           </svg>
         </button>
       
-        <!-- Modal Añadir -->
-        <button
-        class="btn btn-xs btn-accent open-modal-btn"
-        data-url="{{create_url}}"
-        data-success-callback="reloadRow" 
-      >
-        <span class="text-xs">Filtrar</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-        </svg>
-        </button>
-
+      <!-- Modal Filtrar -->
+      <button class="btn btn-warning btn-xs" onclick="filter_modal.showModal()">
         
+        <span class="text-xs">Filtrar</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
+          <path fill-rule="evenodd" d="M3.792 2.938A49.069 49.069 0 0 1 12 2.25c2.797 0 5.54.236 8.209.688a1.857 1.857 0 0 1 1.541 1.836v1.044a3 3 0 0 1-.879 2.121l-6.182 6.182a1.5 1.5 0 0 0-.439 1.061v2.927a3 3 0 0 1-1.658 2.684l-1.757.878A.75.75 0 0 1 9.75 21v-5.818a1.5 1.5 0 0 0-.44-1.06L3.13 7.938a3 3 0 0 1-.879-2.121V4.774c0-.897.64-1.683 1.542-1.836Z" clip-rule="evenodd" />
+        </svg>
+        
+        
+
+      </button>
+      <dialog id="filter_modal" class="modal">
+        <div class="modal-box">
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <div>
+
+            <h3 class="text-center text-2xl text-base-content/80 font-bold">Filtrado de {{model|capfirst}}s</h3>
+            <form method="get" action="{{request.path}}">
+              {{filter.form|mystyle}}
+              <div class="modal-action">
+                <button class="btn btn-success ">Filtrar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+              
       
         <!-- Limpiar -->
         <a href="{{ request.path }}" class="btn btn-xs btn-error flex  items-center justify-center ">
-          <span class="text-xs">Limpiar</span>
+          <span class="text-xs">Refrescar</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
           </svg>

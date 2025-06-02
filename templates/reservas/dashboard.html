@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
 
  <!-- Header Hero Section -->
@@ -28,11 +29,11 @@
                         </div>
                     </div>
                     <div class="hidden lg:block animate-bounce-subtle">
-                        <div class="avatar online">
-                            <div class="w-24 rounded-full ring ring-white ring-offset-4 ring-offset-transparent shadow-2xl">
-                                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="Avatar" />
+                        <div class="avatar avatar-online">
+                            <div class="w-24 rounded-full">
+                              <img src="{% static 'src/images/cantv_wallpaper.jpg' %}" />
                             </div>
-                        </div>
+                          </div>
                     </div>
                 </div>
             </div>

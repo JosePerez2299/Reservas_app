@@ -17,6 +17,7 @@ class UsuarioCreateForm(UserCreationForm):
     class Meta:
         model = Usuario
         fields = ['username', 'email', 'password1', 'password2', 'ubicacion', 'piso', 'groups']
+
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }
@@ -81,6 +82,7 @@ class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ['username', 'email', 'ubicacion', 'piso']
+
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }

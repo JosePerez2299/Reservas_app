@@ -80,7 +80,7 @@
            
                         {% if request.user.is_authenticated %}
                         <li>
-                          <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors">
+                          <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors {% if request.resolver_match.url_name == 'dashboard' %} bg-primary/30 font-semibold {% endif %}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                               <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" />
                             </svg>
@@ -91,7 +91,7 @@
                             {# Dropdowns por cada modelo con permisos #}
                             {% for model, perms in dashboard_access.items %}
                               <li>
-                                <a href="{% url model %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors">
+                                <a href="{% url model %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors {% if request.resolver_match.url_name == model %} bg-primary/30 font-semibold {% endif %}">
 
                                   {% if  model == "reserva" %}
                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
@@ -104,7 +104,10 @@
                                     <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM1.49 15.326a.78.78 0 0 1-.358-.442 3 3 0 0 1 4.308-3.516 6.484 6.484 0 0 0-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 0 1-2.07-.655ZM16.44 15.98a4.97 4.97 0 0 0 2.07-.654.78.78 0 0 0 .357-.442 3 3 0 0 0-4.308-3.517 6.484 6.484 0 0 1 1.907 3.96 2.32 2.32 0 0 1-.026.654ZM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.304 16.19a.844.844 0 0 1-.277-.71 5 5 0 0 1 9.947 0 .843.843 0 0 1-.277.71A6.975 6.975 0 0 1 10 18a6.974 6.974 0 0 1-4.696-1.81Z" />
                                   </svg>
                                   {% elif  model == "espacio" %}
-                                    <span class="badge badge-primary">{{ perms }}</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                                    <path fill-rule="evenodd" d="M1 2.75A.75.75 0 0 1 1.75 2h10.5a.75.75 0 0 1 0 1.5H12v13.75a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1-.75-.75v-2.5a.75.75 0 0 0-.75-.75h-2.5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5H2v-13h-.25A.75.75 0 0 1 1 2.75ZM4 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1ZM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1ZM8 5.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1ZM8.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1ZM14.25 6a.75.75 0 0 0-.75.75V17a1 1 0 0 0 1 1h3.75a.75.75 0 0 0 0-1.5H18v-9h.25a.75.75 0 0 0 0-1.5h-4Zm.5 3.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1Zm.5 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1Z" clip-rule="evenodd" />
+                                  </svg>
+                                  
                                   {% endif %}
                                 <span>{{ model|capfirst }}s</span>
 
@@ -132,8 +135,9 @@
                         </li>
                         
                     </ul>
+                    <div class="divider"></div>
                     {% if request.user.is_authenticated %}
-                    <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class=" pt-6    ">
                         <div class="flex items-center space-x-3 p-3">
                             <div class="avatar online">
                                 <div class="w-10 rounded-full ring ring-violet-200 ring-offset-2">
@@ -144,18 +148,22 @@
                                 <p class="font-semibold text-gray-900">{{request.user}}</p>
                                 <p class="text-sm text-gray-500">{{group|capfirst}}</p>
                             </div>
-                        </div>
+                        </div>  
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="w-full mt-4 btn btn-outline btn-error btn-sm">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                 </svg>
-                                Cerrar Sesión
+                                <span>Cerrar Sesión</span>
                             </button>
                         </form>
                     </div>
                     {% endif %}
+
+                    <footer class="fixed bottom-0 left-0 right-0">
+                        <p class="text-center text-sm text-gray-500">© 2025 Cantv. Todos los derechos reservados.</p>
+                    </footer>
                 </nav>
             </aside>
         </div>

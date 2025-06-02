@@ -5,7 +5,7 @@ class ReservaFilter(django_filters.FilterSet):
     usuario = django_filters.CharFilter(
         field_name='usuario__username',
         lookup_expr='icontains',
-        label='Usuario',
+        label='Nombre de usuario',
 
     )
 

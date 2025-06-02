@@ -54,19 +54,20 @@ def validate_username(value):
         )
 
 class Usuario(AbstractUser):
-    # Sobrescribir el campo username con el validador personalizado
     username = models.CharField(
+        'Nombre de usuario',
         max_length=20,
         unique=True,
         validators=[validate_username],
         help_text='Nombre de usuario único. 3-20 caracteres. Debe comenzar con letra.',
         error_messages={
             'unique': "Ya existe un usuario con este nombre.",
-        }
+        },  
     )
     
     email = models.EmailField(unique=True)
     ubicacion = models.ForeignKey(
+
         'Ubicacion', on_delete=models.SET_NULL, 
         null=True,
         help_text="La sede/edificio al que pertenece el usuario", 
@@ -81,6 +82,7 @@ class Usuario(AbstractUser):
     class Meta:
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
+
 
     def __str__(self):
         return self.username

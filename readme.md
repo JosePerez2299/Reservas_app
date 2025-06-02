@@ -95,4 +95,26 @@ Reservas_app/
   La lógica de permisos y acceso al dashboard se encuentra en parte en los archivos de vistas y en el manejador de señales, según los grupos definidos en la configuración.
 
 
-npm install flowbite --save
+## Prioridad:
+- Exportar a excel las tablas
+- Cron Job, que se rechazen automáticamente las reservas pendientes y anteriores a hoy. 
+- Autocerrar la sesión al cerrar el navegador, o después de inactividad
+- View detail para cada modulo.
+- Si un espacio cambia de estado disponible a no disponible, se deben rechazar todas las reservas desde el momento en que no esta disponible, a futuro. 
+- Panel de usuario/profile, (Cambiar contraseña unicamente). Puede ser un icono de tuerca en el nombre del perfil
+- Notificaciones afirmativas al hacer submit
+- Reservas solo debe listar espacios DISPONIBLES 
+
+## No prioridad
+- aside responsive (drawer de base.html)
+- Field con Django selec2 para buscar el usuario
+- Pruebas de los componentes
+- Botón de más, para registrar ubicación al momento de crear un espacio, o de registrar un usuario
+- Pag404 -> redireccionar 
+- Pag403 -> Permiso denegado
+- Crear Panel de estadísticas en el dashboard
+- Para el selec2widget, añadir modo oscuro, y tamaños
+- En los formularios de editar reservas, al aprobar o rechazar, añadir un campo para que se muestre el mensaje de aprobacion
+- Guardar un Log de actividades realizadas por cada usuario
+- Revisar  los templates base y base_header, para que base extienda de base_header
+- Añadir campo para el full name al registrar
