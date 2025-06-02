@@ -181,14 +181,14 @@ class Reserva(models.Model):
             # Evita que un mismo usuario haga dos reservas el mismo día en el mismo espacio
             models.UniqueConstraint(
                 fields=['usuario', 'espacio', 'fecha_uso'],
-                name='uniq_usuario_espacio_fecha'
-
+                name='uniq_usuario_espacio_fecha',
+                violation_error_message="Ya existe una reserva para este usuario en este espacio el mismo día."
             ),
             # Asegura hora_inicio < hora_fin
             models.CheckConstraint(
-                
                 check=Q(hora_inicio__lt=F('hora_fin')),
-                name='check_hora_inicio_menor_fin'
+                name='check_hora_inicio_menor_fin',
+                violation_error_message="La hora de inicio debe ser menor a la hora de fin."
             ),
         ]
 

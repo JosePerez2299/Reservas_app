@@ -54,6 +54,7 @@ class UsuarioCreateForm(UserCreationForm):
                 except Group.DoesNotExist:
                     pass
         return user
+        
 class UsuarioUpdateForm(forms.ModelForm):
     # Campos opcionales para cambiar la contraseña
     password1 = forms.CharField(
@@ -74,12 +75,12 @@ class UsuarioUpdateForm(forms.ModelForm):
         required=False,
         widget=forms.RadioSelect,
         label='Grupo',
-        empty_label="Sin grupo asignado"
+        empty_label="Sin grupo asignado",
     )
 
     class Meta:
         model = Usuario
-        fields = ['username', 'email', 'ubicacion', 'piso', 'groups']
+        fields = ['username', 'email', 'ubicacion', 'piso']
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }
@@ -88,18 +89,13 @@ class UsuarioUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.request = request  # Guardar request para usarlo en save()
         
-        # Si hay una instancia, pre-seleccionar el grupo actual
-        if self.instance and self.instance.pk:
-            current_group = self.instance.groups.exclude(name='administrador').first()
-            if current_group:
-                self.fields['groups'].initial = current_group
-            else:
-                # Si el usuario no tiene grupo asignado, establecer 'usuario' por defecto
-                try:
-                    grupo_usuario = Group.objects.get(name='usuario')
-                    self.fields['groups'].initial = grupo_usuario
-                except Group.DoesNotExist:
-                    pass
+        grupo_usuario = self.instance.groups.first()
+
+        if grupo_usuario:
+            self.fields['groups'].initial = grupo_usuario
+        else:
+            self.fields['groups'].initial = Group.objects.get(name='usuario')
+        
         
         # Solo mostrar el campo groups si el usuario es admin
         if not (request.user and request.user.is_admin):

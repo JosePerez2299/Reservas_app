@@ -3,25 +3,7 @@ from django.db.models import Q
 from reservas.models import Reserva, Espacio, Usuario
 from datetime import date, timedelta
 from django_select2.forms import Select2Widget
-
-
-class UsuarioWidget(Select2Widget):
-    def build_attrs(self, *args, **kwargs):
-        attrs = super().build_attrs(*args, **kwargs)
-        attrs.update({
-            'data-placeholder': 'Buscar usuario...',
-            'data-minimum-input-length': 2,
-            'data-language': 'es',
-            'data-allow-clear': 'true',
-            'data-minimum-results-for-search': 1,
-            'data-close-on-select': 'true',
-        })
-        return attrs
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.choices = []
-        self.attrs = self.build_attrs(self.attrs)
+from reservas.library.utils.form_widgets import *
 
 
 class ReservaCreateForm(forms.ModelForm):
@@ -38,18 +20,24 @@ class ReservaCreateForm(forms.ModelForm):
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
             'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
             'usuario': UsuarioWidget,
-        }
+            'espacio': Select2Widget,
+                }
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
         super().__init__(*args, **kwargs)
 
-        # Si es administrador, mostrar selector de usuarios
+        # Filtrar espacios disponibles
+        self.fields['espacio'].queryset = Espacio.objects.filter(
+            Q(disponible=True)
+        )
+        
+        # Si es administrador, mostrar selector de usuarios del grupo moderador y usuario, o su mismo id
         if self.request.user.is_admin:
             self.fields['usuario'].queryset = Usuario.objects.filter(
-                Q(groups__name='usuario') | Q(groups__name='moderador'))
+                Q(groups__name='usuario') | Q(groups__name='moderador') | Q(id=self.request.user.id))
 
-        # Si es moderador, mostrar selector de usuarios
+        # Si es moderador, mostrar selector de usuarios del grupo usuario 
         elif self.request.user.is_moderador:
             self.fields['usuario'].queryset = Usuario.objects.filter(
                 (
@@ -64,7 +52,6 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].initial = self.request.user
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
-
 
 
 class ReservaUpdateForm(ReservaCreateForm):
@@ -84,7 +71,15 @@ class ReservaUpdateForm(ReservaCreateForm):
 
         elif self.request.user.is_moderador:
             self.fields['estado'].disabled = self.instance.espacio.ubicacion != self.request.user.ubicacion or self.instance.espacio.piso != self.request.user.piso
-            
+            # Si es moderador, mostrar selector de usuarios del grupo usuario 
+       
+            self.fields['usuario'].queryset = Usuario.objects.filter(
+                (
+                    Q(ubicacion=self.request.user.ubicacion) &
+                    Q(piso=self.request.user.piso)
+                ) 
+            )
+
 
         elif self.request.user.is_usuario:
             self.fields['estado'].widget = forms.HiddenInput()
