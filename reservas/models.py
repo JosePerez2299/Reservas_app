@@ -169,6 +169,7 @@ class Reserva(models.Model):
         max_length=10, choices=ESTADO_CHOICES, default='pendiente'
     )
     motivo       = models.TextField(null=False, blank=False)
+    motivo_admin = models.TextField(null=True, blank=True)
     aprobado_por = models.ForeignKey(
         Usuario, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='reservas_aprobadas'

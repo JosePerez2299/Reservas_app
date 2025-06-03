@@ -95,12 +95,15 @@ Reservas_app/
   La lógica de permisos y acceso al dashboard se encuentra en parte en los archivos de vistas y en el manejador de señales, según los grupos definidos en la configuración.
 
 
-## Prioridad:
+## Listo
 - Exportar a excel las tablas
-- Cron Job, que se rechazen automáticamente las reservas pendientes y anteriores a hoy. 
-- Autocerrar la sesión al cerrar el navegador, o después de inactividad
+
+
+## Prioridad:
 - View detail para cada modulo.
 - Si un espacio cambia de estado disponible a no disponible, se deben rechazar todas las reservas desde el momento en que no esta disponible, a futuro. 
+- Cron Job, que se rechazen automáticamente las reservas pendientes y anteriores a hoy. 
+- Autocerrar la sesión al cerrar el navegador, o después de inactividad
 - Panel de usuario/profile, (Cambiar contraseña unicamente). Puede ser un icono de tuerca en el nombre del perfil
 - Notificaciones afirmativas al hacer submit
 - Reservas solo debe listar espacios DISPONIBLES 
@@ -118,3 +121,38 @@ Reservas_app/
 - Guardar un Log de actividades realizadas por cada usuario
 - Revisar  los templates base y base_header, para que base extienda de base_header
 - Añadir campo para el full name al registrar
+
+---
+# Que hace:
+
+- Modulo usuarios:
+   - Como admin, puedo crear, editar, eliminar y ver los usuarios del grupo usuario y moderador
+   - Como moderador, puedo crear, editar y ver los usuarios del grupo usuario
+   - Como usuario, solo puedo ver mis propios datos (no accedo al listado)
+
+   Validaciones:
+      - TODO Redactar
+
+- Modulo espacios:
+   - Como admin, puedo crear, editar, eliminar y ver los espacios
+
+   Validaciones:
+      - TODO Redactar
+   
+
+- Modulo reservas:
+   - Como admin, puedo crear, editar, eliminar y ver las reservas de todos los usuarios
+   - Como moderador, puedo crear reservas a usuarios del grupo usuario y que su ubicacion, piso sea la misma que el moderador
+   - Como moderador, puedo ver las reservas de todos los usuarios del piso que el moderador tiene asignado
+   - Como usuario, solo puedo ver mis propias reservas
+
+   Validaciones:
+      - TODO Redactar
+   
+- El sistema
+   - Exportar a excel las tablas
+   - No permite reservar espacios que no esten disponibles
+   - Si un espacio cambia de estado disponible a no disponible, se deben rechazar todas las reservas desde el momento en que no esta disponible, a futuro. 
+   - Si la fecha de la reserva es anterior a la fecha actual y su estado es PENDIENTE, se debe rechazar la reserva
+   - Proteccion de rutas.
+   - Expiracion del token de sesión timing o cerrar la sesion al cerrar el navegador
