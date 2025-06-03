@@ -6,6 +6,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 from django.db.models import Q, F
 from django.core.validators import RegexValidator
+from django.utils.text import capfirst
 
 # ——— 1. Ubicación —————————————————————————————————————————————
 class Ubicacion(models.Model):
@@ -99,8 +100,9 @@ class Usuario(AbstractUser):
     def is_admin(self):
         return self.groups.filter(name='administrador').exists()
 
-    def group_name(self):
-        return self.groups.first()
+    @property
+    def group(self):
+        return capfirst(self.groups.first().name)
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
     TIPO_CHOICES = [

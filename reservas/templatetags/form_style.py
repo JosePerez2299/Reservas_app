@@ -56,11 +56,9 @@ def _get_label_html(field):
         f"{required_indicator}"
         f"</div>"
     )
-
-
 def _get_widget_html(field):
     widget = field.field.widget
-    
+
     # Manejo especial para CheckboxSelectMultiple
     if isinstance(widget, CheckboxSelectMultiple):
         return _render_checkbox_select_multiple(field)
@@ -68,7 +66,9 @@ def _get_widget_html(field):
     # Manejo especial para RadioSelect
     if isinstance(widget, RadioSelect):
         return _render_radio_select(field)
-    
+
+    # Copiar atributos existentes del widget
+    attrs = widget.attrs.copy()
     widget_classes = _get_widget_classes(widget)
 
     # Si hay errores, marcar el widget como error
@@ -89,10 +89,14 @@ def _get_widget_html(field):
                 "input-bordered input-error"
             )
 
-    return field.as_widget(attrs={
-        "class": widget_classes,
-        "id": field.auto_id
-    })
+    # Agregar o extender la clase
+    existing_class = attrs.get("class", "")
+    attrs["class"] = (existing_class + " " + widget_classes).strip()
+
+    # Solo definir el ID si no está ya presente
+    attrs.setdefault("id", field.auto_id)
+
+    return field.as_widget(attrs=attrs)
 
 
 def _render_radio_select(field):

@@ -22,7 +22,7 @@ from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
 
-class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMixin, ExportMixin, FilterView ):
+class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListContextMixin, ExportMixin, FilterView ):
     """
     Muestra una lista de usuarios con un formulario de filtrado
     """
@@ -32,13 +32,17 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMi
     paginate_by = 10
     filterset_class = UsuarioFilter
 
-        # Columnas que mostramos en la tabla HTML
+    # Columnas que mostramos en la tabla HTML
     cols = {
         'username': 'Usuario',
         'email': 'Correo electrónico',
         'ubicacion__nombre': 'Ubicación',
         'piso': 'Piso',
-        'group_name': 'Grupo',
+        'group': 'Grupo',
+    }
+    
+    property_to_field_mapping = {
+    'group': 'groups__name'
     }
 
     # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 
@@ -49,23 +53,9 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMi
         'edit': 'usuario_edit',
         'delete': 'usuario_delete',
     }
-    
+
     def get_queryset(self):
         qs = super().get_queryset()
-        
-        # Anotar con el nombre del grupo (excluyendo administrador)
-        qs = qs.annotate(
-            group_name=Coalesce(
-                Case(
-                    When(groups__name='usuario', then=Value('Usuario')),
-                    When(groups__name='moderador', then=Value('Moderador')),
-                    default=Value('Sin grupo'),
-                    output_field=CharField()
-                ),
-                Value('Sin grupo'),
-                output_field=CharField()
-            )
-        )
         
         # Aplicar filtros según permisos
         if self.request.user.is_admin:
@@ -73,32 +63,8 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMi
         else:
             qs = qs.filter(Q(groups__name='usuario'))
         
-        # Aplicar ordenamiento aquí, después de la anotación
-        ordering = self.request.GET.get('ordering')
-        if ordering:
-            if ordering.startswith('-'):
-                field = ordering[1:]
-                if field == 'group_name':
-                    qs = qs.order_by('-group_name', '-id')
-                else:
-                    qs = qs.order_by(Lower(field).desc(), '-id')
-            else:
-                if ordering == 'group_name':
-                    qs = qs.order_by('group_name', 'id')
-                else:
-                    qs = qs.order_by(Lower(ordering), 'id')
-        else:
-            qs = qs.order_by('id')
-            
-        return qs.distinct()
+        return qs
 
-
-    def get_ordering(self):
-        # Retornamos None para que django-filter no interfiera
-        # El ordenamiento lo manejamos en get_queryset()
-        return None
-
-        
 
 class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
     """
@@ -158,11 +124,4 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     html_title = 'Eliminar Usuario'
     url = 'usuario_delete'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'url': reverse_lazy('usuario_delete', args=[self.object.pk]),
-            'title': f'Eliminar {self.object.pk}'
-        })
-        return context
 

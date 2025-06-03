@@ -17,9 +17,9 @@ from reservas.library.filters.espacio import EspacioFilter
 from reservas.library.mixins.helpers import *
 from django.urls import reverse_lazy
 from reservas.library.forms.espacios import EspacioCreateForm
+from django.db.models.functions import Lower
 
-
-class EspacioListView(LoginRequiredMixin, ListContextMixin, ExportMixin, PermissionRequiredMixin, FilterView):
+class EspacioListView(LoginRequiredMixin, ListContextMixin, SmartOrderingMixin, ExportMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -42,36 +42,10 @@ class EspacioListView(LoginRequiredMixin, ListContextMixin, ExportMixin, Permiss
     crud_urls = {
         'create': 'espacio_create',
         'view': 'espacio_view',
-        'edit': 'espacio_edit',
+        'edit': 'espacio_edit', 
         'delete': 'espacio_delete',
     }
     
-    def get_ordering(self):
-        ordering = self.request.GET.get('ordering')
-        if not ordering:
-            return None
-            
-        # Lista de campos numéricos que deben ordenarse como enteros
-        numeric_fields = ['capacidad', 'piso']
-        
-        # Eliminar el signo de ordenación temporalmente
-        is_desc = ordering.startswith('-')
-        field_name = ordering[1:] if is_desc else ordering
-        
-        # Aplicar el tipo de ordenación apropiado según el campo
-        if field_name in numeric_fields:
-            # Para campos numéricos, ordenar como enteros
-            order_field = field_name
-        else:
-            # Para campos de texto, ordenar sin distinguir mayúsculas/minúsculas
-            order_field = f'lower({field_name})'
-        
-        # Aplicar orden descendente si es necesario
-        if is_desc:
-            order_field = f'-{order_field}'
-            
-        return [order_field]
-
 
 class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
     """
@@ -84,8 +58,6 @@ class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     success_url = reverse_lazy('espacio')
     html_title = 'Crear Espacio'
     url = 'espacio_create'
-
-   
 
 
 class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):

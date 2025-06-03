@@ -7,19 +7,20 @@ class UsuarioFilter(django_filters.FilterSet):
     username = django_filters.CharFilter(
         lookup_expr='icontains',
         label='Nombre de usuario',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre de usuario...'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por nombre de usuario...', 'id': 'username_filter'})
+
     )
     
     email = django_filters.CharFilter(
         lookup_expr='icontains',
         label='Correo electrónico',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por correo...'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Buscar por correo...', 'id': 'email_filter'})
     )
     
     ubicacion = django_filters.ModelChoiceFilter(
         queryset=Ubicacion.objects.all(),
         label='Ubicación',
-        widget=forms.Select(attrs={'class': 'form-select'}),
+        widget=forms.Select(attrs={'class': 'form-select', 'id': 'ubicacion_filter'}),
         empty_label='Todas las ubicaciones'
     )
     
@@ -30,7 +31,8 @@ class UsuarioFilter(django_filters.FilterSet):
             'class': 'form-control',
             'placeholder': 'Número de piso...',
             'min': 0,
-            'max': 40
+            'max': 40,
+            'id': 'piso_filter'
         })
     )
     

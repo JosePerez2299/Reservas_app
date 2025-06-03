@@ -1,11 +1,11 @@
 """
-Views para los espacios
+Views para las reservas
 
-* EspacioListView: Muestra una lista de espacios con un formulario de filtrado
-* EspacioCreateView: Crea un nuevo espacio
-* EspacioUpdateView: Edita un espacio existente
-* EspacioDetailView: Muestra los detalles de un espacio
-* EspacioDeleteView: Elimina un espacio existente
+* ReservaListView: Muestra una lista de reservas con un formulario de filtrado
+* ReservaCreateView: Crea una nueva reserva
+* ReservaUpdateView: Edita una reserva existente
+* ReservaDetailView: Muestra los detalles de una reserva
+* ReservaDeleteView: Elimina una reserva existente
 
 """
 
@@ -21,9 +21,9 @@ from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q
 
 
-class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMixin, ExportMixin, FilterView):
+class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListContextMixin, ExportMixin, FilterView):
     """
-    Muestra una lista de espacios con un formulario de filtrado
+    Muestra una lista de reservas con un formulario de filtrado
     """
     model = Reserva
     permission_required = 'reservas.view_reserva'
@@ -67,14 +67,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMi
             return qs.filter(Q(usuario=self.request.user))
         return qs.none()
     
-    def get_ordering(self):
-        ordering = self.request.GET.get('ordering')
-        if ordering:
-            if ordering.startswith('-'):
-                return [Lower(ordering[1:]).desc()]
-            else:
-                return [Lower(ordering)]
-        return None
+    
 
    
 class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
@@ -96,8 +89,6 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-
-        
 
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):
@@ -123,7 +114,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
 
 class ReservaDetailView(LoginRequiredMixin, FormContextMixin, DetailView):
     """
-    Muestra los detalles de un espacio
+    Muestra los detalles de una reserva
     """
     model = Reserva
     template_name = 'reservas/reservas_detail.html'
@@ -133,7 +124,7 @@ class ReservaDetailView(LoginRequiredMixin, FormContextMixin, DetailView):
 
 class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DeleteView):
     """
-    Elimina un espacio existente
+    Elimina una reserva existente
     """
     model = Reserva
     template_name = 'reservas/delete.html'

@@ -57,12 +57,12 @@
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
           </form>
           <div>
-
             <h3 class="text-center text-2xl text-base-content/80 font-bold">Filtrado de {{model|capfirst}}s</h3>
-            <form method="get" action="{{request.path}}">
+            <form method="get" action="{{request.path}}" class="mt-2 p-2">
               {{filter.form|mystyle}}
               <div class="modal-action">
                 <button class="btn btn-success ">Filtrar</button>
+                <a href="{{request.path}}" class="btn btn-error">Limpiar</a>
               </div>
             </form>
           </div>
