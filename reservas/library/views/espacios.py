@@ -14,13 +14,12 @@ from reservas.models import Espacio
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
 from reservas.library.filters.espacio import EspacioFilter
-from reservas.library.mixins.helpers import AjaxFormMixin
-from django.db.models.functions import Lower
+from reservas.library.mixins.helpers import *
 from django.urls import reverse_lazy
 from reservas.library.forms.espacios import EspacioCreateForm
 
 
-class EspacioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
+class EspacioListView(LoginRequiredMixin, ListContextMixin, ExportMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -30,25 +29,23 @@ class EspacioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     paginate_by = 10
     filterset_class = EspacioFilter
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = 'espacio_create'
-        ctx['view_url'] = 'espacio_view'
-        ctx['edit_url'] = 'espacio_edit'
-        ctx['delete_url'] = 'espacio_delete'
+    cols = {
+        'id': 'ID',
+        'nombre': 'Nombre',
+        'tipo': 'Tipo',
+        'capacidad': 'Capacidad',
+        'ubicacion': 'Ubicación',
+        'piso': 'Piso',
+        'disponible': 'Disponible',
+    }
 
-        # Definir las columnas que se mostrarán en la tabla
-        ctx['cols'] = {
-            'nombre': 'Nombre',
-            'tipo': 'Tipo',
-            'capacidad': 'Capacidad',
-            'ubicacion': 'Ubicación',
-            'piso': 'Piso',
-            'disponible': 'Disponible',
-        }
-        return ctx
-
+    crud_urls = {
+        'create': 'espacio_create',
+        'view': 'espacio_view',
+        'edit': 'espacio_edit',
+        'delete': 'espacio_delete',
+    }
+    
     def get_ordering(self):
         ordering = self.request.GET.get('ordering')
         if not ordering:
@@ -76,7 +73,7 @@ class EspacioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
         return [order_field]
 
 
-class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
+class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
     """
     Crea un nuevo espacio
     """
@@ -85,17 +82,13 @@ class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     permission_required = 'reservas.add_espacio'
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
+    html_title = 'Crear Espacio'
+    url = 'espacio_create'
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': 'Crear Espacio',
-            'url': reverse_lazy('espacio_create'),
-        })
-        return ctx
+   
 
 
-class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
+class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):
     """
     Edita un espacio existente
     """
@@ -104,26 +97,21 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     form_class = EspacioCreateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': f'Editar {self.model.__name__.capitalize()}',
-            'url': reverse_lazy('espacio_edit', args=[self.object.pk]),
-        })
-        return ctx
+    html_title = 'Editar Espacio'
+    url = 'espacio_edit'
 
 
-class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
     """
     Muestra los detalles de un espacio
     """
     model = Espacio
     permission_required = 'reservas.view_espacio'
     template_name = 'reservas/view.html'
+    html_title = 'Detalles de Espacio'
+    url = 'espacio_view'
 
-
-class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
     """
     Elimina un espacio existente
     """
@@ -131,11 +119,5 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     permission_required = 'reservas.delete_espacio'
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('espacio') 
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'url': reverse_lazy('espacio_delete', args=[self.object.pk]),
-            'title': f'Eliminar {self.object.nombre}'
-        })
-        return context
+    html_title = 'Eliminar Espacio'
+    url = 'espacio_delete'

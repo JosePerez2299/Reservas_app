@@ -9,10 +9,9 @@ Views para los usuarios
 
 """
 
-from django.views import View
 from django_filters.views import FilterView
 from reservas.library.forms.usuarios import UsuarioCreateForm, UsuarioUpdateForm
-from reservas.library.mixins.helpers import AjaxFormMixin
+from reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from reservas.models import Usuario
@@ -22,12 +21,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
-from reservas.resources import UsuarioResource
-from django.http import HttpResponse
-from datetime import datetime
-import pandas as pd
 
-class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
+class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMixin, ExportMixin, FilterView ):
     """
     Muestra una lista de usuarios con un formulario de filtrado
     """
@@ -36,6 +31,24 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     template_name = 'reservas/table_view.html'
     paginate_by = 10
     filterset_class = UsuarioFilter
+
+        # Columnas que mostramos en la tabla HTML
+    cols = {
+        'username': 'Usuario',
+        'email': 'Correo electrónico',
+        'ubicacion__nombre': 'Ubicación',
+        'piso': 'Piso',
+        'group_name': 'Grupo',
+    }
+
+    # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 
+    # El value debe ser el nombre de la url que se define en urls.py
+    crud_urls = {
+        'create': 'usuario_create',
+        'view': 'usuario_view',
+        'edit': 'usuario_edit',
+        'delete': 'usuario_delete',
+    }
     
     def get_queryset(self):
         qs = super().get_queryset()
@@ -79,30 +92,15 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
             
         return qs.distinct()
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = 'usuario_create'
-        ctx['view_url'] = 'usuario_view'
-        ctx['edit_url'] = 'usuario_edit'
-        ctx['delete_url'] = 'usuario_delete'      
-        
-        # Definir las columnas que se mostrarán en la tabla
-        ctx['cols'] = {
-            'username': 'Nombre de usuario',
-            'email': 'Correo electrónico',
-            'ubicacion': 'Ubicación',
-            'piso': 'Piso',
-            'group_name': 'Grupo',
-        }
-        return ctx
 
     def get_ordering(self):
         # Retornamos None para que django-filter no interfiera
         # El ordenamiento lo manejamos en get_queryset()
         return None
 
-class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
+        
+
+class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
     """
     Crea un nuevo usuario
     """
@@ -111,22 +109,16 @@ class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('usuario')
     permission_required = 'reservas.add_usuario'
-
+    html_title = 'Crear Usuario'
+    url = 'usuario_create'
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': 'Crear Usuario',
-            'url': reverse_lazy('usuario_create'),
-        })
-        return ctx
 
-
-class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
+class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):
     """
     Edita un usuario existente
     """
@@ -135,31 +127,27 @@ class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('usuario')
     permission_required = 'reservas.change_usuario'
-
+    html_title = 'Editar Usuario'
+    url = 'usuario_edit'
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': f'Editar {self.model.__name__.capitalize()}',
-            'url': reverse_lazy('usuario_edit', args=[self.object.pk]),
-        })
-        return ctx
 
-
-class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
     """
     Muestra los detalles de un usuario
     """
     model = Usuario 
     template_name = 'reservas/view.html'
     permission_required = 'reservas.view_usuario'
+    html_title = 'Detalles de Usuario'
+    url = 'usuario_view'
 
 
-class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
     """
     Elimina un usuario existente
     """
@@ -167,6 +155,8 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('usuario') 
     permission_required = 'reservas.delete_usuario'
+    html_title = 'Eliminar Usuario'
+    url = 'usuario_delete'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -176,16 +166,3 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
         })
         return context
 
-class UsuarioExportExcel(View):
-    def get(self, request, *args, **kwargs):
-        # Filtra o adapta tu QuerySet según necesidad. Aquí obj obtendrá todas las usuarios.
-        queryset =  Usuario.objects.all()
-
-        # Instancia el Resource y conviértelo a formato csv
-        df = pd.DataFrame(list(queryset))
-        # Construimos la respuesta HTTP con el contenido csv
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="usuarios_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv"'
-
-        df.to_csv(response, index=False)
-        return response

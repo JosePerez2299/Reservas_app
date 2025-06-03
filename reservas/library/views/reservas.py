@@ -10,18 +10,18 @@ Views para los espacios
 """
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from reservas.models import Reserva, Ubicacion
+from reservas.models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
-from reservas.library.mixins.helpers import AjaxFormMixin
+from reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
-from reservas.library.utils.utils import get_all_cols
 from reservas.library.filters.reservas import ReservaFilter
 from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q
 
-class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
+
+class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, ListContextMixin, ExportMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -29,26 +29,27 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
     permission_required = 'reservas.view_reserva'
     template_name = 'reservas/table_view.html'
     paginate_by = 10
+
+    # Columnas que mostramos en la tabla HTML
+    cols = {
+        'id': 'ID',
+        'usuario__username': 'Usuario',
+        'espacio__nombre': 'Espacio',
+        'fecha_uso': 'Fecha de uso',
+        'estado': 'Estado',
+    }
+
+    # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 
+    # El value debe ser el nombre de la url que se define en urls.py
+    crud_urls = {
+        'create': 'reserva_create',
+        'view': 'reserva_view',
+        'edit': 'reserva_edit',
+        'delete': 'reserva_delete',
+    }
+
+    # Filtros
     filterset_class = ReservaFilter 
-
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = 'reserva_create'
-        ctx['view_url'] = 'reserva_view'
-        ctx['edit_url'] = 'reserva_edit'
-        ctx['delete_url'] = 'reserva_delete'      
-        
-
-            # Definir las columnas que se mostrarán en la tabla
-        ctx['cols'] = {
-            'usuario': 'Usuario',
-            'espacio': 'Espacio',
-            'fecha_uso': 'Fecha de uso',
-            'estado': 'Estado',
-        }   
-        return ctx
 
 
     def get_queryset(self):
@@ -73,9 +74,10 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, FilterView):
                 return [Lower(ordering[1:]).desc()]
             else:
                 return [Lower(ordering)]
+        return None
 
-
-class ReservaCreateView(LoginRequiredMixin, AjaxFormMixin, CreateView):
+   
+class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
     """
     Crea una nueva reserva
     """
@@ -84,6 +86,8 @@ class ReservaCreateView(LoginRequiredMixin, AjaxFormMixin, CreateView):
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.add_reserva'
+    html_title = 'Crear Reserva'
+    url = 'reserva_create'
 
     def get_form_kwargs(self):
         """
@@ -93,17 +97,10 @@ class ReservaCreateView(LoginRequiredMixin, AjaxFormMixin, CreateView):
         kwargs['request'] = self.request
         return kwargs
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': 'Crear Reserva',
-            'url': reverse_lazy('reserva_create'),
-        })
-        return ctx
         
 
 
-class ReservaUpdateView(LoginRequiredMixin, AjaxFormMixin, UpdateView):
+class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):
     """
     Edita una reserva existente
     """
@@ -112,6 +109,8 @@ class ReservaUpdateView(LoginRequiredMixin, AjaxFormMixin, UpdateView):
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.change_reserva'
+    html_title = 'Editar Reserva'
+    url = 'reserva_edit'
 
     def get_form_kwargs(self):
         """
@@ -121,25 +120,18 @@ class ReservaUpdateView(LoginRequiredMixin, AjaxFormMixin, UpdateView):
         kwargs['request'] = self.request
         return kwargs
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx.update({
-            'title': f'Editar {self.model.__name__.capitalize()}',
-            'url': reverse_lazy('reserva_edit', args=[self.object.pk]),
-        })
-        return ctx
 
-
-class ReservaDetailView(LoginRequiredMixin, DetailView):
+class ReservaDetailView(LoginRequiredMixin, FormContextMixin, DetailView):
     """
     Muestra los detalles de un espacio
     """
     model = Reserva
     template_name = 'reservas/reservas_detail.html'
     permission_required = 'reservas.view_reserva'
+    html_title = 'Detalles de Reserva'
+    url = reverse_lazy('reserva_view')
 
-
-class ReservaDeleteView(LoginRequiredMixin, DeleteView):
+class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DeleteView):
     """
     Elimina un espacio existente
     """
@@ -147,11 +139,5 @@ class ReservaDeleteView(LoginRequiredMixin, DeleteView):
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('reserva') 
     permission_required = 'reservas.delete_reserva'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'url': reverse_lazy('reserva_delete', args=[self.object.pk]),   
-            'title': f'Eliminar Reserva {self.object.pk}'
-        })
-        return context
+    html_title = 'Eliminar Reserva'
+    url = 'reserva_delete'
