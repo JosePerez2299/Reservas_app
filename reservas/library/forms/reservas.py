@@ -54,23 +54,42 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
 
 
-class ReservaUpdateForm(ReservaCreateForm):
-    estado = forms.ChoiceField(choices=Reserva.ESTADO_CHOICES)
-
-    class Meta(ReservaCreateForm.Meta):
-        fields = ReservaCreateForm.Meta.fields + ['estado']
+class ReservaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ['usuario', 'fecha_uso', 'hora_inicio',
+                  'hora_fin', 'espacio', 'motivo', 'estado']
+        widgets = {
+            'fecha_uso': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'type': 'date', 'min': date.today().isoformat(), 'max': (
+                    date.today() + timedelta(days=90)).isoformat()}
+            ),
+            'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
+            'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
+            'usuario': UsuarioWidget,
+            'espacio': Select2Widget,
+                }
 
     def __init__(self, request, *args, **kwargs):
-        super().__init__(request, *args, **kwargs)
+        self.request = request
+        super().__init__(*args, **kwargs)
+
         self.fields['usuario'].disabled = True
         self.fields['espacio'].disabled = True
 
+        self.fields['usuario'].help_text = "No puedes cambiar este campo"
+        self.fields['espacio'].help_text = "No puedes cambiar este campo"
 
         if self.request.user.is_admin:
             return
 
         elif self.request.user.is_moderador:
-            self.fields['estado'].disabled = self.instance.espacio.ubicacion != self.request.user.ubicacion or self.instance.espacio.piso != self.request.user.piso
+
+            if self.instance.espacio.ubicacion != self.request.user.ubicacion or self.instance.espacio.piso != self.request.user.piso:
+                self.fields['estado'].disabled = True
+                self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
+            
             # Si es moderador, mostrar selector de usuarios del grupo usuario 
        
             self.fields['usuario'].queryset = Usuario.objects.filter(
@@ -80,17 +99,3 @@ class ReservaUpdateForm(ReservaCreateForm):
                 ) 
             )
 
-
-        elif self.request.user.is_usuario:
-            self.fields['estado'].widget = forms.HiddenInput()
-            self.fields['estado'].disabled = True
-
-    def save(self, commit=True):
-        # Primero, instancia sin guardar aún
-        instance = super().save(commit=False)
-        # Asignamos el usuario que aprueba automáticamente
-        instance.aprobado_por = self.request.user
-        # Ahora sí guardamos
-        if commit:
-            instance.save()
-        return instance

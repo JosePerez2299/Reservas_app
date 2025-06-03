@@ -16,7 +16,7 @@ from django_filters.views import FilterView
 from reservas.library.filters.espacio import EspacioFilter
 from reservas.library.mixins.helpers import *
 from django.urls import reverse_lazy
-from reservas.library.forms.espacios import EspacioCreateForm
+from reservas.library.forms.espacios import *
 from django.db.models.functions import Lower
 
 class EspacioListView(LoginRequiredMixin, ListContextMixin, SmartOrderingMixin, ExportMixin, PermissionRequiredMixin, FilterView):
@@ -66,11 +66,19 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     model = Espacio
     permission_required = 'reservas.change_espacio'
-    form_class = EspacioCreateForm
+    form_class = EspacioUpdateForm
     template_name = 'reservas/edit_create.html'
     success_url = reverse_lazy('espacio')
     html_title = 'Editar Espacio'
     url = 'espacio_edit'
+
+    def get_form_kwargs(self):
+        """
+        Pasa el objeto request al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs   
 
 
 class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):

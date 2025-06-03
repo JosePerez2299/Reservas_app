@@ -14,6 +14,9 @@
     <li><strong>Gestionado por:</strong> {{object.aprobado_por}}</li>
     <li><strong>Estado:</strong> {{object.get_estado_display}}</li>
     <li><strong>Motivo:</strong> {{object.motivo}}</li>
+    {% if object.motivo_admin %}
+    <li><strong>Motivo de administrador:</strong> {{object.motivo_admin}}</li>
+    {% endif %}
   </ul>
 </div>
 {% endblock content %}
