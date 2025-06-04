@@ -29,9 +29,9 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="drawer-side ">
+        <div class="drawer-side bg-primary/5 text-base-content/90  ">
             <label for="dashboard-drawer" class="drawer-overlay"></label>
-            <aside class="w-64 min-h-full bg-base-300 shadow-xl">
+            <aside class="w-64 min-h-full  shadow-xl">
                 <div class="p-6 border-gray-200">
                   <div class="flex justify-evenly gap-4">
                     {% include "includes/logo.html" %}
@@ -40,7 +40,7 @@
                   </div>
                 </div>
                 <div class="divider m-0">
-                  <p class=" font-bold text-gray-700 font-italic font-sans">Reservas 
+                  <p class=" font-bold font-italic font-sans">Reservas 
                   Cantv®
                   </p>
 
@@ -50,7 +50,7 @@
            
                         {% if request.user.is_authenticated %}
                         <li>
-                          <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors {% if request.resolver_match.url_name == 'dashboard' %} bg-primary/30 font-semibold {% endif %}">
+                          <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20  transition-colors {% if request.resolver_match.url_name == 'dashboard' %} bg-primary/30 font-semibold {% endif %}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                               <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" />
                             </svg>
@@ -61,7 +61,7 @@
                             {# Dropdowns por cada modelo con permisos #}
                             {% for model, perms in dashboard_access.items %}
                               <li>
-                                <a href="{% url model %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 text-gray-700 transition-colors {% if request.resolver_match.url_name == model %} bg-primary/30 font-semibold {% endif %}">
+                                <a href="{% url model %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20  transition-colors {% if request.resolver_match.url_name == model %} bg-primary/30 font-semibold {% endif %}">
 
                                   {% if  model == "reserva" %}
                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
@@ -89,7 +89,7 @@
                           {% else %}
                             {# Si no está autenticado, sólo “Iniciar sesión” #}
                             <li>
-                              <a href="{% url 'login' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary/20 text-gray-700 transition-colors">
+                              <a href="{% url 'login' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-secondary/20  transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                                   <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clip-rule="evenodd" />
                                   <path fill-rule="evenodd" d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z" clip-rule="evenodd" />
@@ -115,8 +115,8 @@
                                 </div>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">{{request.user}}</p>
-                                <p class="text-sm text-gray-500">{{group|capfirst}}</p>
+                                <p class="font-semibold text-base-content">{{request.user}}</p>
+                                <p class="text-sm text-base-content/40">{{group|capfirst}}</p>
                             </div>
                         </div>  
                         <form method="post" action="{% url 'logout' %}">
