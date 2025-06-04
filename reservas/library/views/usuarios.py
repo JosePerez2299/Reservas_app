@@ -56,8 +56,16 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
     def get_queryset(self):
         qs = super().get_queryset()
-        
         # Aplicar filtros según permisos
+
+        qs = qs.annotate(
+            group=Case(
+                When(groups__name='moderador', then=Value('Moderador')),
+                When(groups__name='usuario', then=Value('Usuario')),
+                default=Value('-'),
+                output_field=CharField()
+            )
+        )
         if self.request.user.is_admin:
             qs = qs.filter(Q(groups__name__in=['moderador', 'usuario']))
         else:

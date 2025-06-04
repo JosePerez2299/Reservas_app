@@ -105,7 +105,7 @@ class ExportMixin:
         # 5) Preparamos la respuesta HTTP tipo CSV
         response = HttpResponse(content_type='text/csv')
         timestamp = now().strftime('%Y%m%d%H%M%S')
-        filename = f"reservas_export_{timestamp}.csv"
+        filename = f"{self.model.__name__.lower()}_export_{timestamp}.csv"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
         # 6) Volcamos el DataFrame a CSV directamente sobre la HttpResponse

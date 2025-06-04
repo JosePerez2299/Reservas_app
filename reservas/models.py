@@ -100,9 +100,7 @@ class Usuario(AbstractUser):
     def is_admin(self):
         return self.groups.filter(name='administrador').exists()
 
-    @property
-    def group(self):
-        return capfirst(self.groups.first().name)
+
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
     TIPO_CHOICES = [
