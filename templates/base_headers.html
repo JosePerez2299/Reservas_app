@@ -40,6 +40,27 @@
       const modal   = document.getElementById('generic_modal');
       const content = document.getElementById('generic_modal_content');
     
+      // Función para inicializar Select2
+      function initializeSelect2() {
+        // Destruir instancias previas de Select2 para evitar conflictos
+        const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
+        existingSelect2.forEach(select => {
+          if ($(select).data('select2')) {
+            $(select).select2('destroy');
+          }
+        });
+    
+        // Inicializar Select2 en elementos django-select2
+        const selectElements = content.querySelectorAll('select.django-select2');
+        selectElements.forEach(select => {
+          $(select).select2({
+            theme: 'default',
+            width: '100%',
+            dropdownParent: modal
+          });
+        });
+      }
+    
       // Abre el modal cargando el formulario por AJAX
       async function openModal(url) {
         content.innerHTML = '';
@@ -51,15 +72,8 @@
           const html = await resp.text();
           content.innerHTML = html;
           
-          // Initialize Select2 for any select elements
-          const selectElements = content.querySelectorAll('select.django-select2');
-          selectElements.forEach(select => {
-            $(select).select2({
-              theme: 'default',
-              width: '100%',
-              dropdownParent: modal
-            });
-          });
+          // Inicializar Select2
+          initializeSelect2();
           
           bindForm();
         } catch (err) {
@@ -68,7 +82,7 @@
         }
       }
     
-      // Intercepta el submit y lo muestra en consola
+      // Intercepta el submit
       function bindForm() {
         const form = content.querySelector('form.ajax-form');
         if (!form || form._bound) return;
@@ -104,11 +118,15 @@
               });
             }
             else {
+              // Reemplazar contenido y reinicializar Select2
               content.innerHTML = data.html;
+              initializeSelect2(); // ← Esta es la línea clave que faltaba
               bindForm();
             }
           })
-          
+          .catch(err => {
+            console.error('Error en submit:', err);
+          });
         });
       }
     
@@ -119,9 +137,17 @@
         e.preventDefault();
         openModal(btn.dataset.url);
       });
+    
+      // Limpiar Select2 al cerrar el modal
+      modal.addEventListener('close', function() {
+        const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
+        existingSelect2.forEach(select => {
+          if ($(select).data('select2')) {
+            $(select).select2('destroy');
+          }
+        });
+      });
     })();
-
-
     </script>
     
   <script>
