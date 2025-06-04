@@ -1,0 +1,17 @@
+{% load form_style %}
+
+{% block body %}
+{{ form.media.css }}
+
+  <h2 class="text-center text-2xl text-base-content/80 font-bold">{{title}}</h2>
+  <div class="p-2 mt-2 rounded-box ">
+    <form class="ajax-form" id="form-modal"  method="POST" action="{{url}}">
+      {% csrf_token %}
+      {{ form|mystyle }}
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+  </div>
+
+{{ form.media.js }}
+{% endblock %}
+

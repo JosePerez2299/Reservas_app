@@ -38,11 +38,11 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         'email': 'Correo electrónico',
         'ubicacion__nombre': 'Ubicación',
         'piso': 'Piso',
-        'group': 'Grupo',
+        'groups': 'Grupo',
     }
     
     property_to_field_mapping = {
-    'group': 'groups__name'
+    'groups                                                                                                                                                                                                                                                                                                                                                                                                                                                               ': 'groups__name'
     }
 
     # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 

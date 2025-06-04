@@ -97,7 +97,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     model = Reserva
     form_class = ReservaUpdateForm  
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/reserva_edit.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.change_reserva'
     html_title = 'Editar Reserva'

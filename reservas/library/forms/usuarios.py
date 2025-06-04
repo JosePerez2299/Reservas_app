@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.contrib.auth import password_validation
+from django_select2.forms import Select2Widget
 from reservas.models import Usuario
 
 class UsuarioCreateForm(UserCreationForm):
@@ -17,7 +18,15 @@ class UsuarioCreateForm(UserCreationForm):
     class Meta:
         model = Usuario
         fields = ['username', 'email', 'password1', 'password2', 'ubicacion', 'piso', 'groups']
-
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control'}),
+            'ubicacion': Select2Widget(attrs={'class': 'form-control'}),
+            'piso': forms.NumberInput(attrs={'class': 'form-control'}),
+            'groups': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        }
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }

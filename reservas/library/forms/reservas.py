@@ -57,7 +57,7 @@ class ReservaUpdateForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = ['usuario', 'fecha_uso', 'hora_inicio',
-                  'hora_fin', 'espacio', 'motivo', 'estado']
+                  'hora_fin', 'espacio', 'motivo', 'estado', 'motivo_admin']
         widgets = {
             'fecha_uso': forms.DateInput(
                 format='%Y-%m-%d',
@@ -68,6 +68,7 @@ class ReservaUpdateForm(forms.ModelForm):
             'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
             'usuario': UsuarioWidget,
             'espacio': Select2Widget,
+            'motivo_admin': forms.Textarea(attrs={'rows': 3, 'label': 'Motivo de gestion', 'placeholder': 'Motivo de gestion'}),
         }
 
     def __init__(self, request, *args, **kwargs):

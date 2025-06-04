@@ -1,0 +1,43 @@
+{% load form_style %}
+
+{% block body %}
+
+  <h2 class="text-center text-2xl text-base-content/80 font-bold">{{ title }}</h2>
+  <div class="p-2 mt-2 rounded-box">
+    <form
+      x-data="{ estadoValue: '{{ form.instance.estado }}' }"
+      class="ajax-form"
+      id="form-modal"
+      method="POST"
+      action="{{ url }}"
+    >
+      {% csrf_token %}
+
+      {% for field in form %}
+        {% if field.name == 'estado' %}
+          <div @change="estadoValue = $event.target.value">
+            {{ field|mystyle }}
+          </div>
+        {% elif field.name == 'motivo_admin' %}
+          <div
+            x-show="estadoValue === 'aprobada' || estadoValue === 'rechazada'"
+            x-cloak
+            x-effect="
+              if (!(estadoValue === 'aprobada' || estadoValue === 'rechazada')) {
+                const ta = document.getElementById('id_motivo_admin');
+                if (ta) ta.value = '';
+              }
+            "
+          >
+            {{ field|mystyle }}
+          </div>
+        {% else %}
+          {{ field|mystyle }}
+        {% endif %}
+      {% endfor %}
+
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+  </div>
+
+{% endblock %}

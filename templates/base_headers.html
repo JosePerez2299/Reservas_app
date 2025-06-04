@@ -28,21 +28,13 @@
           border: 1px solid rgba(255, 255, 255, 0.125);
       }
   </style>
+  {{form.media.css}}
   </head>
 
 
   {% block body %}
 
   {% endblock %}
-  <script>
-      let content = document.getElementById('generic_modal_content');
-    document.addEventListener('modal-opened', function() {
-    
-    const form = content.querySelector('form.ajax-form');
-
-    console.log(form.estado);
-    });
-  </script>
   <script>
     ;(function() {
       const modal   = document.getElementById('generic_modal');
@@ -236,5 +228,7 @@
           }, 5000);
       }
   </script>
+  {{ form.media.js }}
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
   </body>
 </html>
