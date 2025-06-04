@@ -53,7 +53,6 @@ class ReservaCreateForm(forms.ModelForm):
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
 
-
 class ReservaUpdateForm(forms.ModelForm):
     class Meta:
         model = Reserva
@@ -69,7 +68,7 @@ class ReservaUpdateForm(forms.ModelForm):
             'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
             'usuario': UsuarioWidget,
             'espacio': Select2Widget,
-                }
+        }
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
@@ -81,21 +80,30 @@ class ReservaUpdateForm(forms.ModelForm):
         self.fields['usuario'].help_text = "No puedes cambiar este campo"
         self.fields['espacio'].help_text = "No puedes cambiar este campo"
 
-        if self.request.user.is_admin:
-            return
+        
+        if self.request.user.is_usuario:
+            self.fields['estado'].disabled = True
+            self.fields['estado'].widget = forms.HiddenInput()
 
-        elif self.request.user.is_moderador:
-
+        if not self.request.user.is_admin and self.request.user.is_moderador:
             if self.instance.espacio.ubicacion != self.request.user.ubicacion or self.instance.espacio.piso != self.request.user.piso:
                 self.fields['estado'].disabled = True
                 self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
-            
-            # Si es moderador, mostrar selector de usuarios del grupo usuario 
-       
+
             self.fields['usuario'].queryset = Usuario.objects.filter(
-                (
-                    Q(ubicacion=self.request.user.ubicacion) &
-                    Q(piso=self.request.user.piso)
-                ) 
+                Q(ubicacion=self.request.user.ubicacion) & Q(piso=self.request.user.piso)
             )
 
+    def save(self, commit=True):
+        # Primero, instancia sin guardar aún
+        instance = super().save(commit=False)
+        print(instance.estado)
+        print(self.request.user)
+        if instance.estado == 'aprobada ' or instance.estado == 'rechazada':
+            print("entro")
+            instance.aprobado_por = self.request.user
+        
+        # Ahora sí guardamos
+        if commit:
+            instance.save()
+        return instance

@@ -18,13 +18,17 @@ class AjaxFormMixin:
         return super().post(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        # Solo AJAX: devolvemos HTML del form con errores
-        html = render_to_string(
-            self.template_name, 
-            self.get_context_data(form=form), 
-            request=self.request
-        )
-        return JsonResponse({'success': False, 'html': html})
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Solo AJAX: devolvemos HTML del form con errores
+            html = render_to_string(
+                self.template_name, 
+                self.get_context_data(form=form), 
+                request=self.request
+            )
+            return JsonResponse({'success': False, 'html': html})
+
+        # No es ajax
+        return super().form_invalid(form)
 
     def form_valid(self, form):
         # Guardamos instancia
@@ -35,6 +39,7 @@ class AjaxFormMixin:
                 'redirect_url': self.get_success_url()
             })
         # No AJAX: redirección normal
+        return super().form_valid(form)
 
 class FormContextMixin:
     def get_context_data(self, **kwargs):

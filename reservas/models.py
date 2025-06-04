@@ -231,5 +231,5 @@ class Reserva(models.Model):
             if (self.aprobado_por.ubicacion_id != self.espacio.ubicacion_id or
                 self.aprobado_por.piso        != self.espacio.piso):
                 raise ValidationError(
-                    "El administrador o moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
+                    "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
                 )

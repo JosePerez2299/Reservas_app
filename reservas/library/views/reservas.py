@@ -122,7 +122,7 @@ class ReservaDetailView(LoginRequiredMixin, FormContextMixin, DetailView):
     html_title = 'Detalles de Reserva'
     url = reverse_lazy('reserva_view')
 
-class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DeleteView):
+class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
     """
     Elimina una reserva existente
     """
