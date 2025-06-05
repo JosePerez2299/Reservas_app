@@ -50,7 +50,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
 
             
-            {% for stat in stats %}
+            {% for stat in stats.cards   %}
             <!-- Card 1: reservas_stats -->
             <div class="card bg-primary/5 shadow-xl card-hover animate-slide-up border-l-4 {{ stat.color }}" style="animation-delay: 0.1s">
                 <div class="card-body">
@@ -59,11 +59,9 @@
                             <p class="text-sm font-medium text-base-content">{{ stat.title }}</p>
                             <p class="text-3xl font-bold {{ stat.color }}">{{ stat.value }}</p>
                             
-                            <p class="text-xs {{ stat.color }} mt-1">↗ +12% vs ayer</p>
                         </div>
-             
                             {% get_icon stat.icon %}
-               
+
                     </div>
                 </div>
             </div>
@@ -164,29 +162,22 @@
                 <!-- Progress Card -->
                 <div class="card bg-primary/5 shadow-xl animate-slide-up" style="animation-delay: 0.7s">
                     <div class="card-body">
-                        <h3 class="font-bold text-lg mb-4">Progreso del Mes</h3>
+                        <div class="flex justify-between">
+                            <h3 class="font-bold text-lg mb-4">Progreso del Mes </h3>
+                            <span class="text-lg font-bold text-primary">{{ stats.month_summary.total }}</span>
+                        </div>
                         <div class="space-y-4">
+
+                            {% for item in stats.month_summary.items %}
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
-                                    <span>Reservas Aprobadas</span>
-                                    <span>75%</span>
+                                    <span>{{ item.title }}</span>
+                                    <span>{{ item.value }}%</span>
                                 </div>
-                                <progress class="progress progress-primary" value="75" max="100"></progress>
+
+                                <progress class="progress progress-{{item.color}}" value="{{ item.value }}" max="100"></progress>
                             </div>
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>Reservas Pendientes</span>
-                                    <span>92%</span>
-                                </div>
-                                <progress class="progress progress-success" value="92" max="100"></progress>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>Reservas Rechazadas</span>
-                                    <span>60%</span>
-                                </div>
-                                <progress class="progress progress-warning" value="60" max="100"></progress>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -197,9 +188,17 @@
                         <h3 class="font-bold text-lg mb-4">Proximas Reservas</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between space-x-3 p-3 bg-blue-50 rounded-lg">
-                                <div class="w-12 h-12 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                                    05
-                                </div>
+
+                                <div class="indicator">
+                                    <div class="indicator-item status status-success status-xl"> 
+                                    </div>
+
+                                    <div class="w-12 h-12 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
+                                        05
+                                    </div>
+                                  </div>
+                                
+                                
                                 
                                 <div>
                                     <p class="font-semibold">Sala de conferencias</p>
@@ -213,8 +212,12 @@
                         
                             </div>
                             <div class="flex justify-between items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                                <div class="indicator">
+                                    <div class="indicator-item status status-warning status-xl"> 
+                                    </div>
                                 <div class="w-12 h-12 bg-green-500 text-white rounded-lg flex items-center justify-center font-bold">
                                     07
+                                </div>
                                 </div>
                                 <div>
                                     <p class="font-semibold">Presentación Cliente</p>
@@ -225,20 +228,20 @@
                                     <span class="text-xs">Pendiente</span>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                            <div class="flex  items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                                <div class="indicator">
+                                    <div class="indicator-item status status-error status-xl"> 
+                                    </div>
                                 <div class="w-12 h-12 bg-purple-500 text-white rounded-lg flex items-center justify-center font-bold">
                                     10
+                                </div>
                                 </div>
                                 
                                 <div>
                                     <p class="font-semibold">Workshop UX/UI</p>
                                     <p class="text-sm text-gray-500">9:00 AM - 5:00 PM</p>
                                 </div>
-
-                                <div class="flex flex-col items-center space-x-2 text-success">
-                                    {% get_icon 'success' 'w-5 h-5'  %}
-                                    <span class="text-xs">Aprobada</span>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>

@@ -137,13 +137,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Parametros agregados/modificados
-COMPRESS_ENABLED = False
+COMPRESS_ENABLED = True
+STATIC_ROOT = BASE_DIR / 'static'
 AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
 LOGIN_REDIRECT_URL = '/dashboard/'
