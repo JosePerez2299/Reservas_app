@@ -32,7 +32,7 @@ class EspacioUpdateForm(forms.ModelForm):
             reserva_qs = Reserva.objects.filter(
                 fecha_uso__gte=timezone.now().date(),
                 espacio=espacio.id,
-                estado__in=['pendiente', 'aprobada']
+                estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
             )
             
             # Opcional: Guardar información de las reservas afectadas para notificaciones

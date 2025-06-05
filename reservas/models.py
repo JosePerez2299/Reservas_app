@@ -103,11 +103,10 @@ class Usuario(AbstractUser):
 
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
-    TIPO_CHOICES = [
-        ('salon', 'Salón'),
-        ('laboratorio', 'Laboratorio'),
-        ('auditorio', 'Auditorio'),
-    ]
+    class Tipo(models.TextChoices):
+        SALON     = 'salon', 'Salón'
+        LABORATORIO = 'laboratorio', 'Laboratorio'
+        AUDITORIO   = 'auditorio', 'Auditorio'
 
     nombre      = models.CharField(max_length=20, unique=True, blank=False,
             validators=[
@@ -125,7 +124,7 @@ class Espacio(models.Model):
         validators=[MaxValueValidator(1000)],
         help_text="Capacidad máxima (≤ 1000)"
     )
-    tipo        = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    tipo        = models.CharField(max_length=20, choices=Tipo.choices)
     disponible  = models.BooleanField(default=True)
 
     class Meta:
@@ -148,12 +147,11 @@ class Espacio(models.Model):
 
 # ——— 4. Reserva ————————————————————————————————————————————————
 class Reserva(models.Model):
-    ESTADO_CHOICES = [
-        ('pendiente', 'Pendiente'),
-        ('aprobada',   'Aprobada'),
-        ('rechazada',  'Rechazada'),
-    ]
-
+    class Estado(models.TextChoices):
+        PENDIENTE = 'pendiente', 'Pendiente'
+        APROBADA  = 'aprobada',  'Aprobada'
+        RECHAZADA = 'rechazada', 'Rechazada'
+    
     usuario      = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name='reservas'
     )
@@ -164,7 +162,7 @@ class Reserva(models.Model):
     hora_inicio  = models.TimeField()
     hora_fin     = models.TimeField()
     estado       = models.CharField(
-        max_length=10, choices=ESTADO_CHOICES, default='pendiente'
+        max_length=10, choices=Estado.choices, default=Estado.PENDIENTE
     )
     motivo       = models.TextField(
         "Motivo de reserva", null=False, blank=False

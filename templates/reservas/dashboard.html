@@ -167,7 +167,7 @@
                             <span class="text-lg font-bold text-primary">{{ stats.month_summary.total }}</span>
                         </div>
                         <div class="space-y-4">
-
+                            {% if stats.month_summary.total > 0 %}
                             {% for item in stats.month_summary.items %}
                             <div>
                                 <div class="flex justify-between text-sm mb-1">
@@ -176,8 +176,11 @@
                                 </div>
 
                                 <progress class="progress progress-{{item.color}}" value="{{ item.value }}" max="100"></progress>
-                            </div>
+                                </div>
                             {% endfor %}
+                            {% else %}
+                            <p>No hay reservas para el mes actual</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -91,20 +91,14 @@ class ReservaUpdateForm(forms.ModelForm):
                 self.fields['estado'].disabled = True
                 self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
 
-            self.fields['usuario'].queryset = Usuario.objects.filter(
-                Q(ubicacion=self.request.user.ubicacion) & Q(piso=self.request.user.piso)
-            )
-
     def save(self, commit=True):
         # Primero, instancia sin guardar aún
         instance = super().save(commit=False)
-        print(instance.estado)
-        print(self.request.user)
-        if instance.estado == 'aprobada ' or instance.estado == 'rechazada':
-            print("entro")
+        
+        if instance.estado == Reserva.Estado.APROBADA or instance.estado == Reserva.Estado.RECHAZADA:
             instance.aprobado_por = self.request.user
         
         # Ahora sí guardamos
         if commit:
             instance.save()
-        return instance
+        return instance 

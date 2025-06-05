@@ -51,7 +51,7 @@ class ReservaFilter(django_filters.FilterSet):
         lookup_expr='icontains',
         label='Estado',
         widget=forms.Select(attrs={'class': 'form-select', 'id': 'estado_filter'}),
-        choices=Reserva.ESTADO_CHOICES,
+        choices=Reserva.Estado.choices,
     )
 
     def __init__(self, *args, **kwargs):
