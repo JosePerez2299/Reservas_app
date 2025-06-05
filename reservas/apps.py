@@ -6,3 +6,10 @@ class ReservasConfig(AppConfig):
     name = 'reservas'
     def ready(self):
         import reservas.signals  
+        from auditlog.registry import auditlog
+        from .models import Reserva, Usuario, Espacio, Ubicacion
+        auditlog.register(Reserva)
+        auditlog.register(Usuario)
+        auditlog.register(Espacio)
+        auditlog.register(Ubicacion)
+        

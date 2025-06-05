@@ -4,3 +4,4 @@ django-widget-tweaks
 django-compressor
 django-select2
 pandas
+django-auditlog

@@ -89,6 +89,7 @@
         form.addEventListener('submit', function(e) {
           e.preventDefault();
           const fd = new FormData(form);
+          console.log(fd);
           fetch(form.action, {
             method: 'POST',
             headers: {
