@@ -101,7 +101,11 @@ class UsuarioUpdateForm(forms.ModelForm):
         self.request = request  # Guardar request para usarlo en save()
         
         grupo_usuario = self.instance.groups.first()
-
+        if grupo_usuario not in Group.objects.exclude(name='administrador'):
+            self.fields['groups'].disabled = True
+            self.fields['groups'].widget = forms.HiddenInput()
+            return
+           
         if grupo_usuario:
             self.fields['groups'].initial = grupo_usuario
         else:

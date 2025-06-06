@@ -2,18 +2,25 @@
 from django import forms
 from reservas.models import Espacio, Reserva 
 from django.utils import timezone
+from django_select2.forms import Select2Widget
 
 class EspacioCreateForm(forms.ModelForm):
     class Meta:
         model = Espacio
-        fields = '__all__'  # Puedes usar una lista si solo quieres algunos campos
+        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'disponible']
+        widgets = {
+            'ubicacion': Select2Widget,
+        }
 
 
 class EspacioUpdateForm(forms.ModelForm):
     class Meta:
         model = Espacio
-        fields = '__all__'
-    
+        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'disponible']
+        widgets = {
+            'ubicacion': Select2Widget,
+
+        }
     def __init__(self, request, *args, **kwargs):
         self.request = request
         super().__init__(*args, **kwargs)
