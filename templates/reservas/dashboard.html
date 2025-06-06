@@ -85,19 +85,34 @@
                             <a href="{% url 'log' %}" class="btn btn-outline btn-primary btn-sm">Ver Todo</a>
                         </div>
                         <div class="space-y-4">
+
+                            {% if stats.logs %}
                             {% for log in stats.logs %}
-                            <div class="flex items-center space-x-4 p-4 bg-accent rounded-lg">
-                                <div class="avatar">
-                                    <div class="w-10 rounded-full">
-                                        <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="user" />
+                            <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
+                                
+                                {% if log.action == 0 %}
+                                    <div class="w-10 h-10 rounded-full text-success">
+                                        {% get_icon 'success' 'w-10 h-10' %}
+
                                     </div>
-                                </div>
+                                {% elif log.action == 1 %}
+                                    <div class="w-10 h-10 rounded-full text-info">
+                                        {% get_icon 'info' 'w-10 h-10' %}
+                                    </div>
+                                {% elif log.action == 2 %}
+                                    <div class="w-10 h-10 rounded-full text-error">
+                                        {% get_icon 'error' 'w-10 h-10' %}
+                                    </div>
+                                {% endif %}
                                 <div class="flex-1">
                                     <p class="font-semibold">{% get_message log %}</p>
                                     <p class="text-sm text-gray-500">{{ log.timestamp|naturaltime }}</p>
                                 </div>
                             </div>
                             {% endfor %}
+                            {% else %}
+                            <p class="text-center text-gray-500">No hay actividad reciente.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
