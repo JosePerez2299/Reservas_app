@@ -20,9 +20,11 @@ def crear_grupos_y_permisos(sender, **kwargs):
         grupo, _ = Group.objects.get_or_create(name=nombre_grupo)
         grupo.permissions.clear()
 
-        for modelo_name, acciones in modelos.items():
+        for modelo in modelos:
             try:
-                    Model = apps.get_model(APP_LABEL if modelo_name != "LogEntry" else "auditlog", modelo_name)
+                full_name = modelo['model']['name']
+                app_label, model_name = full_name.split('.')
+                Model = apps.get_model(app_label, model_name)
             except LookupError:
                 continue
 
@@ -33,7 +35,7 @@ def crear_grupos_y_permisos(sender, **kwargs):
                 continue
 
             # Itera sólo las acciones definidas en settings
-            for accion in acciones['perms']:
+            for accion in modelo['perms']:
                 codename = f"{accion}_{Model._meta.model_name}"
                 try:
                     perm = Permission.objects.get(content_type=ct, codename=codename)

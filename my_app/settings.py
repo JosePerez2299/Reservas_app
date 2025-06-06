@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from cProfile import label
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -155,24 +156,34 @@ LOGIN_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 
-DASHBOARD_ACCESS = {
-    'administrador': 
-         {
-            'LogEntry':{'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
-            'usuario': {'label':'Usuarios', 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
-            'espacio': {'label':'Espacios', 'url':'espacio', 'perms':['add', 'change', 'view', 'delete']},
-            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
-         },
+class GRUPOS:
+    ADMINISTRADOR = 'administrador'
+    MODERADOR = 'moderador'
+    USUARIO = 'usuario'
 
-    'moderador': 
-         {
-            'LogEntry': {'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
-            'usuario': {'label':'Usuarios', 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
-            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
-         },
-    'usuario':   
-        {
-            'LogEntry':{'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
-            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
-         },
+class MODELOS:
+    LOGENTRY = {'label':'Auditoría', 'name':'auditlog.LogEntry'}
+    USUARIO = {'label':'Usuarios', 'name':'reservas.Usuario'}
+    ESPACIO = {'label':'Espacios', 'name':'reservas.Espacio'}
+    RESERVA = {'label':'Reservas', 'name':'reservas.Reserva'}
+
+DASHBOARD_ACCESS = {
+    GRUPOS.ADMINISTRADOR: 
+        [
+            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
+            {'model': MODELOS.USUARIO, 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.ESPACIO, 'url':'espacio', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+        ],
+    GRUPOS.MODERADOR: 
+         [
+            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
+            {'model': MODELOS.USUARIO, 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+         ],
+    GRUPOS.USUARIO:   
+        [
+            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
+            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+        ],
 }

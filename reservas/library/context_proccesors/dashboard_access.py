@@ -8,10 +8,10 @@ def dashboard_access(request):
     
     # Obtener nombre de grupo
     grupos = request.user.groups.values_list("name", flat=True)
-    grupo = grupos[0] if grupos else "usuario"
+    grupo = grupos[0] if grupos else settings.GRUPOS.USUARIO
     
     # Permisos por modelo para este grupo
-    permisos_por_modelo = settings.DASHBOARD_ACCESS[grupo]
+    permisos_por_modelo = settings.DASHBOARD_ACCESS.get(grupo, [])
     return {
         "group": grupo,
         "current_section": current_section,  # Sección actual para resaltar en el menú
