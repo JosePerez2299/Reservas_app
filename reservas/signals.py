@@ -21,11 +21,9 @@ def crear_grupos_y_permisos(sender, **kwargs):
         grupo.permissions.clear()
 
         for modelo_name, acciones in modelos.items():
-            # modelo_name viene en minúsculas (ej 'usuario', 'reserva',…) 
             try:
-                Model = apps.get_model(APP_LABEL, modelo_name)
+                    Model = apps.get_model(APP_LABEL if modelo_name != "LogEntry" else "auditlog", modelo_name)
             except LookupError:
-                # si el modelo no existe, lo saltamos
                 continue
 
             # ContentType asociado
@@ -34,14 +32,13 @@ def crear_grupos_y_permisos(sender, **kwargs):
             except ContentType.DoesNotExist:
                 continue
 
-            # Itera sólo las acciones que definiste en settings
-            for accion in acciones:
-                codename = f"{accion}_{modelo_name}"
+            # Itera sólo las acciones definidas en settings
+            for accion in acciones['perms']:
+                codename = f"{accion}_{Model._meta.model_name}"
                 try:
                     perm = Permission.objects.get(content_type=ct, codename=codename)
                     grupo.permissions.add(perm)
                 except Permission.DoesNotExist:
-                    # puede ocurrir si escribiste mal la acción
                     continue
 
         grupo.save()

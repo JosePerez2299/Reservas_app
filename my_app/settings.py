@@ -158,18 +158,21 @@ LOGOUT_REDIRECT_URL = '/'
 DASHBOARD_ACCESS = {
     'administrador': 
          {
-            'usuario': ['add', 'change', 'view', 'delete'],
-            'espacio': ['add', 'change', 'view', 'delete'],
-            'reserva': ['add', 'change', 'view', 'delete'],
+            'LogEntry':{'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
+            'usuario': {'label':'Usuarios', 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
+            'espacio': {'label':'Espacios', 'url':'espacio', 'perms':['add', 'change', 'view', 'delete']},
+            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
          },
 
     'moderador': 
          {
-            'usuario': ['add', 'change', 'view', 'delete'],
-            'reserva': ['add', 'change', 'view', 'delete'],
+            'LogEntry': {'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
+            'usuario': {'label':'Usuarios', 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
+            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
          },
     'usuario':   
         {
-            'reserva': ['add', 'change', 'view', 'delete'],
+            'LogEntry':{'label':'Auditoría', 'url':'dashboard', 'perms':['view']},
+            'reserva': {'label':'Reservas', 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
          },
 }
