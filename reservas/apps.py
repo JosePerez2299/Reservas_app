@@ -9,7 +9,7 @@ class ReservasConfig(AppConfig):
         from auditlog.registry import auditlog
         from .models import Reserva, Usuario, Espacio, Ubicacion
         auditlog.register(Reserva)
-        auditlog.register(Usuario)
+        auditlog.register(Usuario, exclude_fields=['last_login'])
         auditlog.register(Espacio)
         auditlog.register(Ubicacion)
         
