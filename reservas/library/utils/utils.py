@@ -5,6 +5,7 @@ from reservas.models import *
 from django.utils.html import mark_safe
 from datetime import datetime
 from math import floor
+from auditlog.models import LogEntry
     
 def get_user_groups(user):
     """
@@ -33,12 +34,23 @@ def get_all_cols(model):
 
 
 def get_stats(request):
+    ultimos_logs = (
+        LogEntry.objects
+        .select_related('actor', 'content_type')
+        .order_by('-timestamp')[:5]
+    )
     if request.user.is_admin:
-        return get_stats_administrador(request)
+        stats = get_stats_administrador(request)
+        stats['logs'] = ultimos_logs
+        return stats
     elif request.user.is_usuario:
-        return get_stats_usuario(request)
+        stats = get_stats_usuario(request)
+        stats['logs'] = ultimos_logs
+        return stats
     elif request.user.is_moderador:
-        return get_stats_moderador(request)
+        stats = get_stats_moderador(request)
+        stats['logs'] = ultimos_logs
+        return stats
     return {'cards': [], 'month_summary': []}
 
 def get_stats_administrador(request):

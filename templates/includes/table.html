@@ -44,7 +44,10 @@
               {% endif %}
             </th>
           {% endfor %}
+
+          {% if actions %}
           <th class="text-center">Acción</th>
+          {% endif %}
         </tr>
       </thead>
       
@@ -86,7 +89,7 @@
               </td>
           {% endfor %}
             <!-- Celda de acciones -->
-
+            
           {% block actions %}
           {% endblock %}
 

@@ -17,7 +17,6 @@ def get_icon(icon_name, icon_class=None):
                             </svg>
         '''),
         'error': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
         '''),
         'warning': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
@@ -31,3 +30,47 @@ def get_icon(icon_name, icon_class=None):
     }
 
     return icons_svg.get(icon_name)
+
+
+
+
+@register.simple_tag()
+def get_message(logEntry):
+    actor = f"\"{ logEntry.actor.username}\"" if logEntry.actor else "Alguien"
+    model = logEntry.content_type.model.lower()
+    obj = logEntry.object_repr
+    action = logEntry.action
+    timestamp = logEntry.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+    changes = getattr(logEntry, "changes_dict", {})
+
+    if action == 0:  # CREATE
+        return f"{actor} creó {articulo(model)} {model} \"{obj}\""
+    
+    elif action == 1:  # UPDATE
+        if model == "reserva" and "estado" in changes:
+            nuevo_estado = changes["estado"][1]
+            return f"{actor} {estado_verb(nuevo_estado)} la reserva \"{obj}\""
+        else:
+            return f"{actor} actualizó la información de {articulo(model)} {model} \"{obj}\" "
+
+    elif action == 2:  # DELETE
+        return f"{actor} eliminó {articulo(model)} {model} \"{obj}\" "
+
+    return f"{actor} realizó una acción desconocida sobre {model} "
+
+
+# Función auxiliar para poner "el" o "la"
+def articulo(modelo):
+    femeninos = ["reserva", "información", "actividad"]  # puedes expandir
+    return "la" if modelo in femeninos else "el"
+
+# Función auxiliar para transformar estado en verbo
+def estado_verb(estado):
+    estado = estado.lower()
+    if estado == "aprobada":
+        return "aprobó"
+    elif estado == "rechazada":
+        return "rechazó"
+    elif estado == "pendiente":
+        return "marcó como pendiente"
+    return f"cambió el estado a {estado}"

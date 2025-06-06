@@ -23,7 +23,7 @@ from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
 from django.conf import settings
 
-class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListContextMixin, ExportMixin, FilterView ):
+class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView ):
     """
     Muestra una lista de usuarios con un formulario de filtrado
     """
@@ -31,7 +31,8 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     permission_required = 'reservas.view_usuario'
     template_name = 'reservas/table_view.html'
     paginate_by = 10
-    filterset_class = UsuarioFilter
+    filterset_class = UsuarioFilter 
+    can_export = True
 
     # Columnas que mostramos en la tabla HTML
     cols = {

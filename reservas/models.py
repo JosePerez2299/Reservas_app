@@ -199,7 +199,7 @@ class Reserva(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.espacio} — {self.fecha_uso} {self.hora_inicio}-{self.hora_fin}"
+        return f"{self.usuario.username} - {self.espacio.nombre}"
 
     def clean(self):
         super().clean()

@@ -19,7 +19,7 @@ from django.urls import reverse_lazy
 from reservas.library.forms.espacios import *
 from django.db.models.functions import Lower
 
-class EspacioListView(LoginRequiredMixin, ListContextMixin, SmartOrderingMixin, ExportMixin, PermissionRequiredMixin, FilterView):
+class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -28,6 +28,7 @@ class EspacioListView(LoginRequiredMixin, ListContextMixin, SmartOrderingMixin, 
     template_name = 'reservas/table_view.html'
     paginate_by = 10
     filterset_class = EspacioFilter
+    can_export = True
 
     cols = {
         'id': 'ID',

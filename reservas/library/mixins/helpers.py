@@ -8,6 +8,7 @@ from django.utils.timezone import now
 from django.urls import reverse_lazy
 from django.db.models.functions import Lower
 from django.db import models
+from django.conf import settings
 
 class AjaxFormMixin:
     def post(self, request, *args, **kwargs):
@@ -53,31 +54,47 @@ class FormContextMixin:
         return ctx
 
 
-class ListContextMixin:
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['model'] = self.model.__name__.lower()
-        ctx['create_url'] = self.crud_urls['create']
-        ctx['view_url'] = self.crud_urls['view']
-        ctx['edit_url'] = self.crud_urls['edit']
-        ctx['delete_url'] = self.crud_urls['delete']      
-
-        # Definir las columnas que se mostrarán en la tabla
-        ctx['cols'] = self.cols
-        return ctx
-
-
-class ExportMixin:
-
+class ListCrudMixin:
+    
     def get(self, request, *args, **kwargs):
         """
         Si existe ?export=csv en la URL, devolvemos CSV. Si no, delegamos
         a la implementación normal de FilterView (HTML + paginación).
         """
-        if request.GET.get('export') == 'csv':
-            return self.export_csv()
+        try:
+            if self.can_export and request.GET.get('export') == 'csv':
+                return self.export_csv()
+        except AttributeError:
+            return super().get(request, *args, **kwargs)
+
         return super().get(request, *args, **kwargs)
 
+
+    def get_context_data(self, **kwargs):
+        
+        ctx = super().get_context_data(**kwargs)
+        ctx['model'] = settings.MODELOS.dict[self.model.__name__]
+
+        try:
+            ctx['create_url'] = self.crud_urls['create']
+            ctx['view_url'] = self.crud_urls['view']
+            ctx['edit_url'] = self.crud_urls['edit']
+            ctx['delete_url'] = self.crud_urls['delete']      
+            ctx['can_export'] = self.can_export 
+        except AttributeError:
+            pass
+
+        # Definir las columnas que se mostrarán en la tabla
+        try:
+            ctx['cols'] = self.cols
+        except AttributeError:
+            ctx['cols'] = {field.name: field.verbose_name for field in self.model._meta.get_fields()}
+        
+        try:
+            ctx['actions'] = self.actions
+        except AttributeError:
+            ctx['actions'] = True
+        return ctx
 
 
     def export_csv(self):

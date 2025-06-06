@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django_filters',
     'widget_tweaks',
     'compressor',
+    'django.contrib.humanize',
     'reservas',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -131,7 +132,7 @@ LANGUAGE_CODE = 'es'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
@@ -161,29 +162,36 @@ class GRUPOS:
     MODERADOR = 'moderador'
     USUARIO = 'usuario'
 
-class MODELOS:
-    LOGENTRY = {'label':'Auditoría', 'name':'auditlog.LogEntry'}
-    USUARIO = {'label':'Usuarios', 'name':'reservas.Usuario'}
-    ESPACIO = {'label':'Espacios', 'name':'reservas.Espacio'}
-    RESERVA = {'label':'Reservas', 'name':'reservas.Reserva'}
+class MODELOS  :
+    LOGENTRY = {'label':'Actividad', 'name':'auditlog.LogEntry', 'url':'log'}
+    USUARIO = {'label':'Usuarios', 'name':'reservas.Usuario', 'url':'usuario'}
+    ESPACIO = {'label':'Espacios', 'name':'reservas.Espacio', 'url':'espacio'}
+    RESERVA = {'label':'Reservas', 'name':'reservas.Reserva', 'url':'reserva'}
+    dict = {
+        'LogEntry': LOGENTRY,
+        'Usuario': USUARIO,
+        'Espacio': ESPACIO,
+        'Reserva': RESERVA,
+    }
+    
 
 DASHBOARD_ACCESS = {
     GRUPOS.ADMINISTRADOR: 
         [
-            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
-            {'model': MODELOS.USUARIO, 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
-            {'model': MODELOS.ESPACIO, 'url':'espacio', 'perms':['add', 'change', 'view', 'delete']},
-            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+            {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.ESPACIO, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
         ],
     GRUPOS.MODERADOR: 
          [
-            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
-            {'model': MODELOS.USUARIO, 'url':'usuario', 'perms':['add', 'change', 'view', 'delete']},
-            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+            {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
          ],
     GRUPOS.USUARIO:   
         [
-            {'model': MODELOS.LOGENTRY, 'url':'dashboard', 'perms':['view']},
-            {'model': MODELOS.RESERVA, 'url':'reserva', 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+            {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
         ],
 }

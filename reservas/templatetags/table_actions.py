@@ -1,5 +1,7 @@
 # templatetags/permisos.py
 from django import template
+from django.conf import settings
+
 register = template.Library()
 
 
@@ -13,15 +15,15 @@ register = template.Library()
 # el view de edicion o eliminacion.
 @register.simple_tag
 def puede_editar(objeto, user, model):
-
-    if model == 'reserva':
+    model_label = model['label']
+    if model_label == settings.MODELOS.RESERVA['label']:
         return objeto.estado == 'pendiente'
 
-    elif model == 'usuario' or model == 'Usuario':
+    elif model_label == settings.MODELOS.USUARIO['label']:
         return True
 
 
-    elif model == 'espacio':
+    elif model_label == settings.MODELOS.ESPACIO['label']:
         return True
         
     else:
@@ -29,10 +31,11 @@ def puede_editar(objeto, user, model):
 
 @register.simple_tag
 def puede_eliminar(objeto, user, model):
-    if model == 'reserva':
+    model_label = model['label']
+    if model_label == settings.MODELOS.RESERVA['label']:
         return objeto.estado == 'pendiente'
-    elif model == 'usuario':
+    elif model_label == settings.MODELOS.USUARIO['label']:
         return user.is_admin
-    elif model== 'espacio':
+    elif model_label== settings.MODELOS.ESPACIO['label']:
         return True
         

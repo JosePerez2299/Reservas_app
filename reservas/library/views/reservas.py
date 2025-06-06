@@ -21,7 +21,7 @@ from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q
 
 
-class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListContextMixin, ExportMixin, FilterView):
+class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView):
     """
     Muestra una lista de reservas con un formulario de filtrado
     """
@@ -29,6 +29,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     permission_required = 'reservas.view_reserva'
     template_name = 'reservas/table_view.html'
     paginate_by = 10
+    can_export = True
 
     # Columnas que mostramos en la tabla HTML
     cols = {
