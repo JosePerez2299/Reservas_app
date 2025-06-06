@@ -25,6 +25,7 @@ class ReservaCreateForm(forms.ModelForm):
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
+        user = self.request.user
         super().__init__(*args, **kwargs)
 
         # Filtrar espacios disponibles
@@ -33,23 +34,23 @@ class ReservaCreateForm(forms.ModelForm):
         )
         
         # Si es administrador, mostrar selector de usuarios del grupo moderador y usuario, o su mismo id
-        if self.request.user.is_admin:
+        if user.is_admin:
             self.fields['usuario'].queryset = Usuario.objects.filter(
-                Q(groups__name='usuario') | Q(groups__name='moderador') | Q(id=self.request.user.id))
+                Q(groups__name=user.GRUPOS.USUARIO) | Q(groups__name=user.GRUPOS.MODERADOR) | Q(id=user.id))
 
         # Si es moderador, mostrar selector de usuarios del grupo usuario 
-        elif self.request.user.is_moderador:
+        elif user.is_moderador:
             self.fields['usuario'].queryset = Usuario.objects.filter(
                 (
-                    Q(groups__name='usuario') &
-                    Q(ubicacion=self.request.user.ubicacion) &
-                    Q(piso=self.request.user.piso)
-                ) | Q(id=self.request.user.id)
+                    Q(groups__name=user.GRUPOS.USUARIO) &
+                    Q(ubicacion=user.ubicacion) &
+                    Q(piso=user.piso)
+                ) | Q(id=user.id)
             )
 
         # Si es usuario, mostrar selector de su usuario
-        elif self.request.user.is_usuario:
-            self.fields['usuario'].initial = self.request.user
+        elif user.is_usuario:
+            self.fields['usuario'].initial = user
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
 
@@ -73,6 +74,7 @@ class ReservaUpdateForm(forms.ModelForm):
 
     def __init__(self, request, *args, **kwargs):
         self.request = request
+        user = self.request.user
         super().__init__(*args, **kwargs)
 
         self.fields['usuario'].disabled = True
@@ -82,12 +84,12 @@ class ReservaUpdateForm(forms.ModelForm):
         self.fields['espacio'].help_text = "No puedes cambiar este campo"
 
         
-        if self.request.user.is_usuario:
+        if user.is_usuario:
             self.fields['estado'].disabled = True
             self.fields['estado'].widget = forms.HiddenInput()
 
-        if not self.request.user.is_admin and self.request.user.is_moderador:
-            if self.instance.espacio.ubicacion != self.request.user.ubicacion or self.instance.espacio.piso != self.request.user.piso:
+        if not user.is_admin and user.is_moderador:
+            if self.instance.espacio.ubicacion != user.ubicacion or self.instance.espacio.piso != user.piso:
                 self.fields['estado'].disabled = True
                 self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
 
@@ -95,8 +97,9 @@ class ReservaUpdateForm(forms.ModelForm):
         # Primero, instancia sin guardar aún
         instance = super().save(commit=False)
         
+        user = self.request.user
         if instance.estado == Reserva.Estado.APROBADA or instance.estado == Reserva.Estado.RECHAZADA:
-            instance.aprobado_por = self.request.user
+            instance.aprobado_por = user
         
         # Ahora sí guardamos
         if commit:

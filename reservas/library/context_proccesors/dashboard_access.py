@@ -15,6 +15,5 @@ def dashboard_access(request):
     return {
         "group": grupo,
         "current_section": current_section,  # Sección actual para resaltar en el menú
-        # ej. {'usuario': ['add','change',...], 'espacio': [...], ...}
         "dashboard_access": permisos_por_modelo
     }

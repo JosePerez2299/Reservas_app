@@ -2,6 +2,7 @@ import django_filters
 from django import forms
 from reservas.models import Usuario, Ubicacion
 from django.contrib.auth.models import Group
+from django.conf import settings
 
 class UsuarioFilter(django_filters.FilterSet):
     username = django_filters.CharFilter(
@@ -37,10 +38,10 @@ class UsuarioFilter(django_filters.FilterSet):
     )
     
     def filter_by_group(self, queryset, name, value):
-        if value == 'usuario':
-            return queryset.filter(groups__name='usuario')
-        elif value == 'moderador':
-            return queryset.filter(groups__name='moderador')
+        if value == settings.GRUPOS.USUARIO:
+            return queryset.filter(groups__name=settings.GRUPOS.USUARIO)
+        elif value == settings.GRUPOS.MODERADOR:
+            return queryset.filter(groups__name=settings.GRUPOS.MODERADOR)
         return queryset
         
     def __init__(self, *args, **kwargs):
@@ -50,8 +51,8 @@ class UsuarioFilter(django_filters.FilterSet):
                 label='Grupo',
                 method=self.filter_by_group,
                 choices=[
-                    ('usuario', 'Usuario'),
-                    ('moderador', 'Moderador'),
+                    (settings.GRUPOS.USUARIO, 'Usuario'),
+                    (settings.GRUPOS.MODERADOR, 'Moderador'),
                 ],
                 widget=forms.Select(attrs={'class': 'form-select'}),
                 empty_label='Todos los grupos'

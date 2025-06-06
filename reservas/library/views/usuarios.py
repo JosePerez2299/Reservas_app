@@ -21,6 +21,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
+from django.conf import settings
 
 class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListContextMixin, ExportMixin, FilterView ):
     """
@@ -60,16 +61,16 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
         qs = qs.annotate(
             group=Case(
-                When(groups__name='moderador', then=Value('Moderador')),
-                When(groups__name='usuario', then=Value('Usuario')),
+                When(groups__name=settings.GRUPOS.MODERADOR, then=Value(settings.GRUPOS.MODERADOR.capitalize())),
+                When(groups__name=settings.GRUPOS.USUARIO, then=Value(settings.GRUPOS.USUARIO.capitalize())),
                 default=Value('-'),
                 output_field=CharField()
             )
         )
         if self.request.user.is_admin:
-            qs = qs.filter(Q(groups__name__in=['moderador', 'usuario']))
+            qs = qs.filter(Q(groups__name__in=[settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO]))
         else:
-            qs = qs.filter(Q(groups__name='usuario'))
+            qs = qs.filter(Q(groups__name=settings.GRUPOS.USUARIO))
         
         return qs
 

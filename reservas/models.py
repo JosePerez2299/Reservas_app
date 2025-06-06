@@ -7,6 +7,9 @@ from django.utils import timezone
 from django.db.models import Q, F
 from django.core.validators import RegexValidator
 from django.utils.text import capfirst
+import re
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 # ——— 1. Ubicación —————————————————————————————————————————————
 class Ubicacion(models.Model):
@@ -21,11 +24,6 @@ class Ubicacion(models.Model):
 
 
 # ——— 2. Usuario personalizado ————————————————————————————————————
-import re
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 def validate_username(value):
     """
@@ -55,6 +53,9 @@ def validate_username(value):
         )
 
 class Usuario(AbstractUser):
+
+    GRUPOS = settings.GRUPOS
+
     username = models.CharField(
         'Nombre de usuario',
         max_length=20,
@@ -90,15 +91,15 @@ class Usuario(AbstractUser):
 
     @property
     def is_moderador(self):
-        return self.groups.filter(name='moderador').exists()
+        return self.groups.filter(name=self.GRUPOS.MODERADOR).exists()
 
     @property
     def is_usuario(self):
-        return self.groups.filter(name='usuario').exists()
+        return self.groups.filter(name=self.GRUPOS.USUARIO).exists()
 
     @property
     def is_admin(self):
-        return self.groups.filter(name='administrador').exists()
+        return self.groups.filter(name=self.GRUPOS.ADMINISTRADOR).exists()
 
 
 # ——— 3. Espacio ———————————————————————————————————————————————
@@ -220,7 +221,7 @@ class Reserva(models.Model):
 
 
         # 3) si alguien aprueba o rechaza, debe ser administrador o moderador de ese mismo piso y ubicación
-        if self.estado in ['aprobada', 'rechazada'] and self.aprobado_por:
+        if self.estado in [self.Estado.APROBADA, self.Estado.RECHAZADA] and self.aprobado_por:
 
             if self.aprobado_por.is_admin:
                 return

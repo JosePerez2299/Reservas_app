@@ -4,11 +4,13 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import password_validation
 from django_select2.forms import Select2Widget
 from reservas.models import Usuario
+from django.conf import settings
+
 
 class UsuarioCreateForm(UserCreationForm):
     # Tu formulario de creación original permanece igual
     groups = forms.ModelChoiceField(
-        queryset=Group.objects.exclude(name='administrador'),
+        queryset=Group.objects.exclude(name=settings.GRUPOS.ADMINISTRADOR),
         required=False,
         widget=forms.RadioSelect,
         label='Grupo',
@@ -33,17 +35,18 @@ class UsuarioCreateForm(UserCreationForm):
 
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        user = request.user
         self.fields['password1'].help_text = 'Tu contraseña debe tener al menos 8 caracteres y no puede ser completamente numérica.'
         self.fields['password2'].help_text = 'Ingresa la misma contraseña para verificación.'
         
         # Establecer grupo 'usuario' por defecto al crear un nuevo usuario
         try:
-            grupo_usuario = Group.objects.get(name='usuario')
+            grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
             self.fields['groups'].initial = grupo_usuario
         except Group.DoesNotExist:
             pass
         
-        if not (request.user and request.user.is_admin):
+        if not (user and user.is_admin):
             # Si no es admin, ocultar el campo groups y mantener el grupo "usuario" por defecto
             self.fields['groups'].widget = forms.HiddenInput()
             self.fields['groups'].required = False
@@ -59,7 +62,7 @@ class UsuarioCreateForm(UserCreationForm):
                 # Si no hay grupo seleccionado, asignar grupo 'usuario' por defecto
                 user.groups.clear()
                 try:
-                    grupo_usuario = Group.objects.get(name='usuario')
+                    grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
                     user.groups.add(grupo_usuario)
                 except Group.DoesNotExist:
                     pass
@@ -81,7 +84,7 @@ class UsuarioUpdateForm(forms.ModelForm):
     )
     
     groups = forms.ModelChoiceField(
-        queryset=Group.objects.exclude(name='administrador'),
+        queryset=Group.objects.exclude(name=settings.GRUPOS.ADMINISTRADOR),
         required=False,
         widget=forms.RadioSelect,
         label='Grupo',
@@ -100,8 +103,9 @@ class UsuarioUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.request = request  # Guardar request para usarlo en save()
         
+        user = self.request.user
         grupo_usuario = self.instance.groups.first()
-        if grupo_usuario not in Group.objects.exclude(name='administrador'):
+        if grupo_usuario not in Group.objects.exclude(name=settings.GRUPOS.ADMINISTRADOR):
             self.fields['groups'].disabled = True
             self.fields['groups'].widget = forms.HiddenInput()
             return
@@ -109,11 +113,11 @@ class UsuarioUpdateForm(forms.ModelForm):
         if grupo_usuario:
             self.fields['groups'].initial = grupo_usuario
         else:
-            self.fields['groups'].initial = Group.objects.get(name='usuario')
+            self.fields['groups'].initial = Group.objects.get(name=settings.GRUPOS.USUARIO)
         
         
         # Solo mostrar el campo groups si el usuario es admin
-        if not (request.user and request.user.is_admin):
+        if not (user and user.is_admin):
             self.fields['groups'].widget = forms.HiddenInput()
             self.fields['groups'].required = False
 
@@ -148,11 +152,11 @@ class UsuarioUpdateForm(forms.ModelForm):
             user.save()
             
             # Manejar grupos
-            if self.request.user and self.request.user.is_admin:
+            if user and user.is_admin:
                 # Si es admin, permitir cambios de grupo
                 selected_group = self.cleaned_data.get('groups')
                 # Limpiar grupos existentes (excepto administrador)
-                user.groups.remove(*user.groups.exclude(name='administrador'))
+                user.groups.remove(*user.groups.exclude(name=settings.GRUPOS.ADMINISTRADOR))
                 
                 # Agregar el nuevo grupo si se seleccionó uno
                 if selected_group:
@@ -160,16 +164,16 @@ class UsuarioUpdateForm(forms.ModelForm):
                 else:
                     # Si no se seleccionó ningún grupo, asignar 'usuario' por defecto
                     try:
-                        grupo_usuario = Group.objects.get(name='usuario')
+                        grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
                         user.groups.add(grupo_usuario)
                     except Group.DoesNotExist:
                         pass
             else:
                 # Si no es admin, mantener el grupo actual o asignar 'usuario' si no tiene ninguno
-                current_groups = user.groups.exclude(name='administrador')
+                current_groups = user.groups.exclude(name=settings.GRUPOS.ADMINISTRADOR)
                 if not current_groups.exists():
                     try:
-                        grupo_usuario = Group.objects.get(name='usuario')
+                        grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
                         user.groups.add(grupo_usuario)
                     except Group.DoesNotExist:
                         pass
