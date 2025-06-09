@@ -1,0 +1,151 @@
+<div class="p-6 max-w-md mx-auto" x-data="{ showDetails: false }">
+<!-- Header del espacio -->
+<div class="text-center mb-6">
+  <div class="mx-auto h-18 w-18 bg-primary flex items-center justify-center rounded-full">
+    <div class="text-primary-content">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full p-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+    </svg>
+    </div>
+  </div>
+  
+  <h2 class="text-2xl font-bold text-base-content">{{ object.nombre }}</h2>
+  <p class="text-base-content/70">{{ object.get_tipo_display }}</p>
+</div>
+
+    <!-- Información básica -->
+    <div class="space-y-4">
+      <!-- Estado de disponibilidad -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Estado</span>
+        <div class="flex items-center gap-2">
+          {% if object.disponible %}
+            <div class="w-2 h-2 bg-success rounded-full"></div>
+            <div class="badge badge-success badge-sm">Disponible</div>
+          {% else %}
+            <div class="w-2 h-2 bg-error rounded-full"></div>
+            <div class="badge badge-error badge-sm">No disponible</div>
+          {% endif %}
+        </div>
+      </div>
+  
+      <!-- Ubicación -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Ubicación</span>
+        <span class="text-sm font-semibold">{{ object.ubicacion.nombre }}</span>
+      </div>
+  
+      <!-- Piso -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Piso</span>
+        <span class="text-sm font-semibold">Piso {{ object.piso }}</span>
+      </div>
+  
+      <!-- Capacidad -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Capacidad</span>
+        <span class="text-sm font-semibold">{{ object.capacidad }} personas</span>
+      </div>
+  
+      <!-- Tipo de espacio -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Tipo</span>
+        <div class="flex items-center gap-2">
+          {% if object.tipo == 'salon' %}
+            <div class="badge badge-info badge-sm">{{ object.get_tipo_display }}</div>
+          {% elif object.tipo == 'laboratorio' %}
+            <div class="badge badge-warning badge-sm">{{ object.get_tipo_display }}</div>
+          {% elif object.tipo == 'auditorio' %}
+            <div class="badge badge-secondary badge-sm">{{ object.get_tipo_display }}</div>
+          {% endif %}
+        </div>
+      </div>
+  
+      <!-- Botón para mostrar más detalles -->
+      <button 
+        @click="showDetails = !showDetails"
+        class="btn btn-ghost btn-sm w-full"
+        :class="{ 'btn-active': showDetails }"
+      >
+        <span x-text="showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'"></span>
+        <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+  
+      <!-- Detalles adicionales (colapsable) -->
+      <div x-show="showDetails" x-transition class="space-y-3 pt-2">
+        <!-- Información completa de ubicación -->
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Fecha de creación</span>
+          <p class="text-sm text-base-content">
+            <span class="font-semibold">{{ object.created_at|date:"d/m/Y" }}</span>
+          </p>
+        </div>
+  
+        <!-- Características del espacio -->
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Características</span>
+          <div class="space-y-1">
+            <div class="flex justify-between text-sm">
+              <span>Creado por:</span>
+              <span class="font-medium">{{ object.created_by.username }}</span>
+            </div>
+    
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Estadísticas de reservas del espacio -->
+    {% if total_reservas > 0 %}
+    <div class="mt-6 p-4 bg-secondary/10 rounded-lg">
+      <h3 class="text-sm font-semibold text-secondary mb-3">Actividad de Reservas</h3>
+      <div class="flex justify-between items-center text-center">
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-secondary">{{ total_reservas }}</div>
+          <div class="text-xs text-base-content/70">Total</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-success">{{ reservas_aprobadas|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Aprobadas</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-warning">{{ reservas_pendientes|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Pendientes</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-error">{{ reservas_rechazadas|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Rechazadas</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  
+    <!-- Información adicional según el tipo de espacio -->
+
+    {% if object.descripcion %}
+    <div class="mt-6 p-4 bg-info/10 rounded-lg">
+      <h3 class="text-sm font-semibold text-info mb-2">
+        {% if object.tipo == 'salon' %}
+          Información del Salón
+        {% elif object.tipo == 'laboratorio' %}
+          Información del Laboratorio
+        {% elif object.tipo == 'auditorio' %}
+          Información del Auditorio
+        {% endif %}
+      </h3>
+      <div class="text-sm text-base-content/80">
+        <p>{{ object.descripcion }}</p>
+      </div>
+    </div>
+    {% endif %}  
+    <!-- Indicador de capacidad visual -->
+    <div class="mt-4 p-3 bg-base-200 rounded-lg">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium text-base-content/70">Capacidad</span>
+        <span class="text-sm font-bold">{{ object.capacidad }}/1000</span>
+      </div>
+      <progress class="progress w-full progress-secondary" value="{{ object.capacidad }}" max="1000"></progress>
+    </div>
+  </div>

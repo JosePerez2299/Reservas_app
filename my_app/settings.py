@@ -178,20 +178,23 @@ class MODELOS  :
 DASHBOARD_ACCESS = {
     GRUPOS.ADMINISTRADOR: 
         [
-            {'model': MODELOS.LOGENTRY, 'perms':['view']},
             {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.ESPACIO, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+
         ],
     GRUPOS.MODERADOR: 
          [
-            {'model': MODELOS.LOGENTRY, 'perms':['view']},
             {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+
          ],
     GRUPOS.USUARIO:   
         [
-            {'model': MODELOS.LOGENTRY, 'perms':['view']},
             {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.LOGENTRY, 'perms':['view']},
+
         ],
 }

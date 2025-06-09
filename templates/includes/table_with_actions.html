@@ -5,7 +5,7 @@
     {% if view_url %}
     <div class="flex gap-1 bg-base-">
       <button
-        class="btn btn-xs rounded-full btn-accent open-modal-btn w-8 h-8 p-1"
+        class="btn btn-xs btn-ghost rounded-full hover:btn-info hover:text-info-content text-info open-modal-btn w-8 h-8 p-1"
         data-url="{% url view_url obj.pk %}?parent={{ obj.pk }}"
         data-success-callback="reloadRow" 
       >
@@ -20,7 +20,7 @@
       {% puede_editar obj request.user model as permiso_editar %}
       {% if permiso_editar and edit_url %}
       <button
-        class="btn btn-xs rounded-full btn-warning open-modal-btn w-8 h-8 p-1"
+        class="btn btn-xs btn-ghost rounded-full hover:btn-warning hover:text-warning-content text-warning open-modal-btn w-8 h-8 p-1"
         data-url="{% url edit_url obj.pk %}?parent={{ obj.pk }}"
         data-success-callback="reloadRow" 
       >
@@ -35,7 +35,7 @@
       {% puede_eliminar obj request.user model as permiso_eliminar %}
       {% if permiso_eliminar and delete_url %}
       <button
-        class="btn btn-xs btn-error rounded-full open-modal-btn w-8 h-8 p-1"
+        class="btn btn-xs btn-ghost rounded-full hover:btn-error hover:text-base-300 text-error open-modal-btn w-8 h-8 p-1"
         data-url="{% url delete_url obj.pk %}?parent={{ obj.pk }}"
         data-success-callback="reloadRow" 
       >

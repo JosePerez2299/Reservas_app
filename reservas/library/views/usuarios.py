@@ -36,10 +36,10 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
     # Columnas que mostramos en la tabla HTML
     cols = {
+        'pk': 'ID',
         'username': 'Usuario',
         'email': 'Correo electrónico',
         'ubicacion__nombre': 'Ubicación',
-        'piso': 'Piso',
         'group': 'Grupo',
     }
     
@@ -117,10 +117,23 @@ class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     Muestra los detalles de un usuario
     """
     model = Usuario 
-    template_name = 'reservas/view.html'
+    template_name = 'reservas/usuario_detail.html'
     permission_required = 'reservas.view_usuario'
     html_title = 'Detalles de Usuario'
     url = 'usuario_view'
+
+
+    def get_context_data(self, **kwargs):
+        reservas_aprobadas = self.object.reservas.filter(estado='aprobada').count()
+        reservas_pendientes = self.object.reservas.filter(estado='pendiente').count()
+        reservas_rechazadas = self.object.reservas.filter(estado='rechazada').count()
+        ctx = super().get_context_data(**kwargs)
+        ctx.update({
+            'reservas_aprobadas': reservas_aprobadas,
+            'reservas_pendientes': reservas_pendientes,
+            'reservas_rechazadas': reservas_rechazadas,
+        })  
+        return ctx
 
 
 class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):

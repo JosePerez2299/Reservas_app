@@ -7,7 +7,7 @@ from django_select2.forms import Select2Widget
 class EspacioCreateForm(forms.ModelForm):
     class Meta:
         model = Espacio
-        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'disponible']
+        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
         widgets = {
             'ubicacion': Select2Widget,
         }
@@ -16,7 +16,7 @@ class EspacioCreateForm(forms.ModelForm):
 class EspacioUpdateForm(forms.ModelForm):
     class Meta:
         model = Espacio
-        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'disponible']
+        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
         widgets = {
             'ubicacion': Select2Widget,
 
@@ -46,7 +46,11 @@ class EspacioUpdateForm(forms.ModelForm):
             reservas_afectadas = list(reserva_qs.values_list('id', flat=True))
             
             # Rechazar las reservas
-            reservas_actualizadas = reserva_qs.update(estado='rechazada', aprobado_por=self.request.user, motivo_admin='El espacio no se encuentra disponible')
+            reservas_actualizadas = reserva_qs.update(
+                estado=Reserva.Estado.RECHAZADA,
+                aprobado_por=self.request.user,
+                motivo_admin='El espacio no se encuentra disponible'
+            )
             
             # Log o mensaje informativo (opcional)
             if reservas_actualizadas > 0:

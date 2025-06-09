@@ -21,7 +21,7 @@
     {% if create_url %}
         <!-- Modal Añadir -->
         <button
-        class="btn btn-xs btn-accent open-modal-btn"
+        class="btn btn-xs btn-outline btn-primary open-modal-btn"
         data-url="{% url create_url %}"
         data-success-callback="reloadRow" 
       >
@@ -34,7 +34,7 @@
         <!-- Modal exportar -->
 
         {% if can_export %}
-        <a class="btn btn-xs btn-primary" href="{% url model.url %}?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}export=csv">
+        <a class="btn btn-xs btn-outline btn-secondary" href="{% url model.url %}?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}export=csv">
           <span class="text-xs">Exportar</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -44,7 +44,7 @@
     {% endif %}
 
       <!-- Modal Filtrar -->
-      <button class="btn btn-warning btn-xs" onclick="filter_modal.showModal()">
+      <button class="btn btn-xs btn-outline btn-info " onclick="filter_modal.showModal()">
         
         <span class="text-xs">Filtrar</span>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
@@ -74,9 +74,8 @@
       </dialog>
       <!-- Fin Modal Filtrar -->
               
-      
         <!-- Limpiar -->
-        <a href="{{ request.path }}" class="btn btn-xs btn-error flex  items-center justify-center ">
+        <a href="{{ request.path }}" class="btn btn-xs btn-outline btn-error flex  items-center justify-center ">
           <span class="text-xs">Refrescar</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />

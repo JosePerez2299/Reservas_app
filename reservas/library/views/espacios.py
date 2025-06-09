@@ -88,7 +88,7 @@ class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     """
     model = Espacio
     permission_required = 'reservas.view_espacio'
-    template_name = 'reservas/view.html'
+    template_name = 'reservas/espacio_detail.html'
     html_title = 'Detalles de Espacio'
     url = 'espacio_view'
 

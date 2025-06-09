@@ -1,0 +1,139 @@
+<!-- user_profile.html -->
+<div class="p-6 max-w-md mx-auto" x-data="{ showDetails: false }">
+    <!-- Header del espacio -->
+    <div class="text-center mb-6">
+      <div class="mx-auto h-18 w-18 bg-primary flex items-center justify-center rounded-full">
+        <div class="text-primary-content text-2xl font-bold">
+          {{ object.username|first|upper }}
+        </div>
+      </div>
+      
+      <h2 class="text-2xl font-bold text-base-content">{{ object.username }}</h2>
+      <p class="text-base-content/70">{{ object.email }}</p>
+    </div>
+    <!-- Información básica -->
+    <div class="space-y-4">
+      <!-- Rol/Grupo -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Rol</span>
+        <div class="flex gap-1">
+          {% if usuario.is_admin %}
+            <div class="badge badge-error badge-sm">Administrador</div>
+          {% elif usuario.is_moderador %}
+            <div class="badge badge-warning badge-sm">Moderador</div>
+          {% elif usuario.is_usuario %}
+            <div class="badge badge-info badge-sm">Usuario</div>
+          {% else %}
+            <div class="badge badge-ghost badge-sm">Sin rol</div>
+          {% endif %}
+        </div>
+      </div>
+  
+      <!-- Ubicación -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Ubicación</span>
+        <span class="text-sm font-semibold">
+          {% if usuario.ubicacion %}
+            {{ usuario.ubicacion.nombre }}
+          {% else %}
+            <span class="text-base-content/50">No asignada</span>
+          {% endif %}
+        </span>
+      </div>
+  
+      <!-- Piso (solo si es moderador o tiene piso asignado) -->
+      {% if usuario.piso is not None %}
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Piso</span>
+        <span class="text-sm font-semibold">Piso {{ usuario.piso }}</span>
+      </div>
+      {% endif %}
+  
+      <!-- Estado activo -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Estado</span>
+        <div class="flex items-center gap-2">
+          {% if usuario.is_active %}
+            <div class="w-2 h-2 bg-success rounded-full"></div>
+            <span class="text-sm font-semibold text-success">Activo</span>
+          {% else %}
+            <div class="w-2 h-2 bg-error rounded-full"></div>
+            <span class="text-sm font-semibold text-error">Inactivo</span>
+          {% endif %}
+        </div>
+      </div>
+  
+      <!-- Botón para mostrar más detalles -->
+      <button 
+        @click="showDetails = !showDetails"
+        class="btn btn-ghost btn-sm w-full"
+        :class="{ 'btn-active': showDetails }"
+      >
+        <span x-text="showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'"></span>
+        <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+  
+      <!-- Detalles adicionales (colapsable) -->
+      <div x-show="showDetails" x-transition class="space-y-3 pt-2">
+        <!-- Fecha de registro -->
+        <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70">Registrado</span>
+          <span class="text-sm">{{ usuario.date_joined|date:"d/m/Y" }}</span>
+        </div>
+  
+        <!-- Último acceso -->
+        <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70">Último acceso</span>
+          <span class="text-sm">
+            {% if usuario.last_login %}
+              {{ usuario.last_login|date:"d/m/Y H:i" }}
+            {% else %}
+              <span class="text-base-content/50">Nunca</span>
+            {% endif %}
+          </span>
+        </div>
+  
+        <!-- Permisos especiales -->
+        {% if usuario.is_superuser or usuario.is_staff %}
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Permisos especiales</span>
+          <div class="flex flex-wrap gap-1">
+            {% if usuario.is_superuser %}
+              <div class="badge badge-error badge-xs">Superusuario</div>
+            {% endif %}
+            {% if usuario.is_staff %}
+              <div class="badge badge-warning badge-xs">Staff</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  
+    <!-- Estadísticas de reservas (si tienes acceso a ellas) -->
+    {% if usuario.reservas.count > 0 %}
+    <div class="mt-6 p-4 bg-primary/10 rounded-lg">
+      <h3 class="text-sm font-semibold text-primary mb-3">Actividad de Reservas</h3>
+      <div class="flex justify-between">
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-primary">{{ usuario.reservas.count }}</div>
+          <div class="text-xs text-base-content/70">Total</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-success">{{ reservas_aprobadas|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Aprobadas</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-warning">{{ reservas_pendientes|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Pendientes</div>
+        </div>
+        <div class="flex flex-col">
+          <div class="text-lg font-bold text-error">{{ reservas_rechazadas|default:0 }}</div>
+          <div class="text-xs text-base-content/70">Rechazadas</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>

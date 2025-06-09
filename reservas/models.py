@@ -127,7 +127,11 @@ class Espacio(models.Model):
     )
     tipo        = models.CharField(max_length=20, choices=Tipo.choices)
     disponible  = models.BooleanField(default=True)
+    created_at  = models.DateTimeField(auto_now=True)
 
+    descripcion = models.TextField(
+        "Descripción", null=True, blank=True
+    )
     class Meta:
         verbose_name = "Espacio"
         verbose_name_plural = "Espacios"
@@ -176,6 +180,7 @@ class Reserva(models.Model):
         related_name='reservas_aprobadas'
     )
 
+
     class Meta:
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
@@ -200,7 +205,7 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.espacio.nombre}"
-
+    
     def clean(self):
         super().clean()
 

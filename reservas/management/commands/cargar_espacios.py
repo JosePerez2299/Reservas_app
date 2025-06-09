@@ -1,12 +1,12 @@
 import random
 from django.core.management.base import BaseCommand
-from reservas.models import Espacio, Ubicacion
+from reservas.models import Espacio, Ubicacion, Usuario
 
 class Command(BaseCommand):
     help = 'Crea 1000 espacios de prueba para poblar la base de datos.'
 
     def handle(self, *args, **kwargs):
-        tipos = [choice[0] for choice in Espacio.TIPO_CHOICES]
+        tipos = [choice[0] for choice in Espacio.Tipo.choices]
 
         # Trae todas las ubicaciones ya creadas
         ubicaciones = list(Ubicacion.objects.all())
