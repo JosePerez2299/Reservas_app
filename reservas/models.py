@@ -10,6 +10,8 @@ from django.utils.text import capfirst
 import re
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.conf import settings
+from auditlog.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 
 # ——— 1. Ubicación —————————————————————————————————————————————
 class Ubicacion(models.Model):
@@ -101,7 +103,49 @@ class Usuario(AbstractUser):
     def is_admin(self):
         return self.groups.filter(name=self.GRUPOS.ADMINISTRADOR).exists()
 
+    def get_logs(self):
+        qs = LogEntry.objects.all()
+        ct_reserva = ContentType.objects.get_for_model(Reserva)
 
+        # Todos los logs de usuarios y moderadores, incluyendo a sí mismo
+        if self.is_admin:
+            filtro_usuario = Q(actor__groups__name__in=[ self.GRUPOS.MODERADOR, self.GRUPOS.USUARIO]) | Q(actor=self)
+            return qs.filter(filtro_usuario)
+        
+        # Todos los logs de reservas de mi ubicación y piso, o donde el actor es el usuario
+        if self.is_moderador:
+            filtro_usuario = Q(actor=self)
+
+            mis_reservas = Reserva.objects.filter(
+                Q(Q(espacio__ubicacion=self.ubicacion) & Q(espacio__piso=self.piso)) |
+                Q(usuario=self) |
+                Q(aprobado_por=self)
+            ).values_list('pk', flat=True)
+
+            filtro_reserva_mi_ubicacion = Q(
+                Q(content_type=ct_reserva) &
+                Q(object_id__in=mis_reservas)
+            )
+            # Retornar todos los log donde actor es moderador o usuario
+            qs = qs.filter(filtro_usuario | filtro_reserva_mi_ubicacion)
+            return qs
+        
+        # Todos los logs de reservas de mi ubicación y piso, o donde el actor es el usuario
+        if self.is_usuario:
+            filtro_usuario = Q(actor=self)
+            mis_reservas = Reserva.objects.filter(
+                Q(usuario=self)
+            ).values_list('pk', flat=True)
+            
+            filtro_reserva_mi_ubicacion = Q(
+                Q(content_type=ct_reserva) &
+                Q(object_id__in=mis_reservas)
+            )
+            # Retornar todos los log donde actor es usuario
+            qs = qs.filter(filtro_usuario | filtro_reserva_mi_ubicacion)
+            return qs
+        
+   
 # ——— 3. Espacio ———————————————————————————————————————————————
 class Espacio(models.Model):
     class Tipo(models.TextChoices):
@@ -204,7 +248,7 @@ class Reserva(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.usuario.username} - {self.espacio.nombre}"
+        return f"US:{self.usuario.username} | ESP:{self.espacio.nombre}"
     
     def clean(self):
         super().clean()

@@ -90,6 +90,15 @@
                       {% else %}
                       <div class="badge badge-soft badge-error">{{ value }}</div>
                       {% endif %}
+
+                      {% elif col == 'object_id' %}
+                      <button
+                      class="btn btn-ghost  hover:btn-info hover:text-info-content text-info open-modal-btn w-8 h-8 p-1"
+                      data-url="/{{obj.object|lower}}/view/{{ value }}"
+                      data-success-callback="reloadRow" 
+                    >
+                        {{ value }}
+                      </button>
                     {% else %}  
                       <div class="truncate overflow-hidden text-ellipsis whitespace-nowrap" title="{{ value }}">
                         {{ value }}

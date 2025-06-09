@@ -1,11 +1,6 @@
-from django.contrib.auth.models import Group
-from django.utils.text import capfirst  
-from django.apps import apps
 from reservas.models import *
-from django.utils.html import mark_safe
 from datetime import datetime
 from math import floor
-from auditlog.models import LogEntry
     
 def get_user_groups(user):
     """
@@ -34,24 +29,20 @@ def get_all_cols(model):
 
 
 def get_stats(request):
-    ultimos_logs = (
-        LogEntry.objects
-        .select_related('actor', 'content_type')
-        .order_by('-timestamp')[:5]
-    )
+    logs = request.user.get_logs()[:5]
     if request.user.is_admin:
         stats = get_stats_administrador(request)
-        stats['logs'] = ultimos_logs
+        stats['logs'] = logs
         return stats
     elif request.user.is_usuario:
         stats = get_stats_usuario(request)
-        stats['logs'] = ultimos_logs
+        stats['logs'] = logs
         return stats
     elif request.user.is_moderador:
         stats = get_stats_moderador(request)
-        stats['logs'] = ultimos_logs
+        stats['logs'] = logs
         return stats
-    return {'cards': [], 'month_summary': []}
+    return {'cards': [], 'month_summary': [], 'logs': []}
 
 def get_stats_administrador(request):
     month = datetime.now().month
@@ -72,6 +63,9 @@ def get_stats_administrador(request):
     reservas_pendientes_percent = (reservas_pendientes_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     reservas_rechazadas_percent = (reservas_rechazadas_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     usuarios = Usuario.objects.count()
+
+    proximas_reservas = Reserva.objects.filter(estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso','hora_inicio')[:4]
+    
 
     cards = [
         {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
@@ -94,6 +88,7 @@ def get_stats_administrador(request):
     reservas_stats = {
         'cards': cards,
         'month_summary': month_summary,
+        'proximas_reservas': proximas_reservas,
     }
 
     return reservas_stats
@@ -116,6 +111,8 @@ def get_stats_usuario(request):
     reservas_pendientes_percent = (reservas_pendientes_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     reservas_rechazadas_percent = (reservas_rechazadas_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
 
+
+    proximas_reservas = Reserva.objects.filter(usuario=request.user, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
     cards = [
         {'title': 'Mis Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
         {'title': 'Mis Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'warning', 'color': 'text-warning'},
@@ -134,13 +131,14 @@ def get_stats_usuario(request):
     reservas_stats = {
         'cards': cards,
         'month_summary': month_summary,
+        'proximas_reservas': proximas_reservas,
     }
 
     return reservas_stats   
 
 
 def get_stats_moderador(request):
-
+    
     month = datetime.now().month
     year = datetime.now().year
 
@@ -150,12 +148,14 @@ def get_stats_moderador(request):
     
     reservas_mes = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, fecha_uso__month=month, fecha_uso__year=year).count()
     reservas_aprobadas_mes = Reserva.objects.filter(estado=Reserva.Estado.APROBADA, aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
-    reservas_pendientes_mes = Reserva.objects.filter(estado='pendiente', aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
-    reservas_rechazadas_mes = Reserva.objects.filter(estado='rechazada', aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
+    reservas_rechazadas_mes = Reserva.objects.filter(estado=Reserva.Estado.RECHAZADA, aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
+    reservas_pendientes_mes = Reserva.objects.filter(estado=Reserva.Estado.PENDIENTE, fecha_uso__month=month, fecha_uso__year=year).count()
 
     reservas_aprobadas_percent = (reservas_aprobadas_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     reservas_pendientes_percent = (reservas_pendientes_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     reservas_rechazadas_percent = (reservas_rechazadas_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
+
+    proximas_reservas = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
 
     cards = [
         {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
@@ -175,6 +175,7 @@ def get_stats_moderador(request):
     reservas_stats = {
         'cards': cards,
         'month_summary': month_summary,
+        'proximas_reservas': proximas_reservas,
     }
 
     return reservas_stats

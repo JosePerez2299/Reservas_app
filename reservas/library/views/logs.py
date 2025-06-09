@@ -17,6 +17,7 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     cols = {
         'id': 'ID',
         'actor': 'Actor',
+        'object_id': 'Objeto',
         'object_repr': 'Recurso',
         'action_label': 'Acción',
         'tipo': 'Tipo',
@@ -26,7 +27,9 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     actions = False
 
     def get_queryset(self):
-        qs = super().get_queryset()
+
+        user = self.request.user
+        qs = user.get_logs()
         action = {
             LogEntry.Action.CREATE: 'Crear',
             LogEntry.Action.UPDATE: 'Actualizar',
@@ -56,8 +59,7 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
             )
         )
 
+
         return qs
 
-
-    
-        
+   

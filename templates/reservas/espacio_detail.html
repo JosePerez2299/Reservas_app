@@ -82,21 +82,7 @@
             <span class="font-semibold">{{ object.created_at|date:"d/m/Y" }}</span>
           </p>
         </div>
-  
-        <!-- Características del espacio -->
-        <div class="p-3 bg-base-200 rounded-lg">
-          <span class="text-sm font-medium text-base-content/70 block mb-2">Características</span>
-          <div class="space-y-1">
-            <div class="flex justify-between text-sm">
-              <span>Creado por:</span>
-              <span class="font-medium">{{ object.created_by.username }}</span>
-            </div>
-    
-          </div>
-        </div>
-      </div>
     </div>
-  
     <!-- Estadísticas de reservas del espacio -->
     {% if total_reservas > 0 %}
     <div class="mt-6 p-4 bg-secondary/10 rounded-lg">

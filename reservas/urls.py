@@ -16,8 +16,6 @@ urlpatterns = [
 
     path('log/', LogListView.as_view(), name='log'),
 
-
-
     path('espacio/', EspacioListView.as_view(), name='espacio'),
     path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),
     path('espacio/view/<int:pk>/', EspacioDetailView.as_view(), name='espacio_view'),
