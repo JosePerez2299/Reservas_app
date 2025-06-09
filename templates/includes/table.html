@@ -91,14 +91,24 @@
                       <div class="badge badge-soft badge-error">{{ value }}</div>
                       {% endif %}
 
-                      {% elif col == 'object_id' %}
+                    {% elif col == 'object_id' %}
                       <button
                       class="btn btn-ghost  hover:btn-info hover:text-info-content text-info open-modal-btn w-8 h-8 p-1"
-                      data-url="/{{obj.object|lower}}/view/{{ value }}"
+                      data-url="{% url 'log_detail' obj.id %}"
                       data-success-callback="reloadRow" 
                     >
                         {{ value }}
                       </button>
+
+                    {% elif col == 'action_label' %}
+
+                    {% if value == 'Actualizar' %}
+                     <div class="badge badge-soft badge-warning">{{ value }}</div>
+                    {% elif value == 'Eliminar' %}
+                     <div class="badge badge-soft badge-error">{{ value }}</div>
+                    {% elif value == 'Crear' %}
+                     <div class="badge badge-soft badge-success">{{ value }}</div>
+                    {% endif %}
                     {% else %}  
                       <div class="truncate overflow-hidden text-ellipsis whitespace-nowrap" title="{{ value }}">
                         {{ value }}

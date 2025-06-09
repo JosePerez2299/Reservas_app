@@ -217,7 +217,7 @@ class Reserva(models.Model):
         "Motivo de reserva", null=False, blank=False
     )
     motivo_admin = models.TextField(
-        "Mensaje de aprobación/rechazo", null=True, blank=True
+        "Mensaje de aprobación/rechazo", null=True, blank=True, default=""
     )
     aprobado_por = models.ForeignKey(
         Usuario, on_delete=models.SET_NULL, null=True, blank=True,

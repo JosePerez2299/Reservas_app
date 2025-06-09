@@ -15,6 +15,7 @@ urlpatterns = [
 
 
     path('log/', LogListView.as_view(), name='log'),
+    path('log/<int:pk>/', LogDetailView.as_view(), name='log_detail'),
 
     path('espacio/', EspacioListView.as_view(), name='espacio'),
     path('espacio/create/', EspacioCreateView.as_view(), name='espacio_create'),

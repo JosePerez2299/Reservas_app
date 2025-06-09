@@ -86,7 +86,6 @@ class ReservaUpdateForm(forms.ModelForm):
         
         if user.is_usuario:
             self.fields['estado'].disabled = True
-            self.fields['estado'].widget = forms.HiddenInput()
 
         if not user.is_admin and user.is_moderador:
             if self.instance.espacio.ubicacion != user.ubicacion or self.instance.espacio.piso != user.piso:

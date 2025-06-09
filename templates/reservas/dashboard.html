@@ -112,7 +112,7 @@
                                 {% with log.content_type.model as model %}
                                 <button
                                 class="text-base-content/50 hover:text-info btn btn-xs btn-ghost open-modal-btn"
-                                data-url="{% url model|add:'_view' log.object_id %}"
+                                data-url="{% url 'log_detail' log.id %}"
                                 data-success-callback="reloadRow" 
                                  >
                                  Detalles
@@ -163,10 +163,10 @@
                 <div class="card bg-primary/5 shadow-xl animate-slide-up" style="animation-delay: 0.8s">
                     <div class="card-body">
                         <h3 class="font-bold text-lg mb-4">Proximas Reservas</h3>
-                        <div class="space-y-3">
+                        <div class="flex flex-col gap-2">
                             {% for reserva in stats.proximas_reservas %}
-                            
-                            <div class="flex justify-between space-x-3 p-3 bg-{{ reserva.estado }}/5 rounded-lg">
+                            <div class=" cursor-pointer card-hover animate-slide-up  open-modal-btn flex justify-between space-x-3 p-3 bg-primary/5 rounded-lg"
+                            data-url="{% url 'reserva_view' reserva.id %}">
 
                                 <div class="indicator">
                                     {% if reserva.estado ==     'aprobada' %}
@@ -190,15 +190,16 @@
                                     <p class="text-sm text-gray-500">{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A" }}</p>
                                 </div>
 
-                                <div class="flex flex-col items-center space-x-2 text-success">
+                                <div class="flex flex-col items-center  space-x-2 ">
                                     {% if reserva.estado == 'aprobada' %}
-                                    {% get_icon 'success' 'w-5 h-5'  %}
+                                    {% get_icon 'success' 'w-6 h-6 text-success'  %}
                                     {% elif reserva.estado == 'pendiente' %}
-                                    {% get_icon 'warning' 'w-5 h-5'  %}
+                                    {% get_icon 'warning' 'w-6 h-6 text-warning'  %}
                                     {% elif reserva.estado == 'rechazada' %}
-                                    {% get_icon 'error' 'w-5 h-5'  %}
+                                    {% get_icon 'error' 'w-6 h-6 text-error'  %}
                                     {% endif %}
-                                    <span class="text-xs">{{ reserva.estado }}</span>
+                                    <span class="text-xs text-base-content/50 ">{{ reserva.estado|capfirst }}</span>
+                                     
                                 </div>
                         
                             </div>

@@ -1,0 +1,186 @@
+{% load utils %}
+<!-- log_entry_detail.html -->
+<div class="p-6 max-w-md mx-auto" x-data="{ showDetails: false }">
+    <!-- Header del log entry -->
+    <div class="text-center mb-6">
+      <div class="mx-auto h-18 w-18 bg-primary flex items-center justify-center rounded-full">
+        <div class="text-primary-content">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full p-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        </div>
+      </div>
+      
+      <h2 class="text-2xl font-bold text-base-content">Acción #{{ object.id }}</h2>
+      <p class="text-base-content/70">{{ object.content_type.model|capfirst }} - {{ object.get_action_display }}</p>
+    </div>
+  
+    <!-- Información básica -->
+    <div class="space-y-4">
+      <!-- Acción realizada -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Acción</span>
+        <div class="flex items-center gap-2">
+          {% if object.action == 0 %}
+            <div class="w-2 h-2 bg-success rounded-full"></div>
+            <div class="badge badge-success badge-sm">CREADO</div>
+          {% elif object.action == 1 %}
+            <div class="w-2 h-2 bg-warning rounded-full"></div>
+            <div class="badge badge-warning badge-sm">ACTUALIZADO</div>
+          {% elif object.action == 2 %}
+            <div class="w-2 h-2 bg-error rounded-full"></div>
+            <div class="badge badge-error badge-sm">ELIMINADO</div>
+          {% elif object.action == 3 %}
+            <div class="w-2 h-2 bg-info rounded-full"></div>
+            <div class="badge badge-info badge-sm">ACCEDIDO</div>
+          {% endif %}
+        </div>
+      </div>
+  
+      <!-- Usuario que realizó la acción -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Usuario</span>
+        <span class="text-sm font-semibold">
+          {% if object.actor %}
+            {{ object.actor.username }}
+          {% else %}
+            <span class="text-base-content/50">Sistema</span>
+          {% endif %}
+        </span>
+      </div>
+  
+      <!-- Fecha y hora -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Fecha</span>
+        <span class="text-sm font-semibold">{{ object.timestamp|date:"d/m/Y H:i:s" }}</span>
+      </div>
+  
+      <!-- Modelo afectado -->
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Modelo</span>
+        <span class="text-sm font-semibold">{{ object.content_type.model|capfirst }}</span>
+      </div>
+  
+      <!-- ID del objeto -->
+      {% if object.object_pk %}
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">ID Objeto</span>
+        <span class="text-sm font-semibold font-mono">{{ object.object_pk }}</span>
+      </div>
+      {% endif %}
+  
+      <!-- Representación del objeto -->
+      {% if object.object_repr %}
+      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+        <span class="text-sm font-medium text-base-content/70">Objeto</span>
+        <span class="text-sm font-semibold truncate max-w-32" title="{{ object.object_repr }}">{{ object.object_repr }}</span>
+      </div>
+      {% endif %}
+  
+      <!-- Botón para mostrar más detalles -->
+      <button 
+        @click="showDetails = !showDetails"
+        class="btn btn-ghost btn-sm w-full"
+        :class="{ 'btn-active': showDetails }"
+      >
+        <span x-text="showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'"></span>
+        <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+  
+      <!-- Detalles adicionales (colapsable) -->
+      <div x-show="showDetails" x-transition class="space-y-3 pt-2">
+
+  
+        <!-- Información de la sesión -->
+        {% if object.session_key %}
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Session Key</span>
+          <p class="text-xs text-base-content font-mono break-all">{{ object.session_key }}</p>
+        </div>
+        {% endif %}
+  
+        <!-- Cambios realizados -->
+        {% if object.changes %}
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Cambios realizados</span>
+          <div class="space-y-3">
+            {% for field, values in object.changes_display_dict.items %}
+            <div class="bg-base-300 p-3 rounded text-sm">
+              <div class="font-medium text-base-content mb-2">{{ field|capfirst }}</div>
+              <div class="space-y-2">
+                {% if values.0 != 'None' %}
+                  <div class="bg-error/20 text-error px-3 py-2 rounded border-l-4 border-error">
+                    <div class="text-xs text-error/70 mb-1">Valor anterior:</div>
+                    <div class="font-mono text-sm break-words">{{ values.0|default:"Vacío" }}</div>
+                  </div>
+                {% endif %}
+                {% if values.1 != 'None' %}
+                  <div class="bg-success/20 text-success px-3 py-2 rounded border-l-4 border-success">
+                    <div class="text-xs text-success/70 mb-1">Valor nuevo:</div>
+                    <div class="font-mono text-sm break-words">{{ values.1|default:"Vacío" }}</div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+  
+        <!-- Datos adicionales -->
+        {% if object.additional_data %}
+        <div class="p-3 bg-base-200 rounded-lg">
+          <span class="text-sm font-medium text-base-content/70 block mb-2">Datos adicionales</span>
+          <div class="text-xs text-base-content bg-base-300 p-2 rounded overflow-x-auto">
+            <pre>{{ object.additional_data|safe }}</pre>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  
+    <!-- Información del usuario actor -->
+    {% if object.actor %}
+    <div class="mt-6 p-4 bg-secondary/10 rounded-lg">
+      <h3 class="text-sm font-semibold text-secondary mb-3">Información del usuario</h3>
+      <div class="space-y-2 text-sm text-base-content/80">
+        <div class="flex justify-between">
+          <span class="text-base-content/70">Username:</span>
+          <span class="font-semibold">{{ object.actor.username }}</span>
+        </div>
+        {% if object.actor.first_name or object.actor.last_name %}
+        <div class="flex justify-between">
+          <span class="text-base-content/70">Nombre:</span>
+          <span class="font-semibold">{{ object.actor.get_full_name }}</span>
+        </div>
+        {% endif %}
+        {% if object.actor.email %}
+        <div class="flex justify-between">
+          <span class="text-base-content/70">Email:</span>
+          <span class="font-semibold text-xs">{{ object.actor.email }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  
+    <!-- Resumen de la actividad -->
+    <div class="mt-6 p-4 bg-info/10 rounded-lg">
+      <h3 class="text-sm font-semibold text-info mb-2">Resumen de la actividad</h3>
+      <div class="text-sm text-base-content/80">
+        <p>
+            {% get_message object %}
+        </p>
+      </div>
+    </div>
+  
+    <!-- Indicador de tiempo transcurrido -->
+    <div class="mt-4 p-3 bg-base-200 rounded-lg">
+      <div class="flex justify-between items-center">
+        <span class="text-sm font-medium text-base-content/70">Hace</span>
+        <span class="text-sm font-bold">{{ object.timestamp|timesince }}</span>
+      </div>
+    </div>
+  </div>

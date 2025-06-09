@@ -1,7 +1,7 @@
 from auditlog.models import LogEntry
 from reservas.library.mixins.helpers import *
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.conf import settings
 from django.db.models import Case, When, Value, CharField
 from django.contrib.contenttypes.models import ContentType
@@ -59,7 +59,15 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
             )
         )
 
-
         return qs
 
+
+class LogDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    """
+    Muestra los detalles de un log
+    """
+    model = LogEntry
+    permission_required = 'auditlog.view_logentry'
+    template_name = 'reservas/log_detail.html'
+    
    
