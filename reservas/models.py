@@ -208,6 +208,11 @@ class Reserva(models.Model):
     
     def clean(self):
         super().clean()
+        
+
+        # 0) Espacio disponible (solo si espacio ya ha sido asignado)
+        if self.espacio_id is not None and not self.espacio.disponible:
+            raise ValidationError("El espacio no está disponible.")
 
         # 1) fecha en el futuro o hoy
         if self.fecha_uso < timezone.now().date():
@@ -215,7 +220,7 @@ class Reserva(models.Model):
 
         # 2) solapamiento de franjas horarias
         qs = Reserva.objects.filter(
-            espacio=self.espacio,
+            espacio_id=self.espacio_id,
             fecha_uso=self.fecha_uso
         ).exclude(pk=self.pk).filter(
             Q(hora_inicio__lt=self.hora_fin) &
