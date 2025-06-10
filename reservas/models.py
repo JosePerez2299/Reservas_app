@@ -275,7 +275,9 @@ class Reserva(models.Model):
 
 
         # 3) si alguien aprueba o rechaza, debe ser administrador o moderador de ese mismo piso y ubicación
-        if self.estado in [self.Estado.APROBADA, self.Estado.RECHAZADA] and self.aprobado_por:
+        if self.estado in [self.Estado.APROBADA, self.Estado.RECHAZADA]:
+            if not self.aprobado_por:
+                raise ValidationError("Debe haber un moderador o administrador que apruebe o rechace la reserva.")
 
             if self.aprobado_por.is_admin:
                 return
