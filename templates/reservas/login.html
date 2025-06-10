@@ -1,6 +1,6 @@
 {# templates/login.html #}
 {% extends "base_headers.html" %}
-
+{% load form_style %}
 {% load static %}
 
 
@@ -29,30 +29,7 @@
 
     <form method="post" action="{% url 'login' %}" class="space-y-4">
       {% csrf_token %}
-      <div>
-        <label for="id_username" class="block text-gray-700 font-medium">Usuario</label>
-        <input
-          type="text"
-          name="username"
-          id="id_username"
-          required
-          class="input input-bordered w-full mt-1"
-          placeholder="Tu usuario"
-          autofocus
-        />
-      </div>
-
-      <div>
-        <label for="id_password" class="block text-gray-700 font-medium">Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          id="id_password"
-          required
-          class="input input-bordered w-full mt-1"
-          placeholder="Tu contraseña"
-        />
-      </div>
+     {{form|mystyle}}
 
       <div class="flex items-center justify-between">
         <label class="flex items-center">
