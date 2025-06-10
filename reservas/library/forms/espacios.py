@@ -52,11 +52,7 @@ class EspacioUpdateForm(forms.ModelForm):
                 motivo_admin='El espacio no se encuentra disponible'
             )
             
-            # Log o mensaje informativo (opcional)
-            if reservas_actualizadas > 0:
-                # Aquí podrías agregar logging o envío de notificaciones
-                print(f"Se rechazaron {reservas_actualizadas} reservas debido a la indisponibilidad del espacio {espacio.nombre}")
-        
+         
         if commit:
             espacio.save()
             

@@ -156,3 +156,7 @@ Reservas_app/
    - Si la fecha de la reserva es anterior a la fecha actual y su estado es PENDIENTE, se debe rechazar la reserva
    - Proteccion de rutas.
    - Expiracion del token de sesión timing o cerrar la sesion al cerrar el navegador
+
+
+
+python manage.py test reservas.tests.tests_forms -v2
