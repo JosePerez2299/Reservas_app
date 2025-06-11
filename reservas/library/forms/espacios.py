@@ -18,8 +18,8 @@ class EspacioUpdateForm(forms.ModelForm):
         fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
         widgets = {
             'ubicacion': Select2Widget,
-
         }
+
     def __init__(self, request, *args, **kwargs):
         self.request = request
         super().__init__(*args, **kwargs)
@@ -28,30 +28,25 @@ class EspacioUpdateForm(forms.ModelForm):
     
     def save(self, commit=True):
         espacio = super().save(commit=False)
-
             
         # Solo procesar si realmente cambió la disponibilidad de True a False
         if (self.initial_disponible and 
             not self.cleaned_data.get('disponible', True)):
             
-            # Filtrar reservas futuras pendientes y aprobadas
-            reserva_qs = Reserva.objects.filter(
+            # Obtener reservas futuras pendientes y aprobadas
+            reservas_afectadas = Reserva.objects.filter(
                 fecha_uso__gte=timezone.now().date(),
                 espacio=espacio.id,
                 estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
             )
             
-            # Opcional: Guardar información de las reservas afectadas para notificaciones
-            reservas_afectadas = list(reserva_qs.values_list('id', flat=True))
+            # Actualizar cada reserva individualmente para que se registre en audit log
+            for reserva in reservas_afectadas:
+                reserva.estado = Reserva.Estado.RECHAZADA
+                reserva.aprobado_por = self.request.user
+                reserva.motivo_admin = 'El espacio no se encuentra disponible'
+                reserva.save()  # Esto triggerea las señales y el audit log
             
-            # Rechazar las reservas
-            reservas_actualizadas = reserva_qs.update(
-                estado=Reserva.Estado.RECHAZADA,
-                aprobado_por=self.request.user,
-                motivo_admin='El espacio no se encuentra disponible'
-            )
-            
-         
         if commit:
             espacio.save()
             
