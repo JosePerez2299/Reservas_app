@@ -72,30 +72,29 @@ class BaseEspacioTestCase(TestCase):
 class EspacioListViewTest(BaseEspacioTestCase):
     def setUp(self):
         super().setUp()
-        # Nombre de la URL en urls.py para la ListView de Espacio
-        self.url = reverse('espacio')  # ajustar al name real
+        self.url = reverse('espacio')  
     
     def test_list_view_requires_login(self):
         """Test que la vista requiere autenticación"""
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 302)  # Redirect to login
+        self.assertEqual(response.status_code, 302) 
 
     def test_list_view_requires_permission(self):
         """Test que la vista requiere permisos"""
         # Usuario no tiene permisos
         self.client.login(username='usuario', password='testpass123')
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)  # Forbidden
+        self.assertEqual(response.status_code, 403) 
 
         # Moderador no tiene permisos
         self.client.login(username='moderador', password='testpass123')
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)  # Forbidden
+        self.assertEqual(response.status_code, 403) 
 
         # Admin tiene permisos
         self.client.login(username='admin', password='testpass123')
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)  # Forbidden
+        self.assertEqual(response.status_code, 200) 
     
     def test_contain_ctx_espacios(self):
         """Test que valida la existencia del obj_list y los paginadores"""
