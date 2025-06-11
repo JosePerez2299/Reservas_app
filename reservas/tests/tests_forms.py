@@ -8,343 +8,336 @@ from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.utils import timezone
 import random
 from datetime import timedelta, time, date
-from unittest.mock import Mock, patch
 
-# class UsuarioFormsTest(TestCase):
-#     def setUp(self):
-#         self.factory = RequestFactory()
-#         # Crear grupos necesarios en settings.GRUPOS.USUARIO y ADMINISTRADOR
-#         self.grupo_usuario = Group.objects.get_or_create(name=Usuario.GRUPOS.USUARIO)[0]
-#         self.grupo_admin = Group.objects.get_or_create(name=Usuario.GRUPOS.ADMINISTRADOR)[0]
-#         # Crear un usuario admin y un usuario no admin
-#         self.admin_user = Usuario.objects.create_user(username='admin', email='admin@example.com', password='pass')
-#         self.admin_user.groups.add(self.grupo_admin)
-#         self.admin_user.save()
-#         self.normal_user = Usuario.objects.create_user(username='normal', email='normal@example.com', password='pass')
-#         self.normal_user.groups.add(self.grupo_usuario)
-#         self.normal_user.save()
+class UsuarioFormsTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        # Crear grupos necesarios en settings.GRUPOS.USUARIO y ADMINISTRADOR
+        self.grupo_usuario = Group.objects.get_or_create(name=Usuario.GRUPOS.USUARIO)[0]
+        self.grupo_admin = Group.objects.get_or_create(name=Usuario.GRUPOS.ADMINISTRADOR)[0]
+        # Crear un usuario admin y un usuario no admin
+        self.admin_user = Usuario.objects.create_user(username='admin', email='admin@example.com', password='pass')
+        self.admin_user.groups.add(self.grupo_admin)
+        self.admin_user.save()
+        self.normal_user = Usuario.objects.create_user(username='normal', email='normal@example.com', password='pass')
+        self.normal_user.groups.add(self.grupo_usuario)
+        self.normal_user.save()
 
-#         self.ubicacion = Ubicacion.objects.create(nombre="Sede Central")
-
-
-#     def test_usuario_create_form_admin_ve_campo_groups(self):
-#         """Test para verificar que el campo groups se muestra para el usuario admin"""
-#         request = self.factory.post(reverse('usuario_create'))
-#         request.user = self.admin_user
-#         # Datos válidos mínimos
-#         data = {
-#             'username': 'nuevo',
-#             'email': 'nuevo@example.com',
-#             'password1': 'Password123$',
-#             'password2': 'Password123$',
-#             'ubicacion': self.ubicacion.pk,  # según validaciones de tu modelo
-#             'piso': 1,
-#             'groups': self.grupo_usuario.pk
-#         }
-#         form = UsuarioCreateForm(request, data=data)
-
-#         self.assertTrue(form.is_valid())    
-#         user = form.save()
-#         # Verificar que se asignó el grupo
-#         self.assertIn(self.grupo_usuario, user.groups.all())
-
-#     def test_usuario_create_form_no_admin_oculta_groups(self):
-#         """Test para verificar que el campo groups se oculta para el usuario no admin"""
-#         request = self.factory.post(reverse('usuario_create'))
-
-#         request.user = self.normal_user
-#         data = {
-#             'username': 'otro',
-#             'email': 'otro@example.com',
-#             'password1': 'Password123$',
-#             'password2': 'Password123$',
-#             'ubicacion': self.ubicacion.pk,
-#             'piso': 2,
-#         }
-#         form = UsuarioCreateForm(request, data=data)
-#         self.assertTrue(form.is_valid())
-#         # El campo groups debe estar oculto (widget HiddenInput)
-#         self.assertTrue(isinstance(form.fields['groups'].widget.__class__.__name__, str) or form.fields['groups'].widget.__class__.__name__ == 'HiddenInput')
-#         user = form.save()
-#         # Debe asignarse automáticamente el grupo USUARIO
-#         self.assertIn(self.grupo_usuario, user.groups.all())
-
-#     def test_usuario_update_form_password_mismatch(self):
-#         """Test para verificar que el campo password no coincide"""
-#         # Tomar una instancia existente
-#         instancia = self.normal_user
-#         request = self.factory.post(reverse('usuario_edit', args=[instancia.pk]))
-#         request.user = self.normal_user
-#         # Simular que el usuario no es admin: el campo groups se oculta
-#         data = {
-#             'username': instancia.username,
-#             'email': instancia.email,
-#             'ubicacion': '',
-#             'piso': 5,
-#             'password1': 'Newpass123',
-#             'password2': 'Different123',
-#         }
-#         form = UsuarioUpdateForm(request, data=data, instance=instancia)
-#         self.assertFalse(form.is_valid())
-#         self.assertIn('Las contraseñas no coinciden.', form.non_field_errors())
-
-#     def test_usuario_update_form_valida_cambio_contraseña(self):
-#         instancia = self.normal_user
-#         request = self.factory.post('/fake/')
-#         request.user = self.normal_user
-#         data = {
-#             'username': instancia.username,
-#             'email': instancia.email,
-#             'ubicacion': self.ubicacion.pk,
-#             'piso': 5,
-#             'password1': 'NuevaPass123',
-#             'password2': 'NuevaPass123',
-#         }
-#         form = UsuarioUpdateForm(request, data=data, instance=instancia)
-#         print(form.errors)
-#         self.assertTrue(form.is_valid())
-#         user = form.save()
-#         # Verificar que la contraseña cambió: intentar autenticar
-#         self.assertTrue(user.check_password('NuevaPass123'))
+        self.ubicacion = Ubicacion.objects.create(nombre="Sede Central")
 
 
-# class EspacioFormsTestCase(TestCase):
-#     def setUp(self):
-#         self.factory = RequestFactory()
-#         self.user = Usuario.objects.create_user(username='testuser', password='pass')
+    def test_usuario_create_form_admin_ve_campo_groups(self):
+        """Test para verificar que el campo groups se muestra para el usuario admin"""
+        request = self.factory.post(reverse('usuario_create'))
+        request.user = self.admin_user
+        # Datos válidos mínimos
+        data = {
+            'username': 'nuevo',
+            'email': 'nuevo@example.com',
+            'password1': 'Password123$',
+            'password2': 'Password123$',
+            'ubicacion': self.ubicacion.pk,  # según validaciones de tu modelo
+            'piso': 1,
+            'groups': self.grupo_usuario.pk
+        }
+        form = UsuarioCreateForm(request, data=data)
 
-#         self.ubicacion = Ubicacion.objects.create(nombre='Ubicación Test')
+        self.assertTrue(form.is_valid())    
+        user = form.save()
+        # Verificar que se asignó el grupo
+        self.assertIn(self.grupo_usuario, user.groups.all())
 
-#         kwargs = {
-#             'nombre': 'Sala A',
-#             'piso': 1,
-#             'capacidad': 10,
-#             'tipo': Espacio.Tipo.SALON,
-#             'descripcion': 'Sala de reuniones A',
-#             'disponible': True,
-#         }
-#         kwargs['ubicacion'] = self.ubicacion
-#         self.espacio = Espacio.objects.create(**kwargs)
+    def test_usuario_create_form_no_admin_oculta_groups(self):
+        """Test para verificar que el campo groups se oculta para el usuario no admin"""
+        request = self.factory.post(reverse('usuario_create'))
 
-#     def test_espacio_create_form_valido(self):
-#         """
-#         Test básico de que el EspacioCreateForm es válido con datos correctos.
-#         """
-#         request = self.factory.post(reverse('espacio_create'))
-#         request.user = self.user
+        request.user = self.normal_user
+        data = {
+            'username': 'otro',
+            'email': 'otro@example.com',
+            'password1': 'Password123$',
+            'password2': 'Password123$',
+            'ubicacion': self.ubicacion.pk,
+            'piso': 2,
+        }
+        form = UsuarioCreateForm(request, data=data)
+        self.assertTrue(form.is_valid())
+        # El campo groups debe estar oculto (widget HiddenInput)
+        self.assertTrue(isinstance(form.fields['groups'].widget.__class__.__name__, str) or form.fields['groups'].widget.__class__.__name__ == 'HiddenInput')
+        user = form.save()
+        # Debe asignarse automáticamente el grupo USUARIO
+        self.assertIn(self.grupo_usuario, user.groups.all())
 
-#         tipo_choices = list(Espacio.Tipo.choices)
-#         tipo_choices = [choice[0] for choice in tipo_choices]
+    def test_usuario_update_form_password_mismatch(self):
+        """Test para verificar que el campo password no coincide"""
+        # Tomar una instancia existente
+        instancia = self.normal_user
+        request = self.factory.post(reverse('usuario_edit', args=[instancia.pk]))
+        request.user = self.normal_user
+        # Simular que el usuario no es admin: el campo groups se oculta
+        data = {
+            'username': instancia.username,
+            'email': instancia.email,
+            'ubicacion': '',
+            'piso': 5,
+            'password1': 'Newpass123',
+            'password2': 'Different123',
+        }
+        form = UsuarioUpdateForm(request, data=data, instance=instancia)
+        self.assertFalse(form.is_valid())
+        self.assertIn('Las contraseñas no coinciden.', form.non_field_errors())
 
-#         data = {
-#             'nombre': 'Sala B',
-#             'piso': 2,
-#             'capacidad': 20,
-#             'tipo': random.choice(tipo_choices),
-#             'descripcion': 'Sala de formación B',
-#             'disponible': True,
-#         }
+    def test_usuario_update_form_valida_cambio_contraseña(self):
+        instancia = self.normal_user
+        request = self.factory.post('/fake/')
+        request.user = self.normal_user
+        data = {
+            'username': instancia.username,
+            'email': instancia.email,
+            'ubicacion': self.ubicacion.pk,
+            'piso': 5,
+            'password1': 'NuevaPass123',
+            'password2': 'NuevaPass123',
+        }
+        form = UsuarioUpdateForm(request, data=data, instance=instancia)
+        self.assertTrue(form.is_valid())
+        user = form.save()
+        # Verificar que la contraseña cambió: intentar autenticar
+        self.assertTrue(user.check_password('NuevaPass123'))
 
-#         data['ubicacion'] = self.ubicacion.pk
 
-#         form = EspacioCreateForm(data=data)
-#         self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
-#         espacio_nuevo = form.save()
-#         # Verificar que se guardó con los mismos valores
-#         self.assertEqual(espacio_nuevo.nombre, data['nombre'])
-#         self.assertEqual(espacio_nuevo.piso, data['piso'])
-#         self.assertEqual(espacio_nuevo.capacidad, data['capacidad'])
-#         self.assertEqual(espacio_nuevo.disponible, True)
+class EspacioFormsTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = Usuario.objects.create_user(username='testuser', password='pass')
 
-#     def test_espacio_update_form_sin_cambiar_disponible_no_afecta_reservas(self):
-#         """
-#         Test que verifica que si el espacio ya estaba disponible y se mantiene disponible,
-#         no se rechazan las reservas futuras pendientes o aprobadas.
-#         """
-#         hoy = timezone.now().date()
-#         reserva_pendiente_fut = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=2),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
-#         reserva_aprobada_fut = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=3),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.APROBADA,
-#         )
-#         reserva_pasada = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy - timedelta(days=1),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
+        self.ubicacion = Ubicacion.objects.create(nombre='Ubicación Test')
 
-#         data = {
-#             'nombre': self.espacio.nombre,
-#             'piso': self.espacio.piso,
-#             'capacidad': self.espacio.capacidad,
-#             'tipo': self.espacio.tipo,
-#             'descripcion': self.espacio.descripcion,
-#             'ubicacion': self.ubicacion.pk,
-#             'disponible': True,
-#         }
+        kwargs = {
+            'nombre': 'Sala A',
+            'piso': 1,
+            'capacidad': 10,
+            'tipo': Espacio.Tipo.SALON,
+            'descripcion': 'Sala de reuniones A',
+            'disponible': True,
+        }
+        kwargs['ubicacion'] = self.ubicacion
+        self.espacio = Espacio.objects.create(**kwargs)
+
+    def test_espacio_create_form_valido(self):
+        """
+        Test básico de que el EspacioCreateForm es válido con datos correctos.
+        """
+        request = self.factory.post(reverse('espacio_create'))
+        request.user = self.user
+
+        tipo_choices = list(Espacio.Tipo.choices)
+        tipo_choices = [choice[0] for choice in tipo_choices]
+
+        data = {
+            'nombre': 'Sala B',
+            'piso': 2,
+            'capacidad': 20,
+            'tipo': random.choice(tipo_choices),
+            'descripcion': 'Sala de formación B',
+            'disponible': True,
+        }
+
+        data['ubicacion'] = self.ubicacion.pk
+
+        form = EspacioCreateForm(data=data)
+        self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
+        espacio_nuevo = form.save()
+        # Verificar que se guardó con los mismos valores
+        self.assertEqual(espacio_nuevo.nombre, data['nombre'])
+        self.assertEqual(espacio_nuevo.piso, data['piso'])
+        self.assertEqual(espacio_nuevo.capacidad, data['capacidad'])
+        self.assertEqual(espacio_nuevo.disponible, True)
+
+    def test_espacio_update_form_sin_cambiar_disponible_no_afecta_reservas(self):
+        """
+        Test que verifica que si el espacio ya estaba disponible y se mantiene disponible,
+        no se rechazan las reservas futuras pendientes o aprobadas.
+        """
+        hoy = timezone.now().date()
+        reserva_pendiente_fut = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy + timedelta(days=2),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
+        reserva_aprobada_fut = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy + timedelta(days=3),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.APROBADA,
+        )
+        reserva_pasada = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy - timedelta(days=1),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
+
+        data = {
+            'nombre': self.espacio.nombre,
+            'piso': self.espacio.piso,
+            'capacidad': self.espacio.capacidad,
+            'tipo': self.espacio.tipo,
+            'descripcion': self.espacio.descripcion,
+            'ubicacion': self.ubicacion.pk,
+            'disponible': True,
+        }
         
 
-#         request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
-#         request.user = self.user
+        request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
+        request.user = self.user
 
-#         form = EspacioUpdateForm(request, data=data, instance=self.espacio)
+        form = EspacioUpdateForm(request, data=data, instance=self.espacio)
 
-#         print(form.errors)
-#         self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
-#         espacio_guardado = form.save()
+        self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
+        espacio_guardado = form.save()
 
-#         reserva_pendiente_fut.refresh_from_db()
-#         reserva_aprobada_fut.refresh_from_db()
-#         reserva_pasada.refresh_from_db()
+        reserva_pendiente_fut.refresh_from_db()
+        reserva_aprobada_fut.refresh_from_db()
+        reserva_pasada.refresh_from_db()
 
-#         self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.PENDIENTE)
-#         self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.APROBADA)
-#         self.assertEqual(reserva_pasada.estado, Reserva.Estado.PENDIENTE)
+        self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.PENDIENTE)
+        self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.APROBADA)
+        self.assertEqual(reserva_pasada.estado, Reserva.Estado.PENDIENTE)
 
-#     def test_espacio_update_form_cambiar_disponible_false_rechaza_reservas_futuras(self):
-#         """
-#         Test que verifica que al cambiar el estado de un espacio a no disponible,
-#         se rechazan las reservas futuras pendientes o aprobadas.
-#         """
+    def test_espacio_update_form_cambiar_disponible_false_rechaza_reservas_futuras(self):
+        """
+        Test que verifica que al cambiar el estado de un espacio a no disponible,
+        se rechazan las reservas futuras pendientes o aprobadas.
+        """
 
-#         hoy = timezone.now().date()
-#         reserva_pendiente_fut = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=2),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
-#         reserva_aprobada_fut = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=3),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.APROBADA,
-#         )
+        hoy = timezone.now().date()
+        reserva_pendiente_fut = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy + timedelta(days=2),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
+        reserva_aprobada_fut = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy + timedelta(days=3),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.APROBADA,
+        )
 
-#         reserva_rechazada_fut = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=1),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.RECHAZADA,
-#         )
+        reserva_rechazada_fut = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy + timedelta(days=1),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.RECHAZADA,
+        )
 
-#         reserva_pasada = Reserva.objects.create(
-#             usuario=self.user,
-#             espacio=self.espacio,
-#             fecha_uso=hoy - timedelta(days=1),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
+        reserva_pasada = Reserva.objects.create(
+            usuario=self.user,
+            espacio=self.espacio,
+            fecha_uso=hoy - timedelta(days=1),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
 
-#         data = {
-#             'nombre': self.espacio.nombre,
-#             'piso': self.espacio.piso,
-#             'capacidad': self.espacio.capacidad,
-#             'tipo': self.espacio.tipo,
-#             'descripcion': self.espacio.descripcion,
-#             'ubicacion': self.ubicacion.pk,
-#             'disponible': False,
-#         }
+        data = {
+            'nombre': self.espacio.nombre,
+            'piso': self.espacio.piso,
+            'capacidad': self.espacio.capacidad,
+            'tipo': self.espacio.tipo,
+            'descripcion': self.espacio.descripcion,
+            'ubicacion': self.ubicacion.pk,
+            'disponible': False,
+        }
         
 
-#         request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
-#         request.user = self.user
+        request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
+        request.user = self.user
 
-#         form = EspacioUpdateForm(request, data=data, instance=self.espacio)
+        form = EspacioUpdateForm(request, data=data, instance=self.espacio)
 
-#         print(form.errors)
-#         self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
-#         espacio_guardado = form.save()
+        self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
+        espacio_guardado = form.save()
 
-#         # Recargar reservas desde BD y verificar que no cambiaron estado
-#         reserva_pendiente_fut.refresh_from_db()
-#         reserva_aprobada_fut.refresh_from_db()
-#         reserva_rechazada_fut.refresh_from_db()
-#         reserva_pasada.refresh_from_db()
+        # Recargar reservas desde BD y verificar que no cambiaron estado
+        reserva_pendiente_fut.refresh_from_db()
+        reserva_aprobada_fut.refresh_from_db()
+        reserva_rechazada_fut.refresh_from_db()
+        reserva_pasada.refresh_from_db()
 
-#         # Verificar que las reservas futuras pendientes y aprobadas se rechazaron
-#         self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.RECHAZADA)
-#         self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.RECHAZADA)
-#         self.assertEqual(reserva_rechazada_fut.estado, Reserva.Estado.RECHAZADA)
-#         self.assertEqual(reserva_pasada.estado, Reserva.Estado.PENDIENTE)
+        # Verificar que las reservas futuras pendientes y aprobadas se rechazaron
+        self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.RECHAZADA)
+        self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.RECHAZADA)
+        self.assertEqual(reserva_rechazada_fut.estado, Reserva.Estado.RECHAZADA)
+        self.assertEqual(reserva_pasada.estado, Reserva.Estado.PENDIENTE)
 
-#         # Verificar que el espacio se marcó como no disponible
-#         self.assertFalse(self.espacio.disponible)
+        # Verificar que el espacio se marcó como no disponible
+        self.assertFalse(self.espacio.disponible)
 
-#     def test_espacio_update_form_si_initial_disponible_false_no_rechaza_nada(self):
-#         """
-#         Test que verifica que si el espacio ya estaba no disponible y se mantiene no disponible,
-#         no se rechazan las reservas futuras pendientes o aprobadas.
-#         """
-#         # Primero forzamos que el espacio esté inicialmente no disponible
-#         self.espacio.disponible = False
-#         self.espacio.save()
+    def test_espacio_update_form_si_initial_disponible_false_no_rechaza_nada(self):
+        """
+        Test que verifica que si el espacio ya estaba no disponible y se mantiene no disponible,
+        no se rechazan las reservas futuras pendientes o aprobadas.
+        """
+        # Primero forzamos que el espacio esté inicialmente no disponible
+        self.espacio.disponible = False
+        self.espacio.save()
 
-#         hoy = timezone.now().date()
-#         reserva_pendiente_fut = Reserva.objects.create(
-#             espacio=self.espacio,
-#             usuario=self.user,
-#             fecha_uso=hoy + timedelta(days=2),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
-#         reserva_aprobada_fut = Reserva.objects.create(
-#             espacio=self.espacio,
-#             usuario=self.user,
-#             fecha_uso=hoy + timedelta(days=3),
-#             hora_inicio=time(9, 0),
-#             hora_fin=time(10, 0),
-#             estado=Reserva.Estado.APROBADA,
-#         )
+        hoy = timezone.now().date()
+        reserva_pendiente_fut = Reserva.objects.create(
+            espacio=self.espacio,
+            usuario=self.user,
+            fecha_uso=hoy + timedelta(days=2),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
+        reserva_aprobada_fut = Reserva.objects.create(
+            espacio=self.espacio,
+            usuario=self.user,
+            fecha_uso=hoy + timedelta(days=3),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.APROBADA,
+        )
 
-#         data = {
-#             'nombre': self.espacio.nombre,
-#             'piso': self.espacio.piso,
-#             'capacidad': self.espacio.capacidad,
-#             'tipo': self.espacio.tipo,
-#             'descripcion': self.espacio.descripcion,
-#             'disponible': False,
-#             'ubicacion': self.ubicacion.pk,
-#         }
-
-
-#         request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
-#         request.user = self.user
-
-#         form = EspacioUpdateForm(request, data=data, instance=self.espacio)
-#         self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
-#         espacio_guardado = form.save()
-
-#         reserva_pendiente_fut.refresh_from_db()
-#         reserva_aprobada_fut.refresh_from_db()
-#         # No deben haber cambiado
-#         self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.PENDIENTE)
-#         self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.APROBADA)
+        data = {
+            'nombre': self.espacio.nombre,
+            'piso': self.espacio.piso,
+            'capacidad': self.espacio.capacidad,
+            'tipo': self.espacio.tipo,
+            'descripcion': self.espacio.descripcion,
+            'disponible': False,
+            'ubicacion': self.ubicacion.pk,
+        }
 
 
+        request = self.factory.post(reverse('espacio_edit', args=[self.espacio.pk]), data)
+        request.user = self.user
 
+        form = EspacioUpdateForm(request, data=data, instance=self.espacio)
+        self.assertTrue(form.is_valid(), f"Errores: {form.errors.as_json()}")
+        espacio_guardado = form.save()
+
+        reserva_pendiente_fut.refresh_from_db()
+        reserva_aprobada_fut.refresh_from_db()
+        # No deben haber cambiado
+        self.assertEqual(reserva_pendiente_fut.estado, Reserva.Estado.PENDIENTE)
+        self.assertEqual(reserva_aprobada_fut.estado, Reserva.Estado.APROBADA)
 
 
 class ReservaCreateFormTestCase(TestCase):
@@ -649,55 +642,50 @@ class ReservaUpdateFormTestCase(TestCase):
         """Test que verifica que se establece aprobado_por al aprobar"""
         request = self.factory.post('/')
         request.user = self.admin
-    
-        # DEBUG: Verificar el usuario y sus permisos
-        print(f"Usuario: {request.user}")
-        print(f"Es admin: {request.user.is_admin}")
-        print(f"Grupos del usuario: {list(request.user.groups.all())}")
-        print(f"Usuario es staff: {request.user.is_staff}")
-        print(f"Usuario es superuser: {request.user.is_superuser}")
-    
+
+        
         form_data = {
-        'usuario': self.usuario1.id,
-        'fecha_uso': date.today() + timedelta(days=1),
-        'hora_inicio': time(10, 0),
-        'hora_fin': time(12, 0),
-        'espacio': self.espacio.id,
-        'motivo': 'Reunión de trabajo',
-        'estado': Reserva.Estado.APROBADA,
-        'motivo_admin': 'Aprobado por administrador',
-    }
-    
+            'usuario': self.usuario1.id,
+            'fecha_uso': date.today() + timedelta(days=1),
+            'hora_inicio': time(10, 0),
+            'hora_fin': time(12, 0),
+            'espacio': self.espacio.id,
+            'motivo': 'Reunión de trabajo',
+            'estado': Reserva.Estado.APROBADA,
+            'motivo_admin': 'Aprobado por administrador',
+        }
+
         form = ReservaUpdateForm(request=request, data=form_data, instance=self.reserva)
         
-        # DEBUG: Verificar si el form reconoce al usuario como admin
-        print(f"Form reconoce como admin: {hasattr(form, 'request') and form.request.user.is_admin}")
+     
         
         self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
         reserva_actualizada = form.save()
+        
+        reserva_actualizada.refresh_from_db()
         self.assertEqual(reserva_actualizada.aprobado_por, self.admin)
 
-    # def test_save_method_sets_aprobado_por_when_rejected(self):
-    #     """Test que verifica que se establece aprobado_por al rechazar"""
-    #     request = self.factory.post('/')
-    #     request.user = self.moderador
+    def test_save_method_sets_aprobado_por_when_rejected(self):
+        """Test que verifica que se establece aprobado_por al rechazar"""
+        request = self.factory.post('/')
+        request.user = self.moderador
         
-    #     form_data = {
-    #         'usuario': self.usuario1.id,
-    #         'fecha_uso': date.today() + timedelta(days=1),
-    #         'hora_inicio': time(10, 0),
-    #         'hora_fin': time(12, 0),
-    #         'espacio': self.espacio.id,
-    #         'motivo': 'Reunión de trabajo',
-    #         'estado': Reserva.Estado.RECHAZADA,
-    #         'motivo_admin': 'No se puede aprobar en esta fecha'
-    #     }
+        form_data = {
+            'usuario': self.usuario1.id,
+            'fecha_uso': date.today() + timedelta(days=1),
+            'hora_inicio': time(10, 0),
+            'hora_fin': time(12, 0),
+            'espacio': self.espacio.id,
+            'motivo': 'Reunión de trabajo',
+            'estado': Reserva.Estado.RECHAZADA,
+            'motivo_admin': 'No se puede aprobar en esta fecha'
+        }
         
-    #     form = ReservaUpdateForm(request=request, data=form_data, instance=self.reserva)
+        form = ReservaUpdateForm(request=request, data=form_data, instance=self.reserva)
         
-    #     self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
-    #     reserva_actualizada = form.save()
-    #     self.assertEqual(reserva_actualizada.aprobado_por, self.moderador)
+        self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
+        reserva_actualizada = form.save()
+        self.assertEqual(reserva_actualizada.aprobado_por, self.moderador)
 
     def test_save_method_no_aprobado_por_for_pending(self):
         """Test que verifica que no se establece aprobado_por para estado pendiente"""
@@ -738,191 +726,186 @@ class ReservaUpdateFormTestCase(TestCase):
         self.assertEqual(motivo_admin_widget.attrs['placeholder'], 'Motivo de gestion')
 
 
-# class FormValidationTestCase(TestCase):
-#     def setUp(self):
-#         """Configuración para tests de validación"""
-#         self.factory = RequestFactory()
+class FormValidationTestCase(TestCase):
+    def setUp(self):
+        """Configuración para tests de validación"""
+        self.factory = RequestFactory()
         
-#         # Crear ubicación
-#         self.ubicacion = Ubicacion.objects.create(nombre='Sede Principal')
+        # Crear ubicación
+        self.ubicacion = Ubicacion.objects.create(nombre='Sede Principal')
         
-#         # Crear grupo y usuario admin
-#         self.grupo_admin = Group.objects.create(name=Usuario.GRUPOS.ADMINISTRADOR)
-#         self.admin = Usuario.objects.create_user(
-#             username='admin123',
-#             email='admin@test.com',
-#             ubicacion=self.ubicacion,
-#             piso=1
-#         )
-#         self.admin.groups.add(self.grupo_admin)
-        
-#         # Crear espacio
-#         self.espacio = Espacio.objects.create(
-#             nombre='Salon101',
-#             ubicacion=self.ubicacion,
-#             piso=1,
-#             capacidad=30,
-#             tipo=Espacio.Tipo.SALON,
-#             disponible=True
-#         )
+        # Crear grupo y usuario admin
+        self.grupo_admin = Group.objects.get_or_create(name=Usuario.GRUPOS.ADMINISTRADOR)[0]
+        # Crear un usuario admin y un usuario no admin
+        self.admin = Usuario.objects.create_user(username='admin', email='admin@example.com', password='pass')
+        self.admin.groups.add(self.grupo_admin)
+        # Crear espacio
+        self.espacio = Espacio.objects.create(
+            nombre='Salon101',
+            ubicacion=self.ubicacion,
+            piso=1,
+            capacidad=30,
+            tipo=Espacio.Tipo.SALON,
+            disponible=True
+        )
 
-#     def test_create_form_valid_data(self):
-#         """Test que verifica datos válidos en el formulario de creación"""
-#         request = self.factory.post('/')
-#         request.user = self.admin
+    def test_create_form_valid_data(self):
+        """Test que verifica datos válidos en el formulario de creación"""
+        request = self.factory.post('/')
+        request.user = self.admin
         
-#         form_data = {
-#             'usuario': self.admin.id,
-#             'fecha_uso': date.today() + timedelta(days=1),
-#             'hora_inicio': time(10, 0),
-#             'hora_fin': time(12, 0),
-#             'espacio': self.espacio.id,
-#             'motivo': 'Reunión de trabajo importante'
-#         }
+        form_data = {
+            'usuario': self.admin.id,
+            'fecha_uso': date.today() + timedelta(days=1),
+            'hora_inicio': time(10, 0),
+            'hora_fin': time(12, 0),
+            'espacio': self.espacio.id,
+            'motivo': 'Reunión de trabajo importante'
+        }
         
-#         form = ReservaCreateForm(request=request, data=form_data)
-#         self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
+        form = ReservaCreateForm(request=request, data=form_data)
+        self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
 
-#     def test_create_form_invalid_past_date(self):
-#         """Test que verifica que no se puede crear reserva con fecha pasada"""
-#         request = self.factory.post('/')
-#         request.user = self.admin
+    def test_create_form_invalid_past_date(self):
+        """Test que verifica que no se puede crear reserva con fecha pasada"""
+        request = self.factory.post('/')
+        request.user = self.admin
         
-#         form_data = {
-#             'usuario': self.admin.id,
-#             'fecha_uso': date.today() - timedelta(days=1),  # Fecha pasada
-#             'hora_inicio': time(10, 0),
-#             'hora_fin': time(12, 0),
-#             'espacio': self.espacio.id,
-#             'motivo': 'Reunión de trabajo'
-#         }
+        form_data = {
+            'usuario': self.admin.id,
+            'fecha_uso': date.today() - timedelta(days=1),  # Fecha pasada
+            'hora_inicio': time(10, 0),
+            'hora_fin': time(12, 0),
+            'espacio': self.espacio.id,
+            'motivo': 'Reunión de trabajo'
+        }
         
-#         form = ReservaCreateForm(request=request, data=form_data)
-#         # El widget date debería tener restricciones, pero la validación real 
-#         # ocurre en el modelo clean()
+        form = ReservaCreateForm(request=request, data=form_data)
+        # El widget date debería tener restricciones, pero la validación real 
+        # ocurre en el modelo clean()
         
-#     def test_update_form_valid_data(self):
-#         """Test que verifica datos válidos en el formulario de actualización"""
-#         # Crear reserva
-#         reserva = Reserva.objects.create(
-#             usuario=self.admin,
-#             espacio=self.espacio,
-#             fecha_uso=date.today() + timedelta(days=1),
-#             hora_inicio=time(10, 0),
-#             hora_fin=time(12, 0),
-#             motivo='Reunión inicial',
-#             estado=Reserva.Estado.PENDIENTE
-#         )
+    def test_update_form_valid_data(self):
+        """Test que verifica datos válidos en el formulario de actualización"""
+        # Crear reserva
+        reserva = Reserva.objects.create(
+            usuario=self.admin,
+            espacio=self.espacio,
+            fecha_uso=date.today() + timedelta(days=1),
+            hora_inicio=time(10, 0),
+            hora_fin=time(12, 0),
+            motivo='Reunión inicial',
+            estado=Reserva.Estado.PENDIENTE
+        )
         
-#         request = self.factory.post('/')
-#         request.user = self.admin
+        request = self.factory.post('/')
+        request.user = self.admin
         
-#         form_data = {
-#             'usuario': self.admin.id,
-#             'fecha_uso': date.today() + timedelta(days=2),
-#             'hora_inicio': time(14, 0),
-#             'hora_fin': time(16, 0),
-#             'espacio': self.espacio.id,
-#             'motivo': 'Reunión actualizada',
-#             'estado': Reserva.Estado.APROBADA,
-#             'motivo_admin': 'Aprobado por administrador'
-#         }
+        form_data = {
+            'usuario': self.admin.id,
+            'fecha_uso': date.today() + timedelta(days=2),
+            'hora_inicio': time(14, 0),
+            'hora_fin': time(16, 0),
+            'espacio': self.espacio.id,
+            'motivo': 'Reunión actualizada',
+            'estado': Reserva.Estado.APROBADA,
+            'motivo_admin': 'Aprobado por administrador'
+        }
         
-#         form = ReservaUpdateForm(request=request, data=form_data, instance=reserva)
-#         self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
+        form = ReservaUpdateForm(request=request, data=form_data, instance=reserva)
+        self.assertTrue(form.is_valid(), f"Form errors: {form.errors}")
 
-#     def test_form_missing_required_fields(self):
-#         """Test que verifica que fallan los formularios sin campos requeridos"""
-#         request = self.factory.post('/')
-#         request.user = self.admin
+    def test_form_missing_required_fields(self):
+        """Test que verifica que fallan los formularios sin campos requeridos"""
+        request = self.factory.post('/')
+        request.user = self.admin
         
-#         # Formulario de creación sin motivo (requerido)
-#         form_data = {
-#             'usuario': self.admin.id,
-#             'fecha_uso': date.today() + timedelta(days=1),
-#             'hora_inicio': time(10, 0),
-#             'hora_fin': time(12, 0),
-#             'espacio': self.espacio.id,
-#             # 'motivo': Falta este campo requerido
-#         }
+        # Formulario de creación sin motivo (requerido)
+        form_data = {
+            'usuario': self.admin.id,
+            'fecha_uso': date.today() + timedelta(days=1),
+            'hora_inicio': time(10, 0),
+            'hora_fin': time(12, 0),
+            'espacio': self.espacio.id,
+            # 'motivo': Falta este campo requerido
+        }
         
-#         form = ReservaCreateForm(request=request, data=form_data)
-#         self.assertFalse(form.is_valid())
-#         self.assertIn('motivo', form.errors)
+        form = ReservaCreateForm(request=request, data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('motivo', form.errors)
 
 
-# class UserPermissionsTestCase(TestCase):
-    # """Tests específicos para permisos de usuarios"""
+class UserPermissionsTestCase(TestCase):
+    """Tests específicos para permisos de usuarios"""
     
-    # def setUp(self):
-    #     self.factory = RequestFactory()
+    def setUp(self):
+        self.factory = RequestFactory()
         
-    #     # Crear ubicaciones
-    #     self.ubicacion1 = Ubicacion.objects.create(nombre='Sede Central')
-    #     self.ubicacion2 = Ubicacion.objects.create(nombre='Sede Norte')
+        # Crear ubicaciones
+        self.ubicacion1 = Ubicacion.objects.create(nombre='Sede Central')
+        self.ubicacion2 = Ubicacion.objects.create(nombre='Sede Norte')
         
-    #     # Crear grupos
-    #     self.grupo_admin = Group.objects.create(name=Usuario.GRUPOS.ADMINISTRADOR)
-    #     self.grupo_moderador = Group.objects.create(name=Usuario.GRUPOS.MODERADOR)
-    #     self.grupo_usuario = Group.objects.create(name=Usuario.GRUPOS.USUARIO)
+        # Crear grupos
+        self.grupo_admin = Group.objects.get_or_create(name=Usuario.GRUPOS.ADMINISTRADOR)[0]
+        self.grupo_moderador = Group.objects.get_or_create(name=Usuario.GRUPOS.MODERADOR)[0]
+        self.grupo_usuario = Group.objects.get_or_create(name=Usuario.GRUPOS.USUARIO)[0]
         
-    #     # Crear usuarios en diferentes ubicaciones y pisos
-    #     self.moderador_piso1 = Usuario.objects.create_user(
-    #         username='mod_piso1',
-    #         email='mod1@test.com',
-    #         ubicacion=self.ubicacion1,
-    #         piso=1
-    #     )
-    #     self.moderador_piso1.groups.add(self.grupo_moderador)
+        # Crear usuarios en diferentes ubicaciones y pisos
+        self.moderador_piso1 = Usuario.objects.create_user(
+            username='mod_piso1',
+            email='mod1@test.com',
+            ubicacion=self.ubicacion1,
+            piso=1
+        )
+        self.moderador_piso1.groups.add(self.grupo_moderador)
         
-    #     self.moderador_piso2 = Usuario.objects.create_user(
-    #         username='mod_piso2',
-    #         email='mod2@test.com',
-    #         ubicacion=self.ubicacion1,
-    #         piso=2
-    #     )
-    #     self.moderador_piso2.groups.add(self.grupo_moderador)
+        self.moderador_piso2 = Usuario.objects.create_user(
+            username='mod_piso2',
+            email='mod2@test.com',
+            ubicacion=self.ubicacion1,
+            piso=2
+        )
+        self.moderador_piso2.groups.add(self.grupo_moderador)
         
-    #     # Crear espacios en diferentes pisos
-    #     self.espacio_piso1 = Espacio.objects.create(
-    #         nombre='Salon101',
-    #         ubicacion=self.ubicacion1,
-    #         piso=1,
-    #         capacidad=30,
-    #         tipo=Espacio.Tipo.SALON,
-    #         disponible=True
-    #     )
+        # Crear espacios en diferentes pisos
+        self.espacio_piso1 = Espacio.objects.create(
+            nombre='Salon101',
+            ubicacion=self.ubicacion1,
+            piso=1,
+            capacidad=30,
+            tipo=Espacio.Tipo.SALON,
+            disponible=True
+        )
         
-    #     self.espacio_piso2 = Espacio.objects.create(
-    #         nombre='Salon201',
-    #         ubicacion=self.ubicacion1,
-    #         piso=2,
-    #         capacidad=25,
-    #         tipo=Espacio.Tipo.SALON,
-    #         disponible=True
-    #     )
+        self.espacio_piso2 = Espacio.objects.create(
+            nombre='Salon201',
+            ubicacion=self.ubicacion1,
+            piso=2,
+            capacidad=25,
+            tipo=Espacio.Tipo.SALON,
+            disponible=True
+        )
 
-    # def test_moderador_can_only_manage_same_floor(self):
-    #     """Test que moderador solo puede gestionar reservas de su mismo piso"""
-    #     # Crear reserva en piso 2
-    #     reserva_piso2 = Reserva.objects.create(
-    #         usuario=self.moderador_piso2,
-    #         espacio=self.espacio_piso2,
-    #         fecha_uso=date.today() + timedelta(days=1),
-    #         hora_inicio=time(10, 0),
-    #         hora_fin=time(12, 0),
-    #         motivo='Reunión piso 2',
-    #         estado=Reserva.Estado.PENDIENTE
-    #     )
+    def test_moderador_can_only_manage_same_floor(self):
+        """Test que moderador solo puede gestionar reservas de su mismo piso"""
+        # Crear reserva en piso 2
+        reserva_piso2 = Reserva.objects.create(
+            usuario=self.moderador_piso2,
+            espacio=self.espacio_piso2,
+            fecha_uso=date.today() + timedelta(days=1),
+            hora_inicio=time(10, 0),
+            hora_fin=time(12, 0),
+            motivo='Reunión piso 2',
+            estado=Reserva.Estado.PENDIENTE
+        )
         
-    #     # Moderador del piso 1 NO debería poder gestionar reserva del piso 2
-    #     request = self.factory.get('/')
-    #     request.user = self.moderador_piso1
+        # Moderador del piso 1 NO debería poder gestionar reserva del piso 2
+        request = self.factory.get('/')
+        request.user = self.moderador_piso1
         
-    #     form = ReservaUpdateForm(request=request, instance=reserva_piso2)
-    #     self.assertTrue(form.fields['estado'].disabled)
+        form = ReservaUpdateForm(request=request, instance=reserva_piso2)
+        self.assertTrue(form.fields['estado'].disabled)
         
-    #     # Moderador del piso 2 SÍ debería poder gestionar su reserva
-    #     request.user = self.moderador_piso2
-    #     form = ReservaUpdateForm(request=request, instance=reserva_piso2)
-    #     self.assertFalse(form.fields['estado'].disabled)
+        # Moderador del piso 2 SÍ debería poder gestionar su reserva
+        request.user = self.moderador_piso2
+        form = ReservaUpdateForm(request=request, instance=reserva_piso2)
+        self.assertFalse(form.fields['estado'].disabled)
