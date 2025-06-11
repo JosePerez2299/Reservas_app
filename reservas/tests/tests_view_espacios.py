@@ -1,14 +1,10 @@
 
 from django.contrib.auth.models import Group
-from django.http import HttpResponse
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from datetime import date, time, timedelta
 from reservas.models import Ubicacion, Espacio, Reserva, Usuario
-
-
 
 User = get_user_model()
 
