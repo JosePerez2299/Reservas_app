@@ -5,15 +5,15 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import timedelta
+from datetime import date, time, timedelta
 from reservas.models import Ubicacion, Espacio, Reserva, Usuario
+
 
 
 User = get_user_model()
 
-class BaseEspacioTestCase(TestCase):
-
-    def setUp(self):
+class BaseEspacioTestCase:
+    def setup_espacios(self):
 
         self.client = Client()
         
@@ -69,11 +69,6 @@ class BaseEspacioTestCase(TestCase):
             )
             self.espacios.append(espacio)
 
-class EspacioListViewTest(BaseEspacioTestCase):
-    def setUp(self):
-        super().setUp()
-        self.url = reverse('espacio')  
-    
     def test_list_view_requires_login(self):
         """Test que la vista requiere autenticación"""
         response = self.client.get(self.url)
@@ -96,6 +91,12 @@ class EspacioListViewTest(BaseEspacioTestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200) 
     
+
+class EspacioListViewTest(TestCase, BaseEspacioTestCase):
+    def setUp(self):
+        super().setup_espacios()
+        self.url = reverse('espacio')  
+   
     def test_contain_ctx_espacios(self):
         """Test que valida la existencia del obj_list y los paginadores"""
         self.client.login(username='admin', password='testpass123')
@@ -144,11 +145,11 @@ class EspacioListViewTest(BaseEspacioTestCase):
 
             # 1) Verificamos status OK
             self.assertEqual(response.status_code, 200)
-
+            object_list = response.context.get('object_list')
             paginator = response.context.get('paginator')
             self.assertIsNotNone(paginator, "El paginator no está en el contexto; verifica que la vista use paginate_by")
 
-            count_items = len(response.context.get('object_list'))
+            count_items = len(object_list)
             counter_items_pages += count_items
 
         self.assertEqual(counter_items_pages, total) 
@@ -170,3 +171,178 @@ class EspacioListViewTest(BaseEspacioTestCase):
         lineas = contenido.strip().splitlines()
         self.assertGreaterEqual(len(lineas), 1 + len(self.espacios))
 
+
+class EspacioCreateViewTest(TestCase, BaseEspacioTestCase):
+    def setUp(self):
+        super().setup_espacios()
+        self.url = reverse('espacio_create')  
+
+    def test_get_create_view_muestra_form(self):
+        self.client.login(username='admin', password='testpass123')
+
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_post_create_valid(self):
+        self.client.login(username='admin', password='testpass123')
+
+        datos = {
+            'nombre': 'Sala desde el create',
+            'ubicacion': self.ubicacion.pk,
+            'piso': 2,
+            'capacidad': 25,
+            'tipo': 'laboratorio',
+            'descripcion': 'Nueva Sala',
+            'disponible': True,
+        }
+        resp = self.client.post(self.url, datos)
+
+        self.assertEqual(resp.status_code, 302)
+        # Verificar que existe en BD
+        existe = Espacio.objects.filter(nombre='Sala desde el create', ubicacion=self.ubicacion).exists()
+        self.assertTrue(existe)
+
+    def test_post_create_invalid(self):
+        self.client.login(username='admin', password='testpass123')
+
+        logged = self.client.login(username='admin', password='testpass123')
+        self.assertTrue(logged, "Falla login en test: revisa credenciales")
+        
+        datos_invalidos = {
+            'nombre': '',        # nombre requerido
+            'ubicacion': '',     # inválido
+            'piso': -1,          # fuera de rango si hay validación
+            'capacidad': 0,      # debe ser > 0
+            'tipo': '',          # requerido
+            'descripcion': '',   # asumimos requerido o puede permitirse vacío, pero incluimos
+            'disponible': True,
+        }
+        # Contar cuántos espacios hay antes
+        inicial = Espacio.objects.count()
+        
+        resp = self.client.post(self.url, datos_invalidos)
+        # No redirige, status 200 con el form mostrando errores
+        self.assertEqual(resp.status_code, 200)
+        
+        # Debe haber formulario en contexto
+        form = resp.context.get('form')
+        self.assertIsNotNone(form, "No se encontró 'form' en el contexto")
+        
+        # El form debe tener errores
+        self.assertTrue(form.errors, "Se esperaba que el form tuviera errores pero está limpio")
+        
+        # Verificar campos específicos tienen error
+        for campo in ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo']:
+            self.assertIn(campo, form.errors, f"Se esperaba error en el campo '{campo}'")
+        
+        # Opcional: verificar que el queryset no cambió
+        self.assertEqual(Espacio.objects.count(), inicial, "Se creó un Espacio inválido cuando no debía")
+
+# class EspacioUpdateViewTest(BaseEspacioTestCase):
+#     def setUp(self):
+#         super().setUp()
+#         # Tomamos un espacio existente
+#         self.espacio = self.espacios[0]
+#         # URL del UpdateView; suponemos que requiere pk
+#         self.url = reverse('espacio-update', args=[self.espacio.pk])
+
+#     def test_get_update_view_muestra_form_con_datos(self):
+#         resp = self.client.get(self.url)
+#         self.assertEqual(resp.status_code, 200)
+#         self.assertTemplateUsed(resp, 'reservas/espacio_form.html')
+#         # Verificar que el formulario en el contexto tiene inicial con los datos del objeto
+#         form = resp.context['form']
+#         self.assertEqual(form.initial.get('nombre'), self.espacio.nombre)
+
+#     def test_post_update_valido_modifica_objeto(self):
+#         nuevos_datos = {
+#             'nombre': 'Sala Modificada',
+#             'ubicacion': self.ubicacion.pk,
+#             'piso': self.espacio.piso,
+#             'capacidad': self.espacio.capacidad,
+#             'tipo': self.espacio.tipo,
+#             'descripcion': 'Descripción modificada',
+#             'disponible': self.espacio.disponible,
+#         }
+#         resp = self.client.post(self.url, nuevos_datos)
+#         self.assertEqual(resp.status_code, 302)
+#         self.espacio.refresh_from_db()
+#         self.assertEqual(self.espacio.nombre, 'Sala Modificada')
+#         self.assertEqual(self.espacio.descripcion, 'Descripción modificada')
+
+#     def test_post_update_cambio_disponible_false_rechaza_reservas(self):
+#         # Para probar la lógica de rechazar reservas, creamos reservas futuras del espacio
+#         hoy = timezone.now().date()
+#         # Aseguramos que initial disponible sea True
+#         self.espacio.disponible = True
+#         self.espacio.save()
+#         reserva = Reserva.objects.create(
+#             espacio=self.espacio,
+#             fecha_uso=hoy + timedelta(days=2),
+#             estado=Reserva.Estado.PENDIENTE,
+#         )
+#         datos = {
+#             'nombre': self.espacio.nombre,
+#             'ubicacion': self.ubicacion.pk,
+#             'piso': self.espacio.piso,
+#             'capacidad': self.espacio.capacidad,
+#             'tipo': self.espacio.tipo,
+#             'descripcion': self.espacio.descripcion,
+#             'disponible': False,
+#         }
+#         resp = self.client.post(self.url, datos)
+#         self.assertEqual(resp.status_code, 302)
+#         reserva.refresh_from_db()
+#         self.assertEqual(reserva.estado, Reserva.Estado.RECHAZADA)
+#         self.assertEqual(reserva.aprobado_por, self.user)
+#         self.assertEqual(reserva.motivo_admin, 'El espacio no se encuentra disponible')
+
+class EspacioDeleteViewTest(TestCase, BaseEspacioTestCase):
+    def setUp(self):
+        super().setup_espacios()
+
+        # Crear un espacio para borrar
+        self.espacio = Espacio.objects.create(
+            nombre='Sala a borrar',
+            ubicacion=self.ubicacion,
+            piso=1,
+            capacidad=5,
+            tipo='Otro',
+            descripcion='Temporal',
+            disponible=True,
+        )
+        self.url = reverse('espacio_delete', args=[self.espacio.pk])
+
+
+    def test_get_delete_view_template(self):
+        self.client.login(username='admin', password='testpass123')
+
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_post_delete_view(self):
+        self.client.login(username='admin', password='testpass123')
+
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, 302)
+        exists = Espacio.objects.filter(pk=self.espacio.pk).exists()
+        self.assertFalse(exists)
+
+    def test_delete_cascada_o_integridad(self):
+        self.client.login(username='admin', password='testpass123')
+
+        reserva = Reserva.objects.create(
+            usuario=self.usuario_user,
+            espacio=self.espacio,
+            fecha_uso=date.today() + timedelta(days=1),
+            hora_inicio=time(10, 0),
+            hora_fin=time(12, 0),
+            motivo='Reunión en otra sede',
+            estado=Reserva.Estado.PENDIENTE
+        )
+        resp = self.client.post(self.url)
+
+        self.assertEqual(resp.status_code, 302)
+
+        self.assertFalse(Espacio.objects.filter(pk=self.espacio.pk).exists())
+        self.assertFalse(Reserva.objects.filter(pk=reserva.pk).exists())

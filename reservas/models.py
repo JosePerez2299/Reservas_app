@@ -166,7 +166,7 @@ class Espacio(models.Model):
         help_text="Piso en que se encuentra el espacio (≤ 40)"
     )
     capacidad   = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000)],
+        validators=[MaxValueValidator(1000),MinValueValidator(1)],
         help_text="Capacidad máxima (≤ 1000)"
     )
     tipo        = models.CharField(max_length=20, choices=Tipo.choices)
