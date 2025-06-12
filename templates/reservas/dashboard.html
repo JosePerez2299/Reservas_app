@@ -1,218 +1,237 @@
-{% extends "base.html" %}
-{% load static %}
-{% load utils %}
-{% load humanize %}
+{% extends 'base.html' %}
 {% block content %}
 
- <!-- Header Hero Section -->
-<header class="relative overflow-hidden">
-    <div class="gradient-bg relative z-10">
-        <div class="absolute inset-0 bg-black/10"></div>
-        <div class="relative z-20 px-6 py-16 lg:py-24">
-            <div class="max-w-7xl mx-auto">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                    <div class="animate-fade-in">
-                        <h1 class="text-3xl lg:text-5xl font-extrabold text-white mb-4">
-                            ¡Hola, <span class="text-yellow-300"> {% if user.first_name %}{{user.first_name}}{% else %}{{user.username}}{% endif %}</span>! 👋
-                        </h1>
-                        <p class="text-xl text-white/90 mb-6 lg:mb-0">
-                            Bienvenido/a de vuelta. Aquí tienes un resumen de tu actividad.
-                        </p>
-                        <div class="flex items-center space-x-4 text-white/80">
-                            <span class="flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                </svg>
-                            </span>
-                            <span class="flex items-center">
-                                <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                                En línea
-                            </span>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-base-content">Dashboard</h1>
+            <p class="text-base-content/70 mt-2">Bienvenido de vuelta, Carlos Mendoza (Moderador - Edificio Norte)</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="stat bg-base-100 rounded-lg shadow">
+                <div class="stat-figure text-primary">
+                    <i class="fas fa-calendar-check text-2xl"></i>
+                </div>
+                <div class="stat-title">Reservas Activas</div>
+                <div class="stat-value text-primary">43</div>
+                <div class="stat-desc">+12% desde la semana pasada</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg shadow">
+                <div class="stat-figure text-warning">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+                <div class="stat-title">Pendientes</div>
+                <div class="stat-value text-warning">8</div>
+                <div class="stat-desc">Esperando aprobación</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg shadow">
+                <div class="stat-figure text-accent">
+                    <i class="fas fa-building text-2xl"></i>
+                </div>
+                <div class="stat-title">Espacios Disponibles</div>
+                <div class="stat-value text-accent">15</div>
+                <div class="stat-desc">De 18 espacios totales</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg shadow">
+                <div class="stat-figure text-info">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
+                <div class="stat-title">Usuarios Activos</div>
+                <div class="stat-value text-info">247</div>
+                <div class="stat-desc">+5 nuevos esta semana</div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Main Chart -->
+            <div class="lg:col-span-2">
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-area mr-2"></i>
+                            Reservas por Espacio
+                        </h2>
+                        <div class="h-64 bg-base-200 rounded-lg flex items-center justify-center">
+                            <p class="text-base-content/50">Gráfico de ocupación de espacios aquí</p>
                         </div>
-                    </div>
-                    <div class="hidden lg:block animate-bounce-subtle">
-                        <div class="avatar avatar-online">
-                            <div class="w-28 rounded-full">
-                              <img src="{% static 'src/images/cantv_wallpaper.jpg' %}" />
-                            </div>
-                          </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</header>
 
-<!-- Main Dashboard Content -->
-<main class="flex-1 px-6 py-8 space-y-8">
-    <div class="max-w-7xl mx-auto">
-
-        <!-- Quick Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-
-            
-            {% for stat in stats.cards   %}
-            <!-- Card 1: reservas_stats -->
-            <div class="card bg-primary/5 shadow-xl card-hover animate-slide-up border-l-4 {{ stat.color }}" style="animation-delay: 0.1s">
+            <!-- Recent Activity -->
+            <div class="card bg-base-100 shadow-xl">
                 <div class="card-body">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-base-content">{{ stat.title }}</p>
-                            <p class="text-3xl font-bold {{ stat.color }}">{{ stat.value }}</p>
-                            
+                    <h2 class="card-title">
+                        <i class="fas fa-clipboard-list mr-2"></i>
+                        Log de Actividades
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="avatar placeholder">
+                                <div class="bg-success text-success-content rounded-full w-8">
+                                    <i class="fas fa-check text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium">Reserva aprobada</p>
+                                <p class="text-xs text-base-content/70">Sala 201 - Ana García</p>
+                            </div>
+                            <span class="text-xs text-base-content/50">2min</span>
                         </div>
-                            {% get_icon stat.icon %}
-
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="avatar placeholder">
+                                <div class="bg-info text-info-content rounded-full w-8">
+                                    <i class="fas fa-plus text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium">Nueva reserva</p>
+                                <p class="text-xs text-base-content/70">Aula 305 - Mario López</p>
+                            </div>
+                            <span class="text-xs text-base-content/50">5min</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="avatar placeholder">
+                                <div class="bg-warning text-warning-content rounded-full w-8">
+                                    <i class="fas fa-user-plus text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium">Usuario creado</p>
+                                <p class="text-xs text-base-content/70">Carmen Ruiz - Estudiante</p>
+                            </div>
+                            <span class="text-xs text-base-content/50">10min</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="avatar placeholder">
+                                <div class="bg-error text-error-content rounded-full w-8">
+                                    <i class="fas fa-times text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium">Reserva rechazada</p>
+                                <p class="text-xs text-base-content/70">Lab 102 - Pedro Sánchez</p>
+                            </div>
+                            <span class="text-xs text-base-content/50">15min</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {% endfor %}
-
         </div>
 
-        <!-- Dashboard Sections Grid -->
-        <div class="grid lg:grid-cols-3 gap-8">
-            
-            <!-- Left Column: Activity Feed -->
-            <div class="lg:col-span-2 space-y-6">
+        <!-- Data Table -->
+        <div class="card bg-base-100 shadow-xl mt-6">
+            <div class="card-body">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="card-title">
+                        <i class="fas fa-calendar-check mr-2"></i>
+                        Reservas Recientes
+                    </h2>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus mr-2"></i>
+                        Nueva Reserva
+                    </button>
+                </div>
                 
-                <!-- Recent Activity -->
-                <div class="card bg-primary/5 shadow-xl animate-slide-up" style="animation-delay: 0.5s">
-                    <div class="card-body">
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="card-title text-2xl font-bold">Actividad Reciente</h2>
-                            <a href="{% url 'log' %}" class="btn btn-outline btn-primary btn-sm">Ver Todo</a>
-                        </div>
-                        <div class="space-y-4">
-
-                            {% if stats.logs %}
-                            {% for log in stats.logs %}
-                            <div class="flex items-center space-x-4 p-4 bg-primary/5 rounded-lg">
-                                
-                                {% if log.action == 0 %}
-                                    <div class="w-10 h-10 rounded-full text-success">
-                                        {% get_icon 'success' 'w-10 h-10' %}
-                                    </div>
-                                {% elif log.action == 1 %}
-                                    <div class="w-10 h-10 rounded-full text-info">
-                                        {% get_icon 'info' 'w-10 h-10' %}
-                                    </div>
-                                {% elif log.action == 2 %}
-                                    <div class="w-10 h-10 rounded-full text-error">
-                                        {% get_icon 'error' 'w-10 h-10' %}
-                                    </div>
-                                {% endif %}
-
-                                <div class="flex-1">
-                                    <p class="font-semibold">{% get_message log %}</p>
-                                    <p class="text-sm text-gray-500">{{ log.timestamp|naturaltime }}</p>
-                                </div>
-
-                                {% with log.content_type.model as model %}
-                                <button
-                                class="text-base-content/50 hover:text-info btn btn-xs btn-ghost open-modal-btn"
-                                data-url="{% url 'log_detail' log.id %}"
-                                data-success-callback="reloadRow" 
-                                 >
-                                 Detalles
-                                </button>
-                                {% endwith %}
-                            </div>
-                            {% endfor %}
-                            {% else %}
-                            <p class="text-center text-gray-500">No hay actividad reciente.</p>
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuario</th>
+                                <th>Espacio</th>
+                                <th>Fecha/Hora</th>
+                                <th>Estado</th>
+                                <th>Moderador</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#RSV001</td>
+                                <td>Ana García</td>
+                                <td>Sala 201 - Piso 2</td>
+                                <td>13/06/2025 14:00-16:00</td>
+                                <td><span class="badge badge-success">Aprobada</span></td>
+                                <td>Carlos M.</td>
+                                <td>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RSV002</td>
+                                <td>Mario López</td>
+                                <td>Aula 305 - Piso 3</td>
+                                <td>14/06/2025 09:00-11:00</td>
+                                <td><span class="badge badge-warning">Pendiente</span></td>
+                                <td>-</td>
+                                <td>
+                                    <button class="btn btn-success btn-xs"><i class="fas fa-check"></i></button>
+                                    <button class="btn btn-error btn-xs"><i class="fas fa-times"></i></button>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RSV003</td>
+                                <td>Carmen Ruiz</td>
+                                <td>Lab 102 - Piso 1</td>
+                                <td>12/06/2025 16:00-18:00</td>
+                                <td><span class="badge badge-error">Rechazada</span></td>
+                                <td>Carlos M.</td>
+                                <td>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-comment"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#RSV004</td>
+                                <td>Pedro Sánchez</td>
+                                <td>Auditorio - Piso 0</td>
+                                <td>15/06/2025 10:00-17:00</td>
+                                <td><span class="badge badge-info">En Uso</span></td>
+                                <td>Ana R.</td>
+                                <td>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-ghost btn-xs"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-
-              
-            </div>
-
-            <!-- Right Column: Side Info -->
-            <div class="space-y-6">
-                
-                <!-- Progress Card -->
-                <div class="card bg-primary/5 shadow-xl animate-slide-up" style="animation-delay: 0.7s">
-                    <div class="card-body">
-                        <div class="flex justify-between">
-                            <h3 class="font-bold text-lg mb-4">Progreso del Mes </h3>
-                            <span class="text-lg font-bold text-primary">{{ stats.month_summary.total }}</span>
-                        </div>
-                        <div class="space-y-4">
-                            {% if stats.month_summary.total > 0 %}
-                            {% for item in stats.month_summary.items %}
-                            <div>
-                                <div class="flex justify-between text-sm mb-1">
-                                    <span>{{ item.title }}</span>
-                                    <span>{{ item.value }}%</span>
-                                </div>
-
-                                <progress class="progress progress-{{item.color}}" value="{{ item.value }}" max="100"></progress>
-                                </div>
-                            {% endfor %}
-                            {% else %}
-                            <p>No hay reservas para el mes actual</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                    
-                <!-- Calendar Widget -->
-                <div class="card bg-primary/5 shadow-xl animate-slide-up" style="animation-delay: 0.8s">
-                    <div class="card-body">
-                        <h3 class="font-bold text-lg mb-4">Proximas Reservas</h3>
-                        <div class="flex flex-col gap-2">
-                            {% for reserva in stats.proximas_reservas %}
-                            <div class=" cursor-pointer card-hover animate-slide-up  open-modal-btn flex justify-between space-x-3 p-3 bg-primary/5 rounded-lg"
-                            data-url="{% url 'reserva_view' reserva.id %}">
-
-                                <div class="indicator">
-                                    {% if reserva.estado ==     'aprobada' %}
-                                    <div class="indicator-item status status-success status-xl"> 
-                                    </div>
-                                    {% elif reserva.estado == 'pendiente' %}
-                                    <div class="indicator-item status status-warning status-xl"> 
-                                    </div>
-                                    {% elif reserva.estado == 'rechazada' %}
-                                    <div class="indicator-item status status-error status-xl"> 
-                                    </div>
-                                    {% endif %}
-
-                                    <div class="w-12 h-12 bg-blue-500 text-white rounded-lg flex items-center justify-center font-bold">
-                                         {{ reserva.fecha_uso.day }}/{{ reserva.fecha_uso.month }}
-                                    </div>
-                                  </div>
-                                
-                                <div>
-                                    <p class="font-semibold">{{ reserva.espacio.nombre }}</p>
-                                    <p class="text-sm text-gray-500">{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A" }}</p>
-                                </div>
-
-                                <div class="flex flex-col items-center  space-x-2 ">
-                                    {% if reserva.estado == 'aprobada' %}
-                                    {% get_icon 'success' 'w-6 h-6 text-success'  %}
-                                    {% elif reserva.estado == 'pendiente' %}
-                                    {% get_icon 'warning' 'w-6 h-6 text-warning'  %}
-                                    {% elif reserva.estado == 'rechazada' %}
-                                    {% get_icon 'error' 'w-6 h-6 text-error'  %}
-                                    {% endif %}
-                                    <span class="text-xs text-base-content/50 ">{{ reserva.estado|capfirst }}</span>
-                                     
-                                </div>
-                        
-                            </div>
-                            {% endfor %}
-                            
-                        </div>
-                    </div>
-                </div>
-
-              
             </div>
         </div>
     </div>
-</main>
 
-{% endblock %}
+    <script>
+        // Theme toggle functionality
+        const themeController = document.querySelector('.theme-controller');
+        themeController.addEventListener('change', function() {
+            if (this.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        });
+
+        // Mobile menu functionality
+        document.addEventListener('click', function(e) {
+            const dropdowns = document.querySelectorAll('.dropdown[open]');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.removeAttribute('open');
+                }
+            });
+        });
+    </script>
+{% endblock content %}
