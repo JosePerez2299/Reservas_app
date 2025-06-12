@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -59,7 +58,7 @@ class BaseEspacioTestCase:
                 ubicacion=self.ubicacion,
                 piso=(i % 3) + 1,
                 capacidad=10 + i,
-                tipo="Reunión",
+                tipo="laboratorio",
                 descripcion=f"Descripción {i}",
                 disponible=(i % 2 == 0),
             )
@@ -178,6 +177,29 @@ class EspacioCreateViewTest(TestCase, BaseEspacioTestCase):
 
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
+        
+        form = resp.context['form']
+        
+        # Verificar que el formulario es una instancia de EspacioCreateForm
+        from reservas.library.forms.espacios import EspacioCreateForm
+        self.assertIsInstance(form, EspacioCreateForm)
+        
+        # Verificar que todos los campos requeridos están presentes
+        expected_fields = [
+            'nombre', 'ubicacion', 'piso', 'capacidad', 
+            'tipo', 'descripcion', 'disponible'
+        ]
+        self.assertCountEqual(form.fields.keys(), expected_fields)
+        
+        # Verificar que todos los campos requeridos están presentes
+        self.assertIsNotNone(form.fields['nombre'])
+        self.assertIsNotNone(form.fields['ubicacion'])
+        self.assertIsNotNone(form.fields['piso'])
+        self.assertIsNotNone(form.fields['capacidad'])
+        self.assertIsNotNone(form.fields['tipo'])
+        self.assertIsNotNone(form.fields['descripcion'])
+        self.assertTrue(form.fields['disponible'])
+        
 
     def test_post_create_valid(self):
         self.client.login(username='admin', password='testpass123')
@@ -234,64 +256,74 @@ class EspacioCreateViewTest(TestCase, BaseEspacioTestCase):
         # Opcional: verificar que el queryset no cambió
         self.assertEqual(Espacio.objects.count(), inicial, "Se creó un Espacio inválido cuando no debía")
 
-# class EspacioUpdateViewTest(BaseEspacioTestCase):
-#     def setUp(self):
-#         super().setUp()
-#         # Tomamos un espacio existente
-#         self.espacio = self.espacios[0]
-#         # URL del UpdateView; suponemos que requiere pk
-#         self.url = reverse('espacio-update', args=[self.espacio.pk])
+class EspacioUpdateViewTest(TestCase, BaseEspacioTestCase):
+    def setUp(self):
+        super().setup_espacios()
+        self.espacio = self.espacios[0]
+        self.url = reverse('espacio_edit', args=[self.espacio.pk])
 
-#     def test_get_update_view_muestra_form_con_datos(self):
-#         resp = self.client.get(self.url)
-#         self.assertEqual(resp.status_code, 200)
-#         self.assertTemplateUsed(resp, 'reservas/espacio_form.html')
-#         # Verificar que el formulario en el contexto tiene inicial con los datos del objeto
-#         form = resp.context['form']
-#         self.assertEqual(form.initial.get('nombre'), self.espacio.nombre)
+    def test_get_update_view_obtain_data(self):
+        self.client.login(username='admin', password='testpass123')
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 200)
+        form = resp.context['form']
+        self.assertEqual(form.initial.get('nombre'), self.espacio.nombre)
+        self.assertEqual(form.initial.get('ubicacion'), self.espacio.ubicacion.pk)
+        self.assertEqual(form.initial.get('piso'), self.espacio.piso)
+        self.assertEqual(form.initial.get('capacidad'), self.espacio.capacidad)
+        self.assertEqual(form.initial.get('tipo'), self.espacio.tipo)
+        self.assertEqual(form.initial.get('descripcion'), self.espacio.descripcion)
+        self.assertEqual(form.initial.get('disponible'), self.espacio.disponible)
 
-#     def test_post_update_valido_modifica_objeto(self):
-#         nuevos_datos = {
-#             'nombre': 'Sala Modificada',
-#             'ubicacion': self.ubicacion.pk,
-#             'piso': self.espacio.piso,
-#             'capacidad': self.espacio.capacidad,
-#             'tipo': self.espacio.tipo,
-#             'descripcion': 'Descripción modificada',
-#             'disponible': self.espacio.disponible,
-#         }
-#         resp = self.client.post(self.url, nuevos_datos)
-#         self.assertEqual(resp.status_code, 302)
-#         self.espacio.refresh_from_db()
-#         self.assertEqual(self.espacio.nombre, 'Sala Modificada')
-#         self.assertEqual(self.espacio.descripcion, 'Descripción modificada')
+    def test_post_update_valido_modifica_objeto(self):
+        self.client.login(username='admin', password='testpass123')
+        nuevos_datos = {
+            'nombre': 'Sala Modificada',
+            'ubicacion': self.ubicacion.pk,
+            'piso': self.espacio.piso,
+            'capacidad': self.espacio.capacidad,
+            'tipo': self.espacio.tipo,
+            'descripcion': 'Descripción modificada',
+            'disponible': self.espacio.disponible,
+        }   
+        resp = self.client.post(self.url, nuevos_datos)
+        self.assertEqual(resp.status_code, 302)
+        self.espacio.refresh_from_db()
 
-#     def test_post_update_cambio_disponible_false_rechaza_reservas(self):
-#         # Para probar la lógica de rechazar reservas, creamos reservas futuras del espacio
-#         hoy = timezone.now().date()
-#         # Aseguramos que initial disponible sea True
-#         self.espacio.disponible = True
-#         self.espacio.save()
-#         reserva = Reserva.objects.create(
-#             espacio=self.espacio,
-#             fecha_uso=hoy + timedelta(days=2),
-#             estado=Reserva.Estado.PENDIENTE,
-#         )
-#         datos = {
-#             'nombre': self.espacio.nombre,
-#             'ubicacion': self.ubicacion.pk,
-#             'piso': self.espacio.piso,
-#             'capacidad': self.espacio.capacidad,
-#             'tipo': self.espacio.tipo,
-#             'descripcion': self.espacio.descripcion,
-#             'disponible': False,
-#         }
-#         resp = self.client.post(self.url, datos)
-#         self.assertEqual(resp.status_code, 302)
-#         reserva.refresh_from_db()
-#         self.assertEqual(reserva.estado, Reserva.Estado.RECHAZADA)
-#         self.assertEqual(reserva.aprobado_por, self.user)
-#         self.assertEqual(reserva.motivo_admin, 'El espacio no se encuentra disponible')
+        self.assertEqual(self.espacio.nombre, 'Sala Modificada')
+        self.assertEqual(self.espacio.descripcion, 'Descripción modificada')
+
+    def test_post_update_cambio_disponible_false_rechaza_reservas(self):
+        logged = self.client.login(username='admin', password='testpass123')
+        self.assertTrue(logged, "Falla login en test: revisa credenciales")
+        # Para probar la lógica de rechazar reservas, creamos reservas futuras del espacio
+        hoy = date.today()
+        # Aseguramos que initial disponible sea True
+        self.espacio.disponible = True
+        self.espacio.save()
+        reserva = Reserva.objects.create(
+            espacio=self.espacio,
+            usuario=self.usuario_user,
+            fecha_uso=hoy + timedelta(days=2),
+            hora_inicio=time(9, 0),
+            hora_fin=time(10, 0),
+            estado=Reserva.Estado.PENDIENTE,
+        )
+        datos = {
+            'nombre': self.espacio.nombre,
+            'ubicacion': self.ubicacion.pk,
+            'piso': self.espacio.piso,
+            'capacidad': self.espacio.capacidad,
+            'tipo': self.espacio.tipo,
+            'descripcion': self.espacio.descripcion,
+            'disponible': False,
+        }
+        resp = self.client.post(self.url, datos)
+        self.assertEqual(resp.status_code, 302)
+        reserva.refresh_from_db()
+        self.assertEqual(reserva.estado, Reserva.Estado.RECHAZADA)
+        self.assertEqual(reserva.aprobado_por, self.admin_user)
+        self.assertEqual(reserva.motivo_admin, 'El espacio no se encuentra disponible')
 
 class EspacioDeleteViewTest(TestCase, BaseEspacioTestCase):
     def setUp(self):
