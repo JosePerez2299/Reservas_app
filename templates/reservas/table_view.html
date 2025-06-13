@@ -3,223 +3,319 @@
 {% load utils %}
 {% load widget_tweaks %}
 {% load model_extras %}
+{% load querystring %}
 {% load humanize %}
 
 {% block content %}
-<div >
-
-    <!-- Main Content -->
-    <div x-data="{ showFilters: false }" class="container mx-auto px-4 py-6">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-base-content">Gestión de Reservas</h1>
-                <p class="text-base-content/70 mt-1">Administra las reservas de espacios</p>
-            </div>
-            <!-- Modal Añadir -->
-            <button
-            class="btn btn-xs btn-outline btn-primary open-modal-btn"
-            data-url="{% url crud_urls.create %}"
-            data-success-callback="reloadRow" 
-            >
-                <span class="text-xs">Añadir</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-            </button>
-        </div>
-
-
-        <!-- Filters Card -->
-        <div x-show="showFilters"  
-        
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-90"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-300"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-90" 
-            class="card bg-base-100 shadow-lg mb-6">
-            <div class="card-body">
-                <div class="">
-                <form action="" method="get" >
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {% for field in filter.form %}
-                    <div class=""> 
-                        {{ field|mystyle }}
+<div class="drawer">
+    <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content">
+        <!-- Main Content -->
+        <div class="min-h-screen bg-base-200/30">
+            <div class="container mx-auto px-6 py-8">
+                <!-- Header Section -->
+                <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="fas fa-calendar-alt text-2xl text-primary"></i>
+                                <h1 class="text-2xl font-bold text-base-content">Gestión de Reservas</h1>
+                            </div>
+                            <p class="text-sm text-base-content/60 max-w-2xl">
+                                Administra y gestiona las reservas de espacios. Aquí podrás crear nuevas reservas, 
+                                aprobar solicitudes pendientes y ver el historial de reservas.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="btn btn-primary btn-sm gap-2 open-modal-btn" 
+                                    data-url="{% url crud_urls.create %}"
+                                    data-success-callback="reloadRow">
+                                <i class="fas fa-plus text-xs"></i>
+                                Nueva Reserva
+                            </button>
+                        </div>
                     </div>
-                    {% endfor %}
-                    </div>
-
-                  <div class="card-actions justify-end">
-                  <button type="submit" class="btn btn-sm btn-primary">Buscar</button>
-                  <button type="button" class="btn btn-sm btn-ghost" @click="showFilters = false">Cancelar</button>
-                  </div>
-                </form>
                 </div>
-            </div>
-        </div>
 
+                <!-- Controls Section -->
+                <div class="bg-base-100 rounded-2xl shadow-sm p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                        <!-- Left Side -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div class="text-sm font-medium bg-base-200/50 px-4 py-2 rounded-lg">
+                                {% with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+                                    <span class="text-primary font-semibold">{{ total }}</span> reservas en total | Mostrando {{ start }}-{{ end }}
+                                {% endwith %}
+                            </div>
+                            
+                            <div class="join">
+                                <button class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+                                    <i class="fas fa-download text-xs"></i>
+                                    <span>Exportar</span>
+                                </button>
+                                <label for="my-drawer" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+                                    <i class="fas fa-filter text-xs"></i>
+                                    <span>Filtros</span>
+                                </label>
+                                <a href="{{request.path}}" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+                                    <i class="fas fa-times text-xs"></i>
+                                    <span>Limpiar</span>
+                                </a>
+                            </div>
+                        </div>
 
-        <!-- Results Summary -->
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-sm text-base-content/70" id="resultsCount">Mostrando 1-10 de 47 reservas</span>
-            <div class="flex gap-2">
-                <button class="btn btn-sm btn-outline">
-                    <i class="fas fa-download mr-2"></i>Exportar
-                </button>
-                <button  @click="showFilters = !showFilters"class="btn btn-sm btn-outline">
-                  <i class="fa-solid fa-filter"></i>Filtrar
-               </button>
-               <a href="{{request.path}}" class="btn btn-sm btn-outline">
-                <i class="fa-solid fa-filter"></i>Limpiar
-             </a>
-                <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-sm btn-outline">
-                        <i class="fas fa-columns mr-2"></i>Columnas
-                    </div>
-                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                        <li><label class="cursor-pointer label"><input type="checkbox" checked class="checkbox checkbox-sm" /> ID</label></li>
-                        <li><label class="cursor-pointer label"><input type="checkbox" checked class="checkbox checkbox-sm" /> Usuario</label></li>
-                        <li><label class="cursor-pointer label"><input type="checkbox" checked class="checkbox checkbox-sm" /> Espacio</label></li>
-                        <li><label class="cursor-pointer label"><input type="checkbox" checked class="checkbox checkbox-sm" /> Fecha</label></li>
-                        <li><label class="cursor-pointer label"><input type="checkbox" checked class="checkbox checkbox-sm" /> Estado</label></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="card bg-base-100 shadow-lg">
-            <div class="card-body p-0">
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra">
-                        <thead class="text-center bg-base-200">
-                            <tr>
-                                <th>
-                                    <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelectAll(this)">
-                                </th>
-         
-                                {% for field, label in cols.items %}
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('{{ field }}')">
-                                    {{ label }} <i class="fas fa-sort ml-1"></i>
-                                </th>
-                                {% endfor %}
-                                {% if actions %}
-                                <th>Acciones</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                            {% for obj in object_list %}
-                            <tr>
-                                <td>
-                                    <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelect(this)">
-                                </td>
-                              {% for col in cols %}
-                                <td class="text-center">
-                                  <div class="max-w-xs mx-auto">
-                                    {{ obj|get_td_html:col }}
-                                      
-                            {% endfor %}
-                                  <!-- Celda de acciones -->
-                              
-                            {% block actions %}
-                            {% if actions %}
-                            <td class="text-center">
-                                <div class="join">
-                                    <button class="join-item btn btn-sm btn-outline flex items-center" onclick="editRow({{ obj.pk }})">
-                                        <i class="fas fa-eye mr-2"></i><span>Ver</span>
-                                    </button>
-
-                               
-                                    <button class="join-item btn btn-sm btn-outline" onclick="editRow({{ obj.pk }})">
-                                        <i class="fas fa-edit mr-2"></i>Editar
-                                    </button>
-                                    {% if obj.pk != 1 %}
-                                    <button class="join-item btn btn-sm btn-error" onclick="deleteRow({{ obj.pk }})">
-                                        <i class="fas fa-trash mr-2"></i>Eliminar
-                                    </button>
-                                    {% endif %}
+                        <!-- Right Side -->
+                        <div class="flex items-center gap-4">
+                            <div class="dropdown dropdown-end">
+                                <div tabindex="0" role="button" class="btn btn-sm btn-ghost border border-base-300 gap-2">
+                                    <i class="fas fa-columns text-xs"></i>
+                                    <span>Columnas</span>
+                                    <i class="fas fa-chevron-down text-xs"></i>
                                 </div>
-                            </td>
+                                <ul tabindex="0" class="dropdown-content z-[1] menu shadow-lg bg-base-100 rounded-xl border border-base-300 w-56 p-2 mt-2">
+                                    <li class="menu-title px-4 py-2">
+                                        <span class="text-xs font-semibold text-base-content/60">MOSTRAR COLUMNAS</span>
+                                    </li>
+                                    <div class="divider my-0"></div>
+                                    <div class="p-2 space-y-1">
+                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                            <span class="ml-2">ID</span>
+                                        </label></li>
+                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                            <span class="ml-2">Usuario</span>
+                                        </label></li>
+                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                            <span class="ml-2">Espacio</span>
+                                        </label></li>
+                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                            <span class="ml-2">Fecha</span>
+                                        </label></li>
+                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                            <span class="ml-2">Estado</span>
+                                        </label></li>
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="table table-lg">
+                            <thead class="bg-base-200/70">
+                                <tr class="border-b border-base-300">
+                                    <th class="w-12">
+                                        <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelectAll(this)">
+                                    </th>
+                                    
+                                    {% for field, label in cols.items %}
+                                    <th class="hover:bg-base-300/50 font-semibold text-base-content/80 text-sm">
+                                        <div class="flex items-center justify-between gap-2 px-2">
+                                            {% if request.GET.ordering == field %}
+                                                <a href="?{% query_transform request ordering='-'|add:field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                    {{ label }}
+                                                    <i class="fas fa-sort-up text-primary"></i>
+                                                </a>
+                                            {% elif request.GET.ordering == '-'|add:field %}
+                                                <a href="?{% query_transform request ordering='' %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                    {{ label }}
+                                                    <i class="fas fa-sort-down text-primary"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="?{% query_transform request ordering=field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                    {{ label }}
+                                                    <i class="fas fa-sort text-base-content/30"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </th>
+                                    {% endfor %}
+                                    
+                                    {% if actions %}
+                                    <th class="text-center font-semibold text-base-content/80 text-sm w-48">Acciones</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                {% for obj in object_list %}
+                                <tr class="border-b border-base-200 hover:bg-base-50">
+                                    <td>
+                                        <input type="checkbox" class="row-checkbox checkbox checkbox-sm" onchange="toggleSelect(this)">
+                                    </td>
+                                    
+                                    {% for col in cols %}
+                                    <td class="py-4">
+                                        <div class="text-sm text-base-content">
+                                            {{ obj|get_td_html:col }}
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                    
+                                    {% block actions %}
+                                    {% if actions %}
+                                    <td class="py-4">
+                                        <div class="flex items-center justify-center gap-1">
+                                            <div class="tooltip" data-tip="Ver detalles">
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                                                    <i class="fas fa-eye text-xs"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="tooltip" data-tip="Editar">
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                                                    <i class="fas fa-edit text-xs"></i>
+                                                </button>
+                                            </div>
+                                            
+                                            {% if obj.pk != 1 %}
+                                            <div class="tooltip" data-tip="Eliminar">
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 text-error hover:bg-error/10" onclick="deleteRow({{ obj.pk }})">
+                                                    <i class="fas fa-trash text-xs"></i>
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    {% endif %}
+                                    {% endblock %}
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="{{ cols|length|add:'2' }}" class="text-center py-12">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <i class="fas fa-inbox text-4xl text-base-content/20"></i>
+                                            <div>
+                                                <p class="text-base-content/60 font-medium">No se encontraron resultados</p>
+                                                <p class="text-sm text-base-content/40">Intenta ajustar los filtros o crear una nueva reserva</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 p-4 mt-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-base-content/70">Mostrar</span>
+                            <select class="select select-bordered select-sm w-20 h-8">
+                                <option>10</option>
+                                <option>25</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
+                            <span class="text-sm text-base-content/70">por página</span>
+                        </div>
+                        
+                        <div class="join">
+                            {% if page_obj %}
+                                {% if page_obj.has_previous %}
+                                    <a href="?{% query_transform request page=1 %}" class="join-item btn btn-sm">«</a>
+                                    <a href="?{% query_transform request page=page_obj.previous_page_number %}" class="join-item btn btn-sm">‹</a>
+                                {% else %}
+                                    <a href="#" class="join-item btn btn-sm btn-disabled">«</a>
+                                    <a href="#" class="join-item btn btn-sm btn-disabled">‹</a>
+                                {% endif %}
+
+                                {% if page_obj.number > 4 %}
+                                    <a href="?{% query_transform request page=1 %}" class="join-item btn btn-sm">1</a>
+                                    <span class="join-item btn btn-sm btn-disabled">…</span>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                                        {% if num == page_obj.number %}
+                                            <a href="#" class="join-item btn btn-sm btn-active">{{ num }}</a>
+                                        {% else %}
+                                            <a href="?{% query_transform request page=num %}" class="join-item btn btn-sm">{{ num }}</a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                                    <span class="join-item btn btn-sm btn-disabled">…</span>
+                                    <a href="?{% query_transform request page=page_obj.paginator.num_pages %}" class="join-item btn btn-sm">{{ page_obj.paginator.num_pages }}</a>
+                                {% endif %}
+
+                                {% if page_obj.has_next %}
+                                    <a href="?{% query_transform request page=page_obj.next_page_number %}" class="join-item btn btn-sm">›</a>
+                                    <a href="?{% query_transform request page=page_obj.paginator.num_pages %}" class="join-item btn btn-sm">»</a>
+                                {% else %}
+                                    <a href="#" class="join-item btn btn-sm btn-disabled">›</a>
+                                    <a href="#" class="join-item btn btn-sm btn-disabled">»</a>
+                                {% endif %}
                             {% endif %}
-                            {% endblock %}
-                  
-                            </tr>
-                          {% empty %}
-                            <tr>
-                              <td colspan="{{ cols|length|add:'1' }}" class="text-center">
-                                No se encontraron resultados.
-                              </td>
-                            </tr>
-                          {% endfor %}
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions (shown when items selected) -->
+                <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 hidden z-50" id="bulkActions">
+                    <div class="bg-base-100 shadow-2xl rounded-2xl border border-base-300 p-4 min-w-fit">
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm font-medium text-base-content" id="selectedCount">0 elementos seleccionados</span>
+                            <div class="divider divider-horizontal"></div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-sm btn-success" onclick="bulkApprove()">
+                                    <i class="fas fa-check text-xs"></i>
+                                    Aprobar
+                                </button>
+                                <button class="btn btn-sm btn-error" onclick="bulkReject()">
+                                    <i class="fas fa-times text-xs"></i>
+                                    Rechazar
+                                </button>
+                                <button class="btn btn-sm btn-ghost border border-base-300" onclick="bulkExport()">
+                                    <i class="fas fa-download text-xs"></i>
+                                    Exportar
+                                </button>
+                                <button class="btn btn-sm btn-ghost" onclick="clearSelection()">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Pagination -->
-        <div class="flex justify-between items-center mt-6">
-            <div class="flex items-center gap-2">
-                <span class="text-sm">Mostrar</span>
-                <select class="select select-bordered select-sm w-20">
-                    <option>10</option>
-                    <option>25</option>
-                    <option>50</option>
-                    <option>100</option>
-                </select>
-                <span class="text-sm">por página</span>
-            </div>
-            
-            <div class="join">
-                <button class="join-item btn btn-sm">«</button>
-                <button class="join-item btn btn-sm btn-active">1</button>
-                <button class="join-item btn btn-sm">2</button>
-                <button class="join-item btn btn-sm">3</button>
-                <button class="join-item btn btn-sm">4</button>
-                <button class="join-item btn btn-sm">5</button>
-                <button class="join-item btn btn-sm">»</button>
-            </div>
-        </div>
-
-        <!-- Bulk Actions (shown when items selected) -->
-        <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 hidden" id="bulkActions">
-            <div class="bg-base-100 shadow-xl rounded-lg p-4 flex items-center gap-4">
-                <span class="text-sm" id="selectedCount">0 elementos seleccionados</span>
-                <div class="divider divider-horizontal"></div>
-                <button class="btn btn-sm btn-success" onclick="bulkApprove()">
-                    <i class="fas fa-check mr-2"></i>Aprobar
-                </button>
-                <button class="btn btn-sm btn-error" onclick="bulkReject()">
-                    <i class="fas fa-times mr-2"></i>Rechazar
-                </button>
-                    <button class="btn btn-sm btn-outline" onclick="bulkExport()">
-                    <i class="fas fa-download mr-2"></i>Exportar
-                </button>
-                <button class="btn btn-sm btn-outline" onclick="bulkExport()">
-                    <i class="fas fa-download mr-2"></i>Exportar
-                </button>
-                <button class="btn btn-sm btn-ghost" onclick="clearSelection()">
-                    <i class="fas fa-times"></i>
-                </button>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="drawer-side">
+        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+        <div class="min-h-full w-80 bg-base-100 border-l border-base-300">
+            <div class="p-6">
+                <h2 class="text-lg font-bold text-base-content mb-6">Filtros</h2>
+                <form class="space-y-4">
+                    {{ filter.form|mystyle }}
+                    <button type="submit" class="btn btn-primary w-full">Aplicar Filtros</button>
+                </form>
             </div>
         </div>
     </div>
 
     <!-- Create/Edit Modal -->
     <dialog id="createModal" class="modal">
-        <div class="modal-box w-11/12 max-w-2xl">
+        <div class="modal-box w-11/12 max-w-3xl">
             <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-3 top-3">✕</button>
             </form>
-            <h3 class="font-bold text-lg mb-4">Nueva Reserva</h3>
+            <h3 class="font-bold text-xl mb-6">Nueva Reserva</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Usuario</span>
+                        <span class="label-text font-medium">Usuario</span>
                     </label>
                     <select class="select select-bordered">
                         <option disabled selected>Seleccionar usuario</option>
@@ -231,7 +327,7 @@
                 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Espacio</span>
+                        <span class="label-text font-medium">Espacio</span>
                     </label>
                     <select class="select select-bordered">
                         <option disabled selected>Seleccionar espacio</option>
@@ -243,28 +339,28 @@
                 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Fecha</span>
+                        <span class="label-text font-medium">Fecha</span>
                     </label>
                     <input type="date" class="input input-bordered">
                 </div>
                 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Hora inicio</span>
+                        <span class="label-text font-medium">Hora inicio</span>
                     </label>
                     <input type="time" class="input input-bordered">
                 </div>
                 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Hora fin</span>
+                        <span class="label-text font-medium">Hora fin</span>
                     </label>
                     <input type="time" class="input input-bordered">
                 </div>
                 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Estado</span>
+                        <span class="label-text font-medium">Estado</span>
                     </label>
                     <select class="select select-bordered">
                         <option>Pendiente</option>
@@ -275,15 +371,15 @@
                 
                 <div class="form-control md:col-span-2">
                     <label class="label">
-                        <span class="label-text">Notas</span>
+                        <span class="label-text font-medium">Notas</span>
                     </label>
-                    <textarea class="textarea textarea-bordered" placeholder="Notas adicionales..."></textarea>
+                    <textarea class="textarea textarea-bordered h-24" placeholder="Notas adicionales..."></textarea>
                 </div>
             </div>
             
-            <div class="modal-action">
-                <button class="btn" onclick="closeModal('createModal')">Cancelar</button>
-                <button class="btn btn-primary" onclick="saveReservation()">Guardar</button>
+            <div class="modal-action pt-6">
+                <button class="btn btn-ghost" onclick="closeModal('createModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveReservation()">Guardar Reserva</button>
             </div>
         </div>
     </dialog>
@@ -330,11 +426,6 @@
             document.getElementById('statusFilter').value = '';
             document.getElementById('buildingFilter').value = '';
             document.getElementById('dateFilter').value = '';
-        }
-
-        // Sort function
-        function sortTable(column) {
-            console.log('Sorting by:', column);
         }
 
         // CRUD functions
@@ -395,11 +486,14 @@
 
             // Add event listeners to filters
             ['searchInput', 'statusFilter', 'buildingFilter', 'dateFilter'].forEach(id => {
-                document.getElementById(id).addEventListener('change', function() {
-                    console.log('Filter changed:', id, this.value);
-                });
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', function() {
+                        console.log('Filter changed:', id, this.value);
+                    });
+                }
             });
         });
     </script>
-  </div>
+</div>
 {% endblock %}

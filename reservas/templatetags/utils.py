@@ -3,6 +3,8 @@ from django.utils.safestring import mark_safe
 from django.apps import apps
 from reservas.models import Reserva
 from reservas.templatetags.model_extras import get_attr
+from datetime import datetime
+from datetime import date
 register = template.Library()
 
 @register.simple_tag
@@ -95,12 +97,16 @@ def get_td_html(obj, field):
                                     </div>""")
 
         elif field == "estado":
+            
             print(obj.estado)
             estado_html = ""
             if obj.estado == Reserva.Estado.PENDIENTE:
                 estado_html += "warning"
             elif obj.estado == Reserva.Estado.APROBADA:
-                estado_html += "success"
+                if (obj.fecha_uso == date.today() and obj.hora_inicio.time() < datetime.now().time() and obj.hora_fin.time() > datetime.now().time()   ):
+                    return mark_safe(f""" <p class="badge  p-1 badge-lg badge-success text-base-100 ">En uso</p>""")
+                else:
+                    estado_html += "success"
             elif obj.estado == Reserva.Estado.RECHAZADA:
                 estado_html += "error"
             return mark_safe(f""" <p class="badge  p-1 badge-lg badge-{estado_html} text-base-100 ">{obj.estado.capitalize()}</p>""")
