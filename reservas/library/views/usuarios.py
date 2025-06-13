@@ -29,7 +29,7 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     """
     model = Usuario
     permission_required = 'reservas.view_usuario'
-    template_name = 'reservas/table_view.html'
+    template_name = 'reservas/usuarios_table.html'
     paginate_by = 10
     filterset_class = UsuarioFilter 
     can_export = True
@@ -38,8 +38,7 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     cols = {
         'pk': 'ID',
         'username': 'Usuario',
-        'email': 'Correo electrónico',
-        'ubicacion__nombre': 'Ubicación',
+        'ubicacion': 'Ubicación',
         'group': 'Grupo',
     }
     
@@ -62,8 +61,8 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
         qs = qs.annotate(
             group=Case(
-                When(groups__name=settings.GRUPOS.MODERADOR, then=Value(settings.GRUPOS.MODERADOR.capitalize())),
-                When(groups__name=settings.GRUPOS.USUARIO, then=Value(settings.GRUPOS.USUARIO.capitalize())),
+                When(groups__name=settings.GRUPOS.MODERADOR, then=Value(settings.GRUPOS.MODERADOR)),
+                When(groups__name=settings.GRUPOS.USUARIO, then=Value(settings.GRUPOS.USUARIO)),
                 default=Value('-'),
                 output_field=CharField()
             )

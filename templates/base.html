@@ -1,3 +1,4 @@
+{% load utils %}
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
@@ -58,7 +59,10 @@
                                  {# Dropdowns por cada modelo con permisos #}
                                  {% for item in dashboard_access %}
 
-                                 <li><a href={% url item.model.url %}><i class="fas fa-tachometer-alt mr-2"></i> {{ item.model.label|capfirst }}</a></li>
+                                 <li>
+                                  <a href={% url item.model.url %}>
+                                    {% get_icon item.model.label|lower %}
+                                  {{ item.model.label|capfirst }}</a></li>
                               {% endfor %}
 
             </ul>

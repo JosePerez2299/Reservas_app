@@ -17,14 +17,8 @@
                 <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                         <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i class="fas fa-calendar-alt text-2xl text-primary"></i>
-                                <h1 class="text-2xl font-bold text-base-content">Gestión de Reservas</h1>
-                            </div>
-                            <p class="text-sm text-base-content/60 max-w-2xl">
-                                Administra y gestiona las reservas de espacios. Aquí podrás crear nuevas reservas, 
-                                aprobar solicitudes pendientes y ver el historial de reservas.
-                            </p>
+                           {% block header %}
+                           {% endblock %}
                         </div>
                         <div class="flex items-center gap-3">
                             <button class="btn btn-primary btn-sm gap-2 open-modal-btn" 
@@ -44,7 +38,7 @@
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <div class="text-sm font-medium bg-base-200/50 px-4 py-2 rounded-lg">
                                 {% with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
-                                    <span class="text-primary font-semibold">{{ total }}</span> reservas en total | Mostrando {{ start }}-{{ end }}
+                                    <span class="text-primary font-semibold">{{ total }}</span> {{model.label}} en total | Mostrando {{ start }}-{{ end }}
                                 {% endwith %}
                             </div>
                             

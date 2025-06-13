@@ -1,0 +1,15 @@
+{% extends "reservas/table_view.html" %}
+{% load utils %}
+
+{% block header %}
+<div class="flex items-center gap-3 mb-2">
+    <div class="text-2xl text-primary">
+        {% get_icon model.label|lower %}
+    </div>
+    <h1 class="text-3xl font-bold text-base-content">Gestión de Usuarios</h1>
+</div>
+<p class="text-sm text-base-content/60 max-w-2xl">
+    Administra y gestiona los usuarios de la aplicación. Aquí podrás crear nuevos usuarios, 
+    editar usuarios existentes y ver el historial de usuarios.
+</p>
+{% endblock %}

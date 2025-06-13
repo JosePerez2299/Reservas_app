@@ -27,7 +27,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     """
     model = Reserva
     permission_required = 'reservas.view_reserva'
-    template_name = 'reservas/table_view.html'
+    template_name = 'reservas/reservas_table.html'
     paginate_by = 10
     can_export = True
 

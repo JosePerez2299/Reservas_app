@@ -1,14 +1,39 @@
 from django import template
 from django.utils.safestring import mark_safe
 from django.apps import apps
-from reservas.models import Reserva
+from reservas.models import *
 from reservas.templatetags.model_extras import get_attr
 from datetime import datetime
 from datetime import date
 register = template.Library()
 
 @register.simple_tag
-def get_icon(icon_name, icon_class=None):
+def get_icon(icon_name):
+
+    dict_icons = {
+        'reserva': 'fas fa-calendar-alt',
+        'reservas': 'fas fa-calendar-alt',
+        'espacio': 'fas fa-building',
+        'espacios': 'fas fa-building',
+        'usuario': 'fas fa-users',
+        'usuarios': 'fas fa-users',
+        'log': 'fas fa-clipboard-list',
+        'dashboard': 'fas fa-tachometer-alt',
+        'view': 'fas fa-eye',
+        'edit': 'fas fa-edit',
+        'delete': 'fas fa-trash',
+        'add': 'fas fa-plus',
+        'search': 'fas fa-search',
+        'filter': 'fas fa-filter',
+        'sort': 'fas fa-sort',
+    }
+
+    icon_class = dict_icons.get(icon_name)
+    if icon_class is None:
+        icon_class = 'fas fa-info-circle'
+
+    return mark_safe(f'<i class="{icon_class}"></i>')
+
     if icon_class is None:
         icon_class = 'w-10 h-10' 
 
@@ -39,22 +64,29 @@ def get_icon(icon_name, icon_class=None):
 
 @register.filter
 def get_td_html(obj, field):
+
+
     attr = None
 
     try:
         attr = get_attr(obj, field)
     except:
         return mark_safe(f"""{str(obj)}""")
+    
+    if field == "group":
+        print(attr)    
 
     if isinstance(attr, bool):
         if attr:
-            return mark_safe(f"""<span class="badge badge-sm badge-success"><i class="fa-solid fa-check"></i></span>""")
+            return mark_safe(f"""<span class="badge badge-lg badge-success"><i class="fa-solid fa-check"></i></span>""")
         else:
-            return mark_safe(f"""<span class="badge badge-sm badge-error"><i class="fa-solid fa-xmark"></i></span>""")
+            return mark_safe(f"""<span class="badge badge-lg badge-error"><i class="fa-solid fa-xmark"></i></span>""")
     
     if field == "id":
         return obj.id
-    if field == "usuario":
+    if field == "usuario" or field == "aprobado_por":
+
+
         return mark_safe(f"""      <div class="flex items-center  gap-3">
                                         <div class="avatar placeholder">
                                             <div class="bg-secondary text-secondary-content rounded-full w-8">
@@ -86,6 +118,7 @@ def get_td_html(obj, field):
                     Piso {obj.espacio.piso}
                 </div>
             </div>""")
+        
         elif field == "fecha_uso":
             return mark_safe(f"""   <div>
                                         <div class="font-semibold">{obj.fecha_uso.strftime("%d/%m/%Y")} </div>
@@ -123,6 +156,45 @@ def get_td_html(obj, field):
             return mark_safe(f"""   <div>
                                         <div class="font-semibold">{obj.piso}</div>
                                     </div>""")
+        
+    elif isinstance(obj, Usuario):
+        if field == "username" or field == "email":
+             return mark_safe(f"""      <div class="flex items-center  gap-3">
+                                        <div class="avatar placeholder">
+                                            <div class="bg-secondary text-secondary-content rounded-full w-8">
+                                                <span class="text-xs">{(obj.username[0] + obj.username[1]).upper()}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-start">
+                                            <div class="font-bold">{obj.username}</div>
+                                            <div class="text-sm opacity-50">{obj.email}</div>
+                                        </div>
+                                    </div>""")                            
+    
+        
+        elif field == "ubicacion":
+            return mark_safe(f"""   <div>
+                                        <div class="font-semibold">{obj.ubicacion.nombre}</div>
+                                    </div>""")
+        
+        elif field == "group":
+
+            if obj.group == Usuario.GRUPOS.MODERADOR:
+                return mark_safe(f"""   <div>
+                                            <div class="badge badge-lg badge-success text-base-100 min-w-24  ">{obj.group.capitalize()}</div>
+                                        </div>""")
+            elif obj.group == settings.GRUPOS.USUARIO:
+                return mark_safe(f"""   <div>
+                                            <div class="badge badge-lg badge-warning text-base-100  min-w-24  ">{obj.group.capitalize()}</div>
+                                        </div>""")
+            else:
+                return mark_safe(f"""   <div>
+                                            <div class="badge badge-lg badge-error text-base-100  min-w-24  ">{obj.group.capitalize()}</div>
+                                        </div>""")
+
+        
+
+  
     return attr
 
 
