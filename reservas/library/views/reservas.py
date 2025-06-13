@@ -34,10 +34,11 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     # Columnas que mostramos en la tabla HTML
     cols = {
         'id': 'ID',
-        'usuario__username': 'Usuario',
-        'espacio__nombre': 'Espacio',
+        'usuario': 'Usuario',
+        'espacio': 'Espacio',
         'fecha_uso': 'Fecha de uso',
         'estado': 'Estado',
+        'aprobado_por': 'Aprobado por',
     }
 
     # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 

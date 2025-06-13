@@ -1,6 +1,8 @@
 from django import template
 from django.utils.safestring import mark_safe
-
+from django.apps import apps
+from reservas.models import Reserva
+from reservas.templatetags.model_extras import get_attr
 register = template.Library()
 
 @register.simple_tag
@@ -33,6 +35,89 @@ def get_icon(icon_name, icon_class=None):
     return icons_svg.get(icon_name)
 
 
+@register.filter
+def get_td_html(obj, field):
+    attr = None
+
+    try:
+        attr = get_attr(obj, field)
+    except:
+        return mark_safe(f"""{str(obj)}""")
+
+    if isinstance(attr, bool):
+        if attr:
+            return mark_safe(f"""<span class="badge badge-sm badge-success"><i class="fa-solid fa-check"></i></span>""")
+        else:
+            return mark_safe(f"""<span class="badge badge-sm badge-error"><i class="fa-solid fa-xmark"></i></span>""")
+    
+    if field == "id":
+        return obj.id
+    if field == "usuario":
+        return mark_safe(f"""      <div class="flex items-center  gap-3">
+                                        <div class="avatar placeholder">
+                                            <div class="bg-secondary text-secondary-content rounded-full w-8">
+                                                <span class="text-xs">{(obj.usuario.username[0] + obj.usuario.username[1]).upper()}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-start">
+                                            <div class="font-bold">{obj.usuario.username}</div>
+                                            <div class="text-sm opacity-50">{obj.usuario.email}</div>
+                                        </div>
+                                    </div>""")                            
+    
+    elif isinstance(obj, Reserva):
+
+        if field == "espacio":
+            max_length = 15  # Maximum characters to show before truncating
+            nombre = obj.espacio.nombre
+            ubicacion_nombre = obj.espacio.ubicacion.nombre
+            
+            # Truncate names if they're too long
+            nombre_display = (nombre[:max_length] + '...') if len(nombre) > max_length else nombre
+            ubicacion_display = (ubicacion_nombre[:max_length] + '...') if len(ubicacion_nombre) > max_length else ubicacion_nombre
+            
+            return mark_safe(f"""<div>
+                <div class="font-semibold">{nombre_display}</div>
+                <div class="text-sm opacity-50">
+                   {ubicacion_display}
+                -
+                    Piso {obj.espacio.piso}
+                </div>
+            </div>""")
+        elif field == "fecha_uso":
+            return mark_safe(f"""   <div>
+                                        <div class="font-semibold">{obj.fecha_uso.strftime("%d/%m/%Y")} </div>
+                                        <div class="text-sm opacity-50">{obj.hora_inicio.strftime("%I:%M %p") } - {obj.hora_fin.strftime("%I:%M %p")}</div>
+                                    </div>""")
+        elif field == "aprobado_por":
+            return mark_safe(f"""        <div>
+                                        <div class="font-semibold">{obj.aprobado_por.username if obj.aprobado_por else "-"}</div>
+                                    </div>""")
+
+        elif field == "estado":
+            print(obj.estado)
+            estado_html = ""
+            if obj.estado == Reserva.Estado.PENDIENTE:
+                estado_html += "warning"
+            elif obj.estado == Reserva.Estado.APROBADA:
+                estado_html += "success"
+            elif obj.estado == Reserva.Estado.RECHAZADA:
+                estado_html += "error"
+            return mark_safe(f""" <p class="badge  p-1 badge-lg badge-{estado_html} text-base-100 ">{obj.estado.capitalize()}</p>""")
+
+
+    elif isinstance(obj, Espacio):
+        if field == "nombre":
+            return mark_safe(f"""   <div>
+                                        <div class="font-semibold">{obj.nombre}</div>
+                                        <div class="text-sm opacity-50">{obj.tipo}</div>
+                                        
+                                    </div>""")
+        elif field == "ubicacion":
+            return mark_safe(f"""   <div>
+                                        <div class="font-semibold">{obj.piso}</div>
+                                    </div>""")
+    return attr
 
 
 @register.simple_tag()

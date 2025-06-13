@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% load form_style %}
+{% load utils %}
+{% load widget_tweaks %}
+{% load model_extras %}
+{% load humanize %}
+
 {% block content %}
-<div>
+<div >
 
     <!-- Main Content -->
     <div x-data="{ showFilters: false }" class="container mx-auto px-4 py-6">
@@ -11,9 +16,16 @@
                 <h1 class="text-3xl font-bold text-base-content">Gestión de Reservas</h1>
                 <p class="text-base-content/70 mt-1">Administra las reservas de espacios</p>
             </div>
-            <button class="btn btn-primary" onclick="openModal('createModal')">
-                <i class="fas fa-plus mr-2"></i>
-                Nueva Reserva
+            <!-- Modal Añadir -->
+            <button
+            class="btn btn-xs btn-outline btn-primary open-modal-btn"
+            data-url="{% url crud_urls.create %}"
+            data-success-callback="reloadRow" 
+            >
+                <span class="text-xs">Añadir</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
             </button>
         </div>
 
@@ -21,19 +33,33 @@
         <!-- Filters Card -->
         <div x-show="showFilters"  
         
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-90" class="card bg-base-100 shadow-lg mb-6">
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-90"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-90" 
+            class="card bg-base-100 shadow-lg mb-6">
             <div class="card-body">
-                <div class="flex flex-wrap gap-4 items-end">
+                <div class="">
+                <form action="" method="get" >
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for field in filter.form %}
+                    <div class=""> 
+                        {{ field|mystyle }}
+                    </div>
+                    {% endfor %}
+                    </div>
 
-                  {{filter.form|mystyle}}
+                  <div class="card-actions justify-end">
+                  <button type="submit" class="btn btn-sm btn-primary">Buscar</button>
+                  <button type="button" class="btn btn-sm btn-ghost" @click="showFilters = false">Cancelar</button>
+                  </div>
+                </form>
                 </div>
             </div>
         </div>
+
 
         <!-- Results Summary -->
         <div class="flex justify-between items-center mb-4">
@@ -45,7 +71,9 @@
                 <button  @click="showFilters = !showFilters"class="btn btn-sm btn-outline">
                   <i class="fa-solid fa-filter"></i>Filtrar
                </button>
-     
+               <a href="{{request.path}}" class="btn btn-sm btn-outline">
+                <i class="fa-solid fa-filter"></i>Limpiar
+             </a>
                 <div class="dropdown dropdown-end">
                     <div tabindex="0" role="button" class="btn btn-sm btn-outline">
                         <i class="fas fa-columns mr-2"></i>Columnas
@@ -66,169 +94,66 @@
             <div class="card-body p-0">
                 <div class="overflow-x-auto">
                     <table class="table table-zebra">
-                        <thead class="bg-base-200">
+                        <thead class="text-center bg-base-200">
                             <tr>
                                 <th>
                                     <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelectAll(this)">
                                 </th>
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('id')">
-                                    ID <i class="fas fa-sort ml-1"></i>
+         
+                                {% for field, label in cols.items %}
+                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('{{ field }}')">
+                                    {{ label }} <i class="fas fa-sort ml-1"></i>
                                 </th>
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('user')">
-                                    Usuario <i class="fas fa-sort ml-1"></i>
-                                </th>
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('space')">
-                                    Espacio <i class="fas fa-sort ml-1"></i>
-                                </th>
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('date')">
-                                    Fecha/Hora <i class="fas fa-sort ml-1"></i>
-                                </th>
-                                <th class="cursor-pointer hover:bg-base-300" onclick="sortTable('status')">
-                                    Estado <i class="fas fa-sort ml-1"></i>
-                                </th>
-                                <th>Moderador</th>
+                                {% endfor %}
+                                {% if actions %}
                                 <th>Acciones</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody id="tableBody">
+                            {% for obj in object_list %}
                             <tr>
-                                <td><input type="checkbox" class="checkbox checkbox-sm row-checkbox"></td>
-                                <td class="font-mono">#RSV001</td>
                                 <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-primary text-primary-content rounded-full w-8">
-                                                <span class="text-xs">AG</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold">Ana García</div>
-                                            <div class="text-sm opacity-50">ana.garcia@empresa.com</div>
-                                        </div>
-                                    </div>
+                                    <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelect(this)">
                                 </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">Sala 201</div>
-                                        <div class="text-sm opacity-50">Piso 2 - Edificio Norte</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">13/06/2025</div>
-                                        <div class="text-sm opacity-50">14:00 - 16:00</div>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-success">Aprobada</span></td>
-                                <td>Carlos M.</td>
-                                <td>
-                                    <div class="dropdown dropdown-end">
-                                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </div>
-                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                            <li><a onclick="viewItem('RSV001')"><i class="fas fa-eye mr-2"></i>Ver detalles</a></li>
-                                            <li><a onclick="editItem('RSV001')"><i class="fas fa-edit mr-2"></i>Editar</a></li>
-                                            <li><a onclick="duplicateItem('RSV001')"><i class="fas fa-copy mr-2"></i>Duplicar</a></li>
-                                            <li class="divider"></li>
-                                            <li><a class="text-error" onclick="deleteItem('RSV001')"><i class="fas fa-trash mr-2"></i>Eliminar</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
+                              {% for col in cols %}
+                                <td class="text-center">
+                                  <div class="max-w-xs mx-auto">
+                                    {{ obj|get_td_html:col }}
+                                      
+                            {% endfor %}
+                                  <!-- Celda de acciones -->
+                              
+                            {% block actions %}
+                            {% if actions %}
+                            <td class="text-center">
+                                <div class="join">
+                                    <button class="join-item btn btn-sm btn-outline flex items-center" onclick="editRow({{ obj.pk }})">
+                                        <i class="fas fa-eye mr-2"></i><span>Ver</span>
+                                    </button>
+
+                               
+                                    <button class="join-item btn btn-sm btn-outline" onclick="editRow({{ obj.pk }})">
+                                        <i class="fas fa-edit mr-2"></i>Editar
+                                    </button>
+                                    {% if obj.pk != 1 %}
+                                    <button class="join-item btn btn-sm btn-error" onclick="deleteRow({{ obj.pk }})">
+                                        <i class="fas fa-trash mr-2"></i>Eliminar
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            {% endif %}
+                            {% endblock %}
+                  
                             </tr>
+                          {% empty %}
                             <tr>
-                                <td><input type="checkbox" class="checkbox checkbox-sm row-checkbox"></td>
-                                <td class="font-mono">#RSV002</td>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-secondary text-secondary-content rounded-full w-8">
-                                                <span class="text-xs">ML</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold">Mario López</div>
-                                            <div class="text-sm opacity-50">mario.lopez@empresa.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">Aula 305</div>
-                                        <div class="text-sm opacity-50">Piso 3 - Edificio Norte</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">14/06/2025</div>
-                                        <div class="text-sm opacity-50">09:00 - 11:00</div>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-warning">Pendiente</span></td>
-                                <td>-</td>
-                                <td>
-                                    <div class="flex gap-1">
-                                        <button class="btn btn-success btn-xs" onclick="approveReservation('RSV002')">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-error btn-xs" onclick="rejectReservation('RSV002')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <div class="dropdown dropdown-end">
-                                            <div tabindex="0" role="button" class="btn btn-ghost btn-xs">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </div>
-                                            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                                <li><a onclick="viewItem('RSV002')"><i class="fas fa-eye mr-2"></i>Ver detalles</a></li>
-                                                <li><a onclick="editItem('RSV002')"><i class="fas fa-edit mr-2"></i>Editar</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
+                              <td colspan="{{ cols|length|add:'1' }}" class="text-center">
+                                No se encontraron resultados.
+                              </td>
                             </tr>
-                            <tr>
-                                <td><input type="checkbox" class="checkbox checkbox-sm row-checkbox"></td>
-                                <td class="font-mono">#RSV003</td>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-accent text-accent-content rounded-full w-8">
-                                                <span class="text-xs">CR</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold">Carmen Ruiz</div>
-                                            <div class="text-sm opacity-50">carmen.ruiz@empresa.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">Lab 102</div>
-                                        <div class="text-sm opacity-50">Piso 1 - Edificio Norte</div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <div class="font-semibold">12/06/2025</div>
-                                        <div class="text-sm opacity-50">16:00 - 18:00</div>
-                                    </div>
-                                </td>
-                                <td><span class="badge badge-error">Rechazada</span></td>
-                                <td>Carlos M.</td>
-                                <td>
-                                    <div class="dropdown dropdown-end">
-                                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </div>
-                                        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                                            <li><a onclick="viewItem('RSV003')"><i class="fas fa-eye mr-2"></i>Ver detalles</a></li>
-                                            <li><a onclick="viewRejectionReason('RSV003')"><i class="fas fa-comment mr-2"></i>Ver motivo</a></li>
-                                            <li><a onclick="duplicateItem('RSV003')"><i class="fas fa-copy mr-2"></i>Duplicar</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
+                          {% endfor %}
                         </tbody>
                     </table>
                 </div>

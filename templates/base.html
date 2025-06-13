@@ -103,6 +103,19 @@
   <div class = 'h-screen'>
     {% block content %}
     {% endblock content %}
+      {% comment %} Modal {% endcomment %}
+      <dialog id="generic_modal" class="modal">
+        <div class="modal-box">
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <div id="generic_modal_content" style="padding:0"></div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+      {% comment %} Fin Modal {% endcomment %}
   </div>
     <script>
         // Theme toggle functionality
@@ -125,7 +138,227 @@
             });
         });
     </script>
-    <script src="//unpkg.com/alpinejs" defer></script>
-
+    <script>
+      ;(function() {
+        const modal   = document.getElementById('generic_modal');
+        const content = document.getElementById('generic_modal_content');
+      
+        // Función para inicializar Select2
+        function initializeSelect2() {
+          // Destruir instancias previas de Select2 para evitar conflictos
+          const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
+          existingSelect2.forEach(select => {
+            if ($(select).data('select2')) {
+              $(select).select2('destroy');
+            }
+          });
+      
+          // Inicializar Select2 en elementos django-select2
+          const selectElements = content.querySelectorAll('select.django-select2');
+          selectElements.forEach(select => {
+            $(select).select2({
+              theme: 'default',
+              width: '100%',
+              dropdownParent: modal
+            });
+          });
+        }
+      
+        // Abre el modal cargando el formulario por AJAX
+        async function openModal(url) {
+          content.innerHTML = '';
+          modal.showModal();
+          try {
+            const resp = await fetch(url, {
+              headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const html = await resp.text();
+            content.innerHTML = html;
+            
+            // Inicializar Select2
+            initializeSelect2();
+            
+            bindForm();
+          } catch (err) {
+            console.error('Error cargando formulario:', err);
+            content.innerHTML = '<p class="p-4 text-red-600">Error cargando el formulario.</p>';
+          }
+        }
+      
+        // Intercepta el submit
+        function bindForm() {
+          const form = content.querySelector('form.ajax-form');
+          if (!form || form._bound) return;
+      
+          form._bound = true;
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fd = new FormData(form);
+            console.log(fd);
+            fetch(form.action, {
+              method: 'POST',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+              },
+              body: fd
+            })
+            .then(resp => resp.json())
+            .then(data => {
+              console.log(data);
+              if (data.success) {
+                modal.close();
+                Swal.fire({
+                  title: "¡Éxito!",
+                  text: "Datos enviados correctamente.",
+                  icon: "success",
+                  confirmButtonText: "Aceptar",
+                  allowOutsideClick: false,
+                  allowEscapeKey: false
+                }).then((result) => {
+                  if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                  }
+                });
+              }
+              else {
+                // Reemplazar contenido y reinicializar Select2
+                content.innerHTML = data.html;
+                initializeSelect2(); // ← Esta es la línea clave que faltaba
+                bindForm();
+              }
+            })
+            .catch(err => {
+              console.error('Error en submit:', err);
+            });
+          });
+        }
+      
+        // Delegación de clicks para botones .open-modal-btn
+        document.addEventListener('click', function(e) {
+          const btn = e.target.closest('.open-modal-btn');
+          if (!btn) return;
+          e.preventDefault();
+          openModal(btn.dataset.url);
+        });
+      
+        // Limpiar Select2 al cerrar el modal
+        modal.addEventListener('close', function() {
+          const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
+          existingSelect2.forEach(select => {
+            if ($(select).data('select2')) {
+              $(select).select2('destroy');
+            }
+          });
+        });
+      })();
+      </script>
+      
+    <script>
+        function themeSwitcher() {
+          return {
+            // usamos booleano para simplificar el binding con el checkbox
+            dark: localStorage.getItem('theme') === 'dark',
+        
+            init() {
+              // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
+              this.applyTheme(this.dark)
+            },
+        
+            toggle() {
+              // invocado al hacer click sobre el swap
+              this.dark = !this.dark
+              this.applyTheme(this.dark)
+            },
+        
+            applyTheme(isDark) {
+              // ponemos el atributo data-theme que DaisyUI utiliza
+              document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+              // guardamos la preferencia
+              localStorage.setItem('theme', isDark ? 'dark' : 'light')
+            }
+          }
+        }
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+      <!-- Alpine Plugins -->
+      <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+      <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+  
+      <!-- Alpine Core -->
+      <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+   
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>     
+      
+      <script>
+        // Animaciones y interactividad adicional
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar efectos de hover dinámicos
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+  
+          
+            // Efecto de escritura para el título de bienvenida
+            const welcomeText = document.querySelector('h1');
+            if (welcomeText) {
+                welcomeText.style.opacity = '0';
+                setTimeout(() => {
+                    welcomeText.style.transition = 'opacity 1s ease-in-out';
+                    welcomeText.style.opacity = '1';
+                }, 500);
+            }
+  
+            // Notificación de bienvenida
+            setTimeout(() => {
+                showWelcomeNotification();
+            }, 2000);
+        });
+  
+        function showWelcomeNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-white shadow-xl rounded-lg p-4 border-l-4 border-l-green-500 z-50 animate-slide-up';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">¡Bienvenida de vuelta!</p>
+                        <p class="text-sm text-gray-600">Todo está funcionando correctamente.</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        }
+    </script>
+    {{ form.media.js }}
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>

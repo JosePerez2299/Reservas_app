@@ -12,16 +12,8 @@ def get_model_fields(model, exclude=None):
 
 @register.filter
 def get_attr(obj, attr_name):
-    """
-    Permite lookup anidado con '__' en templates.
-    Ej: {{ obj|get_attr:"espacio__ubicacion" }}
-    """
-    try:
-        for part in attr_name.split('__'):
-            obj = getattr(obj, part)
-        return obj
-    except Exception:
-        return None
+    obj = getattr(obj, attr_name)
+    return obj
 
 
 @register.filter

@@ -76,10 +76,7 @@ class ListCrudMixin:
         ctx['model'] = settings.MODELOS.dict[self.model.__name__]
 
         try:
-            ctx['create_url'] = self.crud_urls['create']
-            ctx['view_url'] = self.crud_urls['view']
-            ctx['edit_url'] = self.crud_urls['edit']
-            ctx['delete_url'] = self.crud_urls['delete']      
+            ctx['crud_urls'] = self.crud_urls
             ctx['can_export'] = self.can_export 
         except AttributeError:
             pass
