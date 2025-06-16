@@ -39,7 +39,9 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         'pk': 'ID',
         'username': 'Usuario',
         'ubicacion': 'Ubicación',
+        'piso': 'Piso',
         'group': 'Grupo',
+
     }
     
     property_to_field_mapping = {

@@ -71,10 +71,7 @@ def get_td_html(obj, field):
     try:
         attr = get_attr(obj, field)
     except:
-        return mark_safe(f"""{str(obj)}""")
-    
-    if field == "group":
-        print(attr)    
+        return mark_safe(f"""{str(obj)}""")  
 
     if isinstance(attr, bool):
         if attr:
@@ -131,7 +128,6 @@ def get_td_html(obj, field):
 
         elif field == "estado":
             
-            print(obj.estado)
             estado_html = ""
             if obj.estado == Reserva.Estado.PENDIENTE:
                 estado_html += "warning"

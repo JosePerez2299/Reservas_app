@@ -1,0 +1,41 @@
+{% extends "includes/table_view.html" %}
+{% load utils %}
+
+{% block header %}
+<div class="flex items-center gap-3 mb-2">
+    <div class="text-2xl text-primary">
+        {% get_icon model.label|lower %}
+    </div>
+    <h1 class="text-3xl font-bold text-base-content">Gestión de Espacios</h1>
+</div>
+<p class="text-sm text-base-content/60 max-w-2xl">
+    Administra y gestiona los espacios de la aplicación. Aquí podrás crear nuevos espacios, 
+    editar espacios existentes y ver el historial de espacios.
+</p>
+{% endblock %}
+
+
+{% block actions %}
+<td class="py-4">
+    <div class="flex items-center justify-center gap-1">
+        <div class="tooltip" data-tip="Ver detalles">
+            <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                <i class="fas fa-eye text-xs"></i>
+            </button>
+        </div>
+
+        <div class="tooltip" data-tip="Editar">
+            <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                <i class="fas fa-edit text-xs"></i>
+            </button>
+        </div>
+        
+       
+        <div class="tooltip" data-tip="Eliminar">
+            <button class="btn btn-ghost btn-sm h-8 w-8 p-0 text-error hover:bg-error/10" onclick="deleteRow({{ obj.pk }})">
+                <i class="fas fa-trash text-xs"></i>
+            </button>
+        </div>
+    </div>
+</td>
+{% endblock %}

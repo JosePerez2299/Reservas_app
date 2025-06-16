@@ -25,7 +25,7 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
     """
     model = Espacio
     permission_required = 'reservas.view_espacio'
-    template_name = 'reservas/table_view.html'
+    template_name = 'reservas/espacio_table.html'
     paginate_by = 10
     filterset_class = EspacioFilter
     can_export = True

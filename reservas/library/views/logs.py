@@ -12,7 +12,7 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     """
     model = LogEntry    
     permission_required = 'auditlog.view_logentry'
-    template_name = 'reservas/table_view.html'
+    template_name = 'reservas/actividad_table.html'
     paginate_by = 10
     cols = {
         'id': 'ID',

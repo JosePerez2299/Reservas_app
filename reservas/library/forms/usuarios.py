@@ -65,7 +65,7 @@ class UsuarioCreateForm(UserCreationForm):
                     grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
                     user.groups.add(grupo_usuario)
                 except Group.DoesNotExist:
-                    pass
+                    raise forms.ValidationError("No se encontró el grupo 'usuario'.")
         return user
         
 class UsuarioUpdateForm(forms.ModelForm):

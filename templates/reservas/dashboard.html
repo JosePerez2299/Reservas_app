@@ -6,7 +6,8 @@
         <!-- Header -->
         <div class="mb-6">
             <h1 class="text-3xl font-bold text-base-content">Dashboard</h1>
-            <p class="text-base-content/70 mt-2">Bienvenido de vuelta, Carlos Mendoza (Moderador - Edificio Norte)</p>
+            <p class="text-base-content/70 mt-2">Bienvenido de vuelta, {% if user and user.first_name %} {{user.first_name}} {{user.last_name}} {% else %} {{user.username}} {% endif %} </p>
+            <p class="text-primary/70 font-bold text-sm" >({{user.grupo|capfirst}} - {{user.ubicacion}})</p>
         </div>
 
         <!-- Stats Cards -->
@@ -213,25 +214,4 @@
         </div>
     </div>
 
-    <script>
-        // Theme toggle functionality
-        const themeController = document.querySelector('.theme-controller');
-        themeController.addEventListener('change', function() {
-            if (this.checked) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        });
-
-        // Mobile menu functionality
-        document.addEventListener('click', function(e) {
-            const dropdowns = document.querySelectorAll('.dropdown[open]');
-            dropdowns.forEach(dropdown => {
-                if (!dropdown.contains(e.target)) {
-                    dropdown.removeAttribute('open');
-                }
-            });
-        });
-    </script>
 {% endblock content %}

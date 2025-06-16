@@ -1,6 +1,7 @@
-# templatetags/permisos.py
+# templatetags/table_actions.py
 from django import template
 from django.conf import settings
+from reservas.models import Reserva, Usuario, Espacio
 
 register = template.Library()
 
@@ -14,28 +15,27 @@ register = template.Library()
 # En su lugar, se dejan deshabilitados, y se verifica el permiso en
 # el view de edicion o eliminacion.
 @register.simple_tag
-def puede_editar(objeto, user, model):
-    model_label = model['label']
-    if model_label == settings.MODELOS.RESERVA['label']:
-        return objeto.estado == 'pendiente'
+def puede_editar(objeto):
 
-    elif model_label == settings.MODELOS.USUARIO['label']:
-        return True
-
-
-    elif model_label == settings.MODELOS.ESPACIO['label']:
-        return True
+    if isinstance(objeto, Reserva):
+        print(objeto.estado)
         
-    else:
-        return False
+    elif isinstance(objeto, Usuario):
+        print(objeto.username)
+        
+    elif isinstance(objeto, Espacio):
+        print(objeto.nombre)
+        
+    return (
+        isinstance(objeto, Reserva) and objeto.estado == 'pendiente') or \
+        isinstance(objeto, Usuario) or \
+        isinstance(objeto, Espacio)
+
 
 @register.simple_tag
-def puede_eliminar(objeto, user, model):
-    model_label = model['label']
-    if model_label == settings.MODELOS.RESERVA['label']:
-        return objeto.estado == 'pendiente'
-    elif model_label == settings.MODELOS.USUARIO['label']:
-        return user.is_admin
-    elif model_label== settings.MODELOS.ESPACIO['label']:
-        return True
-        
+def puede_eliminar(objeto):
+    return (
+        isinstance(objeto, Reserva) and objeto.estado == 'pendiente') or \
+        isinstance(objeto, Usuario) or \
+        isinstance(objeto, Espacio)
+    

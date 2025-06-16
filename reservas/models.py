@@ -103,6 +103,10 @@ class Usuario(AbstractUser):
     def is_admin(self):
         return self.groups.filter(name=self.GRUPOS.ADMINISTRADOR).exists()
 
+    @property
+    def grupo(self):
+        return self.groups.first().name
+
     def get_logs(self):
         qs = LogEntry.objects.all()
         ct_reserva = ContentType.objects.get_for_model(Reserva)

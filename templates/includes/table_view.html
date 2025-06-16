@@ -4,6 +4,8 @@
 {% load widget_tweaks %}
 {% load model_extras %}
 {% load querystring %}
+{% load table_actions %}
+
 {% load humanize %}
 
 {% block content %}
@@ -11,7 +13,7 @@
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
         <!-- Main Content -->
-        <div class="min-h-screen bg-base-200/30">
+        <div class="min-h-screen">
             <div class="container mx-auto px-6 py-8">
                 <!-- Header Section -->
                 <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
@@ -20,14 +22,18 @@
                            {% block header %}
                            {% endblock %}
                         </div>
+
+                        {% if crud_urls.create %}
                         <div class="flex items-center gap-3">
+                            
                             <button class="btn btn-primary btn-sm gap-2 open-modal-btn" 
                                     data-url="{% url crud_urls.create %}"
                                     data-success-callback="reloadRow">
                                 <i class="fas fa-plus text-xs"></i>
-                                Nueva Reserva
+                                Crear {{model.label|slice:":-1"|lower}}
                             </button>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -72,26 +78,12 @@
                                     </li>
                                     <div class="divider my-0"></div>
                                     <div class="p-2 space-y-1">
-                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
-                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
-                                            <span class="ml-2">ID</span>
-                                        </label></li>
-                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
-                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
-                                            <span class="ml-2">Usuario</span>
-                                        </label></li>
-                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
-                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
-                                            <span class="ml-2">Espacio</span>
-                                        </label></li>
-                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
-                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
-                                            <span class="ml-2">Fecha</span>
-                                        </label></li>
-                                        <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
-                                            <input type="checkbox" checked class="checkbox checkbox-sm" />
-                                            <span class="ml-2">Estado</span>
-                                        </label></li>
+                                        {% for col, label in cols.items %}
+                                            <li><label class="flex cursor-pointer items-center px-4 py-2 hover:bg-base-200 rounded-lg">
+                                                <input type="checkbox" checked class="checkbox checkbox-sm" />
+                                                <span class="ml-2">{{ label }}</span>
+                                            </label></li>
+                                        {% endfor %}
                                     </div>
                                 </ul>
                             </div>
@@ -102,7 +94,7 @@
                 <!-- Data Table -->
                 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="table table-lg">
+                        <table class="table table-md text-sm">
                             <thead class="bg-base-200/70">
                                 <tr class="border-b border-base-300">
                                     <th class="w-12">
@@ -150,35 +142,52 @@
                                             {{ obj|get_td_html:col }}
                                         </div>
                                     </td>
+
                                     {% endfor %}
-                                    
-                                    {% block actions %}
-                                    {% if actions %}
+
+                                    <!-- Actions -->
+                                    {% if crud_urls.view %}
                                     <td class="py-4">
                                         <div class="flex items-center justify-center gap-1">
                                             <div class="tooltip" data-tip="Ver detalles">
-                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 open-modal-btn" 
+                                                data-url="{% url crud_urls.view obj.pk %}"
+                                                data-success-callback="reloadRow" >
                                                     <i class="fas fa-eye text-xs"></i>
                                                 </button>
                                             </div>
-
+                                    {% endif %} 
+                                    {% puede_editar obj as puede_editar_obj %}
+                                    {% puede_eliminar obj as puede_eliminar_obj %}
+                                    
+                                    {% if puede_editar_obj %}
+                                    {% if crud_urls.edit %}
                                             <div class="tooltip" data-tip="Editar">
-                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0" onclick="editRow({{ obj.pk }})">
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 open-modal-btn" 
+                                                data-url="{% url crud_urls.edit obj.pk %}"
+                                                data-success-callback="reloadRow" >
                                                     <i class="fas fa-edit text-xs"></i>
                                                 </button>
                                             </div>
-                                            
-                                            {% if obj.pk != 1 %}
+                                    {% endif %}
+                                    {% endif %}
+                                    
+                                    
+                                    
+                                    {% if puede_eliminar_obj %}
+                                    {% if crud_urls.delete %}
                                             <div class="tooltip" data-tip="Eliminar">
-                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 text-error hover:bg-error/10" onclick="deleteRow({{ obj.pk }})">
-                                                    <i class="fas fa-trash text-xs"></i>
+                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 text-error hover:bg-error/10" 
+                                                data-url="{% url crud_urls.delete obj.pk %}"
+                                                data-success-callback="reloadRow" >
+                                                        <i class="fas fa-trash text-xs"></i>
                                                 </button>
                                             </div>
-                                            {% endif %}
                                         </div>
-                                    </td>
                                     {% endif %}
-                                    {% endblock %}
+                                    {% endif %}
+                                    </td>
+                                   
                                 </tr>
                                 {% empty %}
                                 <tr>
