@@ -139,13 +139,15 @@
                                     {% for col in cols %}
                                     <td class="py-4">
                                         <div class="text-sm text-base-content">
-                                            {{ obj|get_td_html:col }}
+                                            {% get_td_html obj col %}
                                         </div>
                                     </td>
 
                                     {% endfor %}
 
                                     <!-- Actions -->
+
+                                    {% if actions %}
                                     {% if crud_urls.view %}
                                     <td class="py-4">
                                         <div class="flex items-center justify-center gap-1">
@@ -187,7 +189,7 @@
                                     {% endif %}
                                     {% endif %}
                                     </td>
-                                   
+                                   {% endif %}
                                 </tr>
                                 {% empty %}
                                 <tr>

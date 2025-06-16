@@ -17,15 +17,6 @@ register = template.Library()
 @register.simple_tag
 def puede_editar(objeto):
 
-    if isinstance(objeto, Reserva):
-        print(objeto.estado)
-        
-    elif isinstance(objeto, Usuario):
-        print(objeto.username)
-        
-    elif isinstance(objeto, Espacio):
-        print(objeto.nombre)
-        
     return (
         isinstance(objeto, Reserva) and objeto.estado == 'pendiente') or \
         isinstance(objeto, Usuario) or \

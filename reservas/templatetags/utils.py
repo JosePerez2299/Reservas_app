@@ -1,10 +1,11 @@
 from django import template
 from django.utils.safestring import mark_safe
-from django.apps import apps
 from reservas.models import *
 from reservas.templatetags.model_extras import get_attr
 from datetime import datetime
 from datetime import date
+from django.urls import reverse
+from django.utils.html import format_html
 register = template.Library()
 
 @register.simple_tag
@@ -17,7 +18,7 @@ def get_icon(icon_name):
         'espacios': 'fas fa-building',
         'usuario': 'fas fa-users',
         'usuarios': 'fas fa-users',
-        'log': 'fas fa-clipboard-list',
+        'actividad': 'fas fa-clipboard-list',
         'dashboard': 'fas fa-tachometer-alt',
         'view': 'fas fa-eye',
         'edit': 'fas fa-edit',
@@ -34,197 +35,216 @@ def get_icon(icon_name):
 
     return mark_safe(f'<i class="{icon_class}"></i>')
 
-    if icon_class is None:
-        icon_class = 'w-10 h-10' 
-
-    if icon_name not in ['success', 'error', 'warning', 'info']:
-        icon_name = 'info'
-    
-    icons_svg = {
-        'success': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg"  fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                            </svg>
-        '''),
-        'error': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                            </svg>
-        '''),
-        'warning': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                            </svg>
-        '''),
-        'info': mark_safe(f'''<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{icon_class}">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                            </svg>
-        ''')
-    }
-
-    return icons_svg.get(icon_name)
-
-
-@register.filter
-def get_td_html(obj, field):
-
-
-    attr = None
-
+@register.simple_tag(takes_context=True)
+def get_td_html(context, obj, field):
+    """
+    Devuelve un fragmento HTML (<td> o contenido para <td>) según el campo y la instancia.
+    Usa format_html para escapar valores dinámicos.
+    """
+    # Intentar obtener el atributo dinámico
     try:
         attr = get_attr(obj, field)
-    except:
-        return mark_safe(f"""{str(obj)}""")  
+    except Exception:
+        # Si falla, devolvemos representación del objeto
+        return format_html("{}", obj)
 
+    # Booleanos: mostrar iconos
     if isinstance(attr, bool):
         if attr:
-            return mark_safe(f"""<span class="badge badge-lg badge-success"><i class="fa-solid fa-check"></i></span>""")
+            return format_html(
+                '<span class="badge badge-lg badge-success"><i class="fa-solid fa-check"></i></span>'
+            )
         else:
-            return mark_safe(f"""<span class="badge badge-lg badge-error"><i class="fa-solid fa-xmark"></i></span>""")
+            return format_html(
+                '<span class="badge badge-lg badge-error"><i class="fa-solid fa-xmark"></i></span>'
+            )
+
+    # Fechas: mostrar en formato dd/mm/yyyy
+    if isinstance(attr, datetime):
+        return format_html("{}", attr.strftime("%d/%m/%Y"))
     
+    # Campo "id": resolver URL de detalle o mostrar id plano
     if field == "id":
-        return obj.id
-    if field == "usuario" or field == "aprobado_por":
+        # Se espera que en el contexto exista algo como:
+        # context['crud_urls'] = {'view': 'nombre_url_ver', ...}
+        crud_urls = context.get('crud_urls', {})
+        nombre_url = crud_urls.get('view')
+        if nombre_url:
+            try:
+                url = reverse(nombre_url, args=[obj.id])
+                return format_html('<a href="{}" class="link text-info text-center btn btn-ghost open-modal-btn " data-url="{} " data-success-callback="reloadRow">{}</a>', url, url, obj.id)
+            except Exception:
+                pass
+        return format_html("{}", obj.id)
 
+    # Campo "usuario": avatar con iniciales, nombre, email
+    if field == "usuario" and hasattr(obj, 'usuario') and obj.usuario:
+        username = getattr(obj.usuario, 'username', '')
+        initials = (username[:2].upper()) if username else ""
+        email = getattr(obj.usuario, 'email', '')
+        return format_html(
+            '<div class="flex items-center gap-3">'
+                '<div class="avatar placeholder">'
+                    '<div class="bg-secondary text-secondary-content rounded-full w-8">'
+                        '<span class="text-xs">{}</span>'
+                    '</div>'
+                '</div>'
+                '<div class="text-start">'
+                    '<div class="font-bold">{}</div>'
+                    '<div class="text-sm opacity-50">{}</div>'
+                '</div>'
+            '</div>',
+            initials, username, email
+        )
 
-        return mark_safe(f"""      <div class="flex items-center  gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-secondary text-secondary-content rounded-full w-8">
-                                                <span class="text-xs">{(obj.usuario.username[0] + obj.usuario.username[1]).upper()}</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-start">
-                                            <div class="font-bold">{obj.usuario.username}</div>
-                                            <div class="text-sm opacity-50">{obj.usuario.email}</div>
-                                        </div>
-                                    </div>""")                            
-    
-    elif isinstance(obj, Reserva):
-
-        if field == "espacio":
-            max_length = 15  # Maximum characters to show before truncating
-            nombre = obj.espacio.nombre
-            ubicacion_nombre = obj.espacio.ubicacion.nombre
-            
-            # Truncate names if they're too long
-            nombre_display = (nombre[:max_length] + '...') if len(nombre) > max_length else nombre
-            ubicacion_display = (ubicacion_nombre[:max_length] + '...') if len(ubicacion_nombre) > max_length else ubicacion_nombre
-            
-            return mark_safe(f"""<div>
-                <div class="font-semibold">{nombre_display}</div>
-                <div class="text-sm opacity-50">
-                   {ubicacion_display}
-                -
-                    Piso {obj.espacio.piso}
-                </div>
-            </div>""")
-        
-        elif field == "fecha_uso":
-            return mark_safe(f"""   <div>
-                                        <div class="font-semibold">{obj.fecha_uso.strftime("%d/%m/%Y")} </div>
-                                        <div class="text-sm opacity-50">{obj.hora_inicio.strftime("%I:%M %p") } - {obj.hora_fin.strftime("%I:%M %p")}</div>
-                                    </div>""")
-        elif field == "aprobado_por":
-            return mark_safe(f"""        <div>
-                                        <div class="font-semibold">{obj.aprobado_por.username if obj.aprobado_por else "-"}</div>
-                                    </div>""")
-
-        elif field == "estado":
-            
-            estado_html = ""
-            if obj.estado == Reserva.Estado.PENDIENTE:
-                estado_html += "warning"
-            elif obj.estado == Reserva.Estado.APROBADA:
-                if (obj.fecha_uso == date.today() and obj.hora_inicio.time() < datetime.now().time() and obj.hora_fin.time() > datetime.now().time()   ):
-                    return mark_safe(f""" <p class="badge  p-1 badge-lg badge-success text-base-100 ">En uso</p>""")
-                else:
-                    estado_html += "success"
-            elif obj.estado == Reserva.Estado.RECHAZADA:
-                estado_html += "error"
-            return mark_safe(f""" <p class="badge  p-1 badge-lg badge-{estado_html} text-base-100 ">{obj.estado.capitalize()}</p>""")
-
-
-    elif isinstance(obj, Espacio):
-        if field == "nombre":
-            return mark_safe(f"""   <div>
-                                        <div class="font-semibold">{obj.nombre}</div>
-                                        <div class="text-sm opacity-50">{obj.tipo}</div>
-                                        
-                                    </div>""")
-        elif field == "ubicacion":
-            return mark_safe(f"""   <div>
-                                        <div class="font-semibold">{obj.piso}</div>
-                                    </div>""")
-        
-    elif isinstance(obj, Usuario):
-        if field == "username" or field == "email":
-             return mark_safe(f"""      <div class="flex items-center  gap-3">
-                                        <div class="avatar placeholder">
-                                            <div class="bg-secondary text-secondary-content rounded-full w-8">
-                                                <span class="text-xs">{(obj.username[0] + obj.username[1]).upper()}</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-start">
-                                            <div class="font-bold">{obj.username}</div>
-                                            <div class="text-sm opacity-50">{obj.email}</div>
-                                        </div>
-                                    </div>""")                            
-    
-        
-        elif field == "ubicacion":
-            return mark_safe(f"""   <div>
-                                        <div class="font-semibold">{obj.ubicacion.nombre}</div>
-                                    </div>""")
-        
-        elif field == "group":
-
-            if obj.group == Usuario.GRUPOS.MODERADOR:
-                return mark_safe(f"""   <div>
-                                            <div class="badge badge-lg badge-success text-base-100 min-w-24  ">{obj.group.capitalize()}</div>
-                                        </div>""")
-            elif obj.group == settings.GRUPOS.USUARIO:
-                return mark_safe(f"""   <div>
-                                            <div class="badge badge-lg badge-warning text-base-100  min-w-24  ">{obj.group.capitalize()}</div>
-                                        </div>""")
+    # Caso Reserva
+    if isinstance(obj, Reserva):
+        # campo "espacio"
+        if field == "espacio" and obj.espacio:
+            max_length = 15
+            nombre = getattr(obj.espacio, 'nombre', '') or ""
+            ubicacion_nombre = getattr(obj.espacio.ubicacion, 'nombre', '') or ""
+            if len(nombre) > max_length:
+                nombre_display = nombre[:max_length] + "..."
             else:
-                return mark_safe(f"""   <div>
-                                            <div class="badge badge-lg badge-error text-base-100  min-w-24  ">{obj.group.capitalize()}</div>
-                                        </div>""")
+                nombre_display = nombre
+            if len(ubicacion_nombre) > max_length:
+                ubicacion_display = ubicacion_nombre[:max_length] + "..."
+            else:
+                ubicacion_display = ubicacion_nombre
+            piso = getattr(obj.espacio, 'piso', '')
+            return format_html(
+                '<div>'
+                    '<div class="font-semibold">{}</div>'
+                    '<div class="text-sm opacity-50">{} - Piso {}</div>'
+                '</div>',
+                nombre_display, ubicacion_display, piso
+            )
+        # campo "fecha_uso"
+        elif field == "fecha_uso" and getattr(obj, 'fecha_uso', None):
+            fecha = obj.fecha_uso
+            inicio = getattr(obj, 'hora_inicio', None)
+            fin = getattr(obj, 'hora_fin', None)
+            fecha_str = fecha.strftime("%d/%m/%Y")
+            inicio_str = inicio.strftime("%I:%M %p") if inicio else ""
+            fin_str = fin.strftime("%I:%M %p") if fin else ""
+            return format_html(
+                '<div>'
+                    '<div class="font-semibold">{}</div>'
+                    '<div class="text-sm opacity-50">{} - {}</div>'
+                '</div>',
+                fecha_str, inicio_str, fin_str
+            )
+        # campo "aprobado_por"
+        elif field == "aprobado_por":
+            aprobado = obj.aprobado_por
+            username = aprobado.username if aprobado else "-"
+            return format_html(
+                '<div><div class="font-semibold">{}</div></div>',
+                username
+            )
+        # campo "estado"
+        elif field == "estado":
+            estado = obj.estado
+            # Caso especial "En uso"
+            if estado == Reserva.Estado.APROBADA:
+                hoy = date.today()
+                ahora = datetime.now().time()
+                fecha_uso = getattr(obj, 'fecha_uso', None)
+                hora_inicio = getattr(obj, 'hora_inicio', None)
+                hora_fin = getattr(obj, 'hora_fin', None)
+                if fecha_uso == hoy and hora_inicio and hora_fin:
+                    if hora_inicio.time() < ahora < hora_fin.time():
+                        return format_html(
+                            '<p class="badge p-1 badge-lg badge-success text-base-100">En uso</p>'
+                        )
+                cls = "success"
+            elif estado == Reserva.Estado.PENDIENTE:
+                cls = "warning"
+            elif estado == Reserva.Estado.RECHAZADA:
+                cls = "error"
+            else:
+                cls = ""
+            texto = str(estado).capitalize()
+            return format_html(
+                '<p class="badge p-1 badge-lg badge-{} text-base-100">{}</p>',
+                cls, texto
+            )
 
-        
+    # Caso Espacio
+    if isinstance(obj, Espacio):
+        if field == "nombre":
+            nombre = getattr(obj, 'nombre', '')
+            tipo = getattr(obj, 'tipo', '')
+            return format_html(
+                '<div>'
+                    '<div class="font-semibold">{}</div>'
+                    '<div class="text-sm opacity-50">{}</div>'
+                '</div>',
+                nombre, tipo
+            )
+        elif field == "ubicacion":
+            # Según lógica, quizá mostrar nombre de ubicación o piso
+            ubic = getattr(obj, 'ubicacion', None)
+            texto = getattr(ubic, 'nombre', '') if ubic else ""
+            return format_html(
+                '<div><div class="font-semibold">{}</div></div>',
+                texto
+            )
 
-  
-    return attr
+    # Caso Usuario
+    if isinstance(obj, Usuario):
+        if field in ("username", "email"):
+            username = getattr(obj, 'username', '')
+            initials = (username[:2].upper()) if username else ""
+            email = getattr(obj, 'email', '')
+            return format_html(
+                '<div class="flex items-center gap-3">'
+                    '<div class="avatar placeholder">'
+                        '<div class="bg-secondary text-secondary-content rounded-full w-8">'
+                            '<span class="text-xs">{}</span>'
+                        '</div>'
+                    '</div>'
+                    '<div class="text-start">'
+                        '<div class="font-bold">{}</div>'
+                        '<div class="text-sm opacity-50">{}</div>'
+                    '</div>'
+                '</div>',
+                initials, username, email
+            )
+        elif field == "ubicacion":
+            ubic = getattr(obj, 'ubicacion', None)
+            texto = getattr(ubic, 'nombre', '-') if ubic else "-"
+            return format_html(
+                '<div><div class="font-semibold">{}</div></div>',
+                texto
+            )
+        elif field == "group":
+            grupo = getattr(obj, 'group', '')
+            label = str(grupo).capitalize()
+            # Decide clase
+            if grupo == Usuario.GRUPOS.MODERADOR:
+                clase = "success"
+            elif grupo == settings.GRUPOS.USUARIO:
+                clase = "warning"
+            else:
+                clase = "error"
+            return format_html(
+                '<div><div class="badge badge-lg badge-{} text-base-100 min-w-24">{}</div></div>',
+                clase, label
+            )
+
+    # Por defecto, mostrar el valor escapado
+    if attr is None:
+        return format_html("{}", obj)
+    return format_html("{}", attr)
 
 
-@register.simple_tag()
-def get_message(logEntry):
-    actor = f"\"{ logEntry.actor.username}\"" if logEntry.actor else "Alguien"
-    model = logEntry.content_type.model.lower()
-    obj = logEntry.object_repr
-    action = logEntry.action
-    timestamp = logEntry.timestamp.strftime("%d/%m/%Y %H:%M:%S")
-    changes = getattr(logEntry, "changes_dict", {})
-
-    if action == 0:  # CREATE
-        return f"{actor} creó {articulo(model)} {model} \"{obj}\""
-    
-    elif action == 1:  # UPDATE
-        if model == "reserva" and "estado" in changes:
-            nuevo_estado = changes["estado"][1]
-            return f"{actor} {estado_verb(nuevo_estado)} la reserva \"{obj}\""
-        else:
-            return f"{actor} actualizó la información de {articulo(model)} {model} \"{obj}\" "
-
-    elif action == 2:  # DELETE
-        return f"{actor} eliminó {articulo(model)} {model} \"{obj}\" "
-
-    return f"{actor} realizó una acción desconocida sobre {model} "
-
-
-# Función auxiliar para poner "el" o "la"
+# Funciones auxiliares existentes:
 def articulo(modelo):
-    femeninos = ["reserva", "información", "actividad"]  # puedes expandir
+    femeninos = ["reserva", "información", "actividad"]
     return "la" if modelo in femeninos else "el"
 
-# Función auxiliar para transformar estado en verbo
 def estado_verb(estado):
     estado = estado.lower()
     if estado == "aprobada":
@@ -234,3 +254,192 @@ def estado_verb(estado):
     elif estado == "pendiente":
         return "marcó como pendiente"
     return f"cambió el estado a {estado}"
+
+@register.simple_tag()
+def get_message(logEntry):
+    """
+    Devuelve un dict con keys: label, description, icon_class, bg_class, text_class, timestamp, full_message (opcional).
+    """
+    # Actor
+    actor_name = logEntry.actor.username if logEntry.actor else None
+    actor_display = f'"{actor_name}"' if actor_name else "Alguien"
+
+    # Modelo en minúsculas
+    model = logEntry.content_type.model.lower()
+    obj_repr = logEntry.object_repr  # texto genérico
+    action = logEntry.action
+    timestamp = logEntry.timestamp  # datetime
+    # Para descripción más rica, intentamos obtener la instancia real
+    instance = None
+    try:
+        model_class = logEntry.content_type.model_class()
+        # Usar object_pk; puede ser string, convertir si es necesario
+        instance = model_class.objects.filter(pk=logEntry.object_pk).first()
+    except Exception:
+        instance = None
+
+    # Inicializamos el dict de resultado
+    result = {
+        "label": "",
+        "description": "",
+        "icon_class": "",
+        "bg_class": "",
+        "text_class": "",
+        "timestamp": timestamp,
+        "full_message": "",  # opcional, si necesitas el texto completo
+    }
+
+    # Helper para calcular "time since" en plantilla: usamos timestamp en result
+    # Decide según acción y modelo
+    # Ejemplos basados en convenciones:
+    if action == 0:  # CREATE
+        # CREAR
+        if model == "reserva":
+            result["label"] = "Nueva reserva"
+            result["icon_class"] = "fa-plus"
+            result["bg_class"] = "info"
+            result["text_class"] = "info-content"
+            # Description: intentar espacio y usuario
+            if instance:
+                espacio = getattr(instance, "espacio", None)
+                usuario = getattr(instance, "usuario", None)
+                nombre_esp = getattr(espacio, "nombre", "") if espacio else ""
+                nombre_usr = getattr(usuario, "username", "") if usuario else ""
+                if nombre_esp or nombre_usr:
+                    result["description"] = f"{nombre_esp} - {nombre_usr}"
+                else:
+                    result["description"] = obj_repr
+            else:
+                result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} creó reserva \"{obj_repr}\""
+        elif model == "usuario":
+            result["label"] = "Usuario creado"
+            result["icon_class"] = "fa-user-plus"
+            result["bg_class"] = "warning"
+            result["text_class"] = "warning-content"
+            if instance:
+                username = getattr(instance, "username", "")
+                grupo = getattr(instance, "group", "")
+                desc = username
+                if grupo:
+                    desc += f" - {grupo}"
+                result["description"] = desc
+            else:
+                result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} creó usuario \"{obj_repr}\""
+        else:
+            # Otros modelos: genérico
+            result["label"] = f"Nueva {model}" if model in ["reserva", "actividad"] else f"Nuevo {model}"
+            result["icon_class"] = "fa-plus"
+            result["bg_class"] = "info"
+            result["text_class"] = "info-content"
+            result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} creó {articulo(model)} {model} \"{obj_repr}\""
+
+    elif action == 1:  # UPDATE
+        if model == "reserva" and hasattr(logEntry, "changes_dict") and "estado" in getattr(logEntry, "changes_dict", {}):
+            nuevo_estado = logEntry.changes_dict["estado"][1]
+            # Si cambia a aprobada o rechazada
+            if nuevo_estado.lower() == "aprobada":
+                result["label"] = "Reserva aprobada"
+                result["icon_class"] = "fa-check"
+                result["bg_class"] = "success"
+                result["text_class"] = "success-content"
+            elif nuevo_estado.lower() == "rechazada":
+                result["label"] = "Reserva rechazada"
+                result["icon_class"] = "fa-times"
+                result["bg_class"] = "error"
+                result["text_class"] = "error-content"
+            else:
+                result["label"] = f"Cambio de estado"
+                result["icon_class"] = "fa-exchange-alt"
+                result["bg_class"] = "warning"
+                result["text_class"] = "warning-content"
+            # Description: similar a antes
+            if instance:
+                espacio = getattr(instance, "espacio", None)
+                usuario = getattr(instance, "usuario", None)
+                nombre_esp = getattr(espacio, "nombre", "") if espacio else ""
+                nombre_usr = getattr(usuario, "username", "") if usuario else ""
+                if nombre_esp or nombre_usr:
+                    result["description"] = f"{nombre_esp} - {nombre_usr}"
+                else:
+                    result["description"] = obj_repr
+            else:
+                result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} {estado_verb(nuevo_estado)} la reserva \"{obj_repr}\""
+        else:
+            # UPDATE genérico
+            if model == "reserva":
+                result["label"] = "Reserva actualizada"
+                result["icon_class"] = "fa-edit"
+                result["bg_class"] = "info"
+                result["text_class"] = "info-content"
+                if instance:
+                    espacio = getattr(instance, "espacio", None)
+                    usuario = getattr(instance, "usuario", None)
+                    nombre_esp = getattr(espacio, "nombre", "") if espacio else ""
+                    nombre_usr = getattr(usuario, "username", "") if usuario else ""
+                    result["description"] = f"{nombre_esp} - {nombre_usr}" if (nombre_esp or nombre_usr) else obj_repr
+                else:
+                    result["description"] = obj_repr
+            elif model == "usuario":
+                result["label"] = "Usuario actualizado"
+                result["icon_class"] = "fa-edit"
+                result["bg_class"] = "info"
+                result["text_class"] = "info-content"
+                if instance:
+                    username = getattr(instance, "username", "")
+                    result["description"] = username
+                else:
+                    result["description"] = obj_repr
+            else:
+                result["label"] = f"{model.capitalize()} actualizado"
+                result["icon_class"] = "fa-edit"
+                result["bg_class"] = "info"
+                result["text_class"] = "info-content"
+                result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} actualizó la información de {articulo(model)} {model} \"{obj_repr}\""
+
+    elif action == 2:  # DELETE
+        if model == "reserva":
+            result["label"] = "Reserva eliminada"
+            result["icon_class"] = "fa-times"
+            result["bg_class"] = "error"
+            result["text_class"] = "error-content"
+            if instance:
+                espacio = getattr(instance, "espacio", None)
+                usuario = getattr(instance, "usuario", None)
+                nombre_esp = getattr(espacio, "nombre", "") if espacio else ""
+                nombre_usr = getattr(usuario, "username", "") if usuario else ""
+                result["description"] = f"{nombre_esp} - {nombre_usr}" if (nombre_esp or nombre_usr) else obj_repr
+            else:
+                result["description"] = obj_repr
+        elif model == "usuario":
+            result["label"] = "Usuario eliminado"
+            result["icon_class"] = "fa-user-times"
+            result["bg_class"] = "error"
+            result["text_class"] = "error-content"
+            if instance:
+                username = getattr(instance, "username", "")
+                result["description"] = username
+            else:
+                result["description"] = obj_repr
+        else:
+            result["label"] = f"{model.capitalize()} eliminado"
+            result["icon_class"] = "fa-times"
+            result["bg_class"] = "error"
+            result["text_class"] = "error-content"
+            result["description"] = obj_repr
+        result["full_message"] = f"{actor_display} eliminó {articulo(model)} {model} \"{obj_repr}\""
+
+    else:
+        # Acción desconocida
+        result["label"] = f"Acción en {model}"
+        result["icon_class"] = "fa-question"
+        result["bg_class"] = "warning"
+        result["text_class"] = "warning-content"
+        result["description"] = obj_repr
+        result["full_message"] = f"{actor_display} realizó una acción desconocida sobre {model} \"{obj_repr}\""
+
+    return result

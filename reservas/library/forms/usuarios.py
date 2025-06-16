@@ -149,33 +149,9 @@ class UsuarioUpdateForm(forms.ModelForm):
             user.set_password(password1)
         
         if commit:
-            user.save()
+            user.save()  
+            if self.cleaned_data.get('groups'):
+                user.groups.clear()
+                user.groups.add(self.cleaned_data['groups'])
             
-            # Manejar grupos
-            if user and user.is_admin:
-                # Si es admin, permitir cambios de grupo
-                selected_group = self.cleaned_data.get('groups')
-                # Limpiar grupos existentes (excepto administrador)
-                user.groups.remove(*user.groups.exclude(name=settings.GRUPOS.ADMINISTRADOR))
-                
-                # Agregar el nuevo grupo si se seleccionó uno
-                if selected_group:
-                    user.groups.add(selected_group)
-                else:
-                    # Si no se seleccionó ningún grupo, asignar 'usuario' por defecto
-                    try:
-                        grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
-                        user.groups.add(grupo_usuario)
-                    except Group.DoesNotExist:
-                        pass
-            else:
-                # Si no es admin, mantener el grupo actual o asignar 'usuario' si no tiene ninguno
-                current_groups = user.groups.exclude(name=settings.GRUPOS.ADMINISTRADOR)
-                if not current_groups.exists():
-                    try:
-                        grupo_usuario = Group.objects.get(name=settings.GRUPOS.USUARIO)
-                        user.groups.add(grupo_usuario)
-                    except Group.DoesNotExist:
-                        pass
-        
         return user

@@ -68,12 +68,12 @@ def get_stats_administrador(request):
     
 
     cards = [
-        {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
-        {'title': 'Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'warning', 'color': 'text-warning'},
-        {'title': 'Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'error', 'color': 'text-error'},
-        {'title': 'Espacios Disponibles', 'value': espacios_disponibles, 'icon': 'success', 'color': 'text-success'},
-        {'title': 'Espacios No Disponibles', 'value': espacios_no_disponibles, 'icon': 'error', 'color': 'text-error'},
-        {'title': 'Usuarios Registrados', 'value': usuarios, 'icon': 'info', 'color': 'text-info'},
+        {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'reserva', 'color': 'text-success'},
+        {'title': 'Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},
+        {'title': 'Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'reserva', 'color': 'text-error'},
+        {'title': 'Espacios Disponibles', 'value': espacios_disponibles, 'icon': 'espacio', 'color': 'text-success'},
+        {'title': 'Espacios No Disponibles', 'value': espacios_no_disponibles, 'icon': 'espacio', 'color': 'text-error'},
+        {'title': 'Usuarios Registrados', 'value': usuarios, 'icon': 'usuario', 'color': 'text-info'},
     ]
 
     month_summary = {
@@ -87,6 +87,7 @@ def get_stats_administrador(request):
 
     reservas_stats = {
         'cards': cards,
+        'today': datetime.now(),
         'month_summary': month_summary,
         'proximas_reservas': proximas_reservas,
     }
@@ -114,9 +115,9 @@ def get_stats_usuario(request):
 
     proximas_reservas = Reserva.objects.filter(usuario=request.user, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
     cards = [
-        {'title': 'Mis Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
-        {'title': 'Mis Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'warning', 'color': 'text-warning'},
-        {'title': 'Mis Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'error', 'color': 'text-error'},
+        {'title': 'Mis Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'reserva', 'color': 'text-success'},
+        {'title': 'Mis Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},
+        {'title': 'Mis Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'reserva', 'color': 'text-error'},
     ]
 
     month_summary = {
@@ -158,9 +159,9 @@ def get_stats_moderador(request):
     proximas_reservas = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
 
     cards = [
-        {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'success', 'color': 'text-success'},
-        {'title': 'Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'warning', 'color': 'text-warning'},
-        {'title': 'Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'error', 'color': 'text-error'},
+        {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'reserva', 'color': 'text-success'},
+        {'title': 'Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},
+        {'title': 'Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'reserva', 'color': 'text-error'},
     ]
 
     month_summary = {

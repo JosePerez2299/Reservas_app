@@ -24,7 +24,11 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
 
         'timestamp': 'Fecha',
     }
-    actions = False
+
+    crud_urls = {
+        'view': 'log_detail',
+    }
+    actions = True
 
     def get_queryset(self):
 

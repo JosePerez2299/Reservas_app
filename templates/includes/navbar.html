@@ -51,7 +51,9 @@
       </ul>
   </div>
   
-  <div class="navbar-end">
+  <div class="navbar-end ">
+
+    <div class="flex items-center">
       <!-- Theme toggle -->
        <div class="mr-2 btn btn-ghost btn-circle">
         {% include "includes/switch_theme.html" %}
@@ -69,6 +71,9 @@
               </div>
           </div>
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+
+            <p class="p-1 text-sm text-center text-base-content/70" >{{ user.username|upper }}</p>
+            <hr>
               <li><a><i class="fas fa-user mr-2"></i>Perfil</a></li>
 
               <form method="post" action="{% url 'logout' %}">
@@ -77,5 +82,7 @@
               </form>
           </ul>
       </div>
+
+    </div>
   </div>
 </div>
