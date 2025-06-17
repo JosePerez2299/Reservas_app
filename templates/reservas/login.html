@@ -1,50 +1,69 @@
 {# templates/login.html #}
-{% extends "base_headers.html" %}
+{% extends "base.html" %}
 {% load form_style %}
 {% load static %}
 
+{% block navbar %}
+{# No mostrar la barra de navegación en la página de login #}
+{% endblock navbar %}
 
-{% block body %}
-<div class=" gradient-bg flex items-center justify-center min-h-screen bg-base-100">
+{% block content %}
+<div class="min-h-screen bg-base-200 flex flex-col justify-center items-center p-4">
 
-  <div class="w-full max-w-md px-6 py-8 glass-effect rounded-2xl shadow-xl">
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
-    
-    {% if messages %}
-      <div class="mb-4">
-        {% for message in messages %}
-          <div class="alert alert-error shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6"
-                 fill="none" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M18.364 5.636l-1.414 1.414M5.636 18.364l-1.414-1.414M6.343 
-                        6.343l1.414 1.414m10.607 10.607l1.414-1.414M17 
-                        12a5 5 0 11-10 0 5 5 0 0110 0z" />
-            </svg>
-            <span>{{ message }}</span>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  <div class="w-full max-w-md">
+    <!-- Logo -->
+    <div class="flex justify-center mb-8">
+      <img src="{% static 'src/images/logo.svg' %}" alt="Logo" class="h-12">
+    </div>
 
-    <form method="post" action="{% url 'login' %}" class="space-y-4">
-      {% csrf_token %}
-     {{form|mystyle}}
+    <div class="bg-base-100 rounded-2xl shadow-xl p-6 sm:p-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-center text-base-content mb-2">
+        Bienvenido de Vuelta
+      </h1>
+      <p class="text-center text-base-content/70 mb-6 sm:mb-8 text-sm sm:text-base">
+        Inicia sesión para continuar
+      </p>
 
-      <div class="flex items-center justify-between">
-        <label class="flex items-center">
-          <input type="checkbox" name="remember" class="checkbox checkbox-sm mr-2" />
-          <span class="text-gray-600 text-sm">Recordarme</span>
-        </label>
-        <a href="#" class="text-sm text-primary hover:underline">¿Olvidaste tu contraseña?</a>
-      </div>
+      {% if messages %}
+        <div class="mb-4 space-y-2">
+          {% for message in messages %}
+            <div role="alert" class="alert alert-error text-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-      <button type="submit" class="btn btn-primary w-full mt-4">
-        Entrar
-      </button>
-    </form>
+      <form method="post" action="{% url 'login' %}" class="space-y-4">
+        {% csrf_token %}
+        
+        <!-- Renderiza los campos del formulario con el filtro personalizado -->
+        {{ form|mystyle }}
 
-    
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center cursor-pointer">
+            <input type="checkbox" name="remember" class="checkbox checkbox-primary checkbox-xs sm:checkbox-sm mr-2" />
+            <span class="text-base-content/80">Recordarme</span>
+          </label>
+          <a href="#" class="font-medium text-primary hover:text-primary-focus transition-colors duration-300">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <div class="pt-4">
+          <button type="submit" class="btn btn-primary btn-block">
+            Entrar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="text-center mt-6 text-sm">
+      <p class="text-base-content/60">
+        ¿No tienes una cuenta? <a href="#" class="font-medium text-primary hover:underline">Contacta al administrador</a>.
+      </p>
+    </div>
   </div>
 </div>
-{% endblock %}
+{% endblock content %}

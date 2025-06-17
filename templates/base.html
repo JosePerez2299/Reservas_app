@@ -21,9 +21,11 @@
 
 <body class="bg-base-200">
 
+    {% block navbar %}
     {% include "includes/navbar.html" %}
+    {% endblock navbar %}
     
-    <div class = 'min-h-screen bg-primary/10'>
+    <div class = 'min-h-screen'>
 
     {% block content %}
     {% endblock content %}
