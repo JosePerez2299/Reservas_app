@@ -368,6 +368,23 @@ def get_message(logEntry):
             else:
                 result["description"] = obj_repr
             result["full_message"] = f"{actor_display} {estado_verb(nuevo_estado)} la reserva \"{obj_repr}\""
+
+        elif model == "espacio" and hasattr(logEntry, "changes_dict") and "disponible" in getattr(logEntry, "changes_dict", {}):
+            nuevo_disponible = logEntry.changes_dict["disponible"][1]
+            if nuevo_disponible:
+                result["label"] = "Espacio disponible"
+                result["icon_class"] = "fa-check"
+                result["bg_class"] = "success"
+                result["text_class"] = "success-content"
+                result["description"] = obj_repr
+            else:
+                result["label"] = "Espacio no disponible"
+                result["icon_class"] = "fa-times"
+                result["bg_class"] = "error"
+                result["text_class"] = "error-content"
+                result["description"] = obj_repr
+            result["full_message"] = f"{actor_display} {estado_verb(nuevo_disponible)} el espacio \"{obj_repr}\""
+            
         else:
             # UPDATE genérico
             if model == "reserva":

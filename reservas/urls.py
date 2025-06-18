@@ -36,8 +36,8 @@ urlpatterns = [
     path('reserva/edit/<int:pk>/', ReservaUpdateView.as_view(), name='reserva_edit'),
     path('reserva/delete/<int:pk>/', ReservaDeleteView.as_view(), name='reserva_delete'),
     path('calendario/', CalendarioReservasView.as_view(), name='calendario'),
-    path('api/reservas/', reservas_json, name='reservas_json'),
-    path('api/reservas-by-date/', reservas_by_date_json, name='reservas_by_date_json'),
+    path('api/reservas/', Reservas_json.as_view(), name='reservas_json'),
+    path('api/reservas/daily/', reservas_by_date_json, name='reservas_by_date_json'),
 ]
 
 # Manejador de error 404

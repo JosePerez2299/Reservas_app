@@ -21,60 +21,56 @@ from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime
+from django.views import View
 
-
-def reservas_json(request):
+class Reservas_json(LoginRequiredMixin, PermissionRequiredMixin,View):
     """
     Devuelve un conteo de reservas por día para un rango de fechas,
     opcionalmente filtrado por estado.
     Usado por el calendario para mostrar indicadores de actividad.
     """
-    start_str = request.GET.get('start')
-    end_str = request.GET.get('end')
-    status = request.GET.get('status')
+    permission_required = 'reservas.view_reserva'
+    
+    def get(self, request):
+        start_str = request.GET.get('start')
+        end_str = request.GET.get('end')
+        status = request.GET.get('status')
 
-    try:
-        start_date = datetime.fromisoformat(start_str.split('T')[0])
-        end_date = datetime.fromisoformat(end_str.split('T')[0])
-    except (ValueError, TypeError):
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
+        try:
+            if start_str and end_str:
+                start_date = datetime.fromisoformat(start_str.split('T')[0])
+                end_date = datetime.fromisoformat(end_str.split('T')[0])
+            else:
+                return JsonResponse({'error': 'Faltan fechas'}, status=400)
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'Formato de fecha invalido'}, status=400)
 
-    queryset = Reserva.objects.filter(
-        fecha_uso__gte=start_date,
-        fecha_uso__lte=end_date,
-    )
+        queryset = Reserva.objects.filter(
+            fecha_uso__gte=start_date,
+            fecha_uso__lte=end_date,
+        )
+        
 
-    possible_states = ['pendiente', 'aprobada', 'rechazada']
+        possible_states = ['pendiente', 'aprobada', 'rechazada']
 
-    if status and status in possible_states:
-        queryset = queryset.filter(estado=status)
-    else: 
-        queryset = queryset.filter(estado__in=possible_states)
+        if status and status in possible_states:
+            queryset = queryset.filter(estado=status)
+        else: 
+            queryset = queryset.filter(estado__in=possible_states)
 
-    daily_counts = queryset.values('fecha_uso').annotate(
-        pendiente_count=Count('id', filter=Q(estado='pendiente')),
-        aprobada_count=Count('id', filter=Q(estado='aprobada')),
-        rechazada_count=Count('id', filter=Q(estado='rechazada'))
-    ).order_by('fecha_uso')
-
-    data = [
-        {
-            'date': item['fecha_uso'].strftime('%Y-%m-%d'),
-            'pendiente_count': item['pendiente_count'],
-            'aprobada_count': item['aprobada_count'],
-            'rechazada_count': item['rechazada_count'],
-        }
-        for item in daily_counts
-        if item['pendiente_count'] > 0 or item['aprobada_count'] > 0 or item['rechazada_count'] > 0
-    ]
-    return JsonResponse(data, safe=False)
+        daily_counts = queryset.values('fecha_uso').annotate(
+            pendiente_count=Count('id', filter=Q(estado='pendiente')),
+            aprobada_count=Count('id', filter=Q(estado='aprobada')),
+            rechazada_count=Count('id', filter=Q(estado='rechazada'))
+        ).order_by('fecha_uso')
+        return JsonResponse(list(daily_counts), safe=False)
 
 
 def reservas_by_date_json(request):
     """
     Devuelve una lista detallada de reservas para una fecha específica.
     """
-    date_str = request.GET.get('date')
+    date_str = request.GET.get('fecha')
     status = request.GET.get('status')
 
     try:

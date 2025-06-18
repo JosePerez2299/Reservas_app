@@ -1,0 +1,479 @@
+<!-- reservas/templates/includes/calendario_reservas.html -->
+{% load static %}
+
+<div x-data="reservasCalendar({
+    reservasJsonUrl: '{% url 'reservas_json' %}',
+    reservasByDateUrl: '{% url 'reservas_by_date_json' %}',
+    editUrlTemplate: '{% url 'reserva_edit' 0 %}'.replace('0', 'RESERVATION_ID')
+})" class="mx-auto">
+    
+    <!-- Calendario y Lista de Reservas -->
+    <div class="flex flex-col lg:flex-row justify-between items-start gap-6">
+        <!-- Calendario -->
+        <div class="flex-1 bg-base-100 rounded-xl shadow-sm p-6">
+            <div>
+                <div class="rounded-lg shadow-sm">
+                    <div id="calendar-{{ calendar_id|default:'main' }}" class=""></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de Reservas del Día Seleccionado -->
+        <div class="flex-1">
+            <div class="bg-white rounded-lg shadow-sm p-4 sticky top-4 h-fit">
+                <!-- Filtros de Estado -->
+                <div class="flex justify-between items-center md:flex-row flex-col gap-3 mb-4">
+                    <div>
+                        <label class="text-xs font-medium text-base-content mb-1 block">Filtrar por estado:</label>
+                        <div class="join">
+                            <button 
+                                @click="setFilter('all')" 
+                                class="join-item btn btn-xs btn-ghost border border-base-300"
+                                :class="filterStatus === 'all' ? 'btn-primary' : 'btn-outline'"
+                            >
+                                Todas
+                            </button>
+                            <button 
+                                @click="setFilter('pendiente')" 
+                                class="join-item btn btn-xs btn-ghost border border-base-300"
+                                :class="filterStatus === 'pendiente' ? 'btn-primary' : 'btn-outline'"
+                            >
+                                Pendientes
+                            </button>
+                            <button 
+                                @click="setFilter('aprobada')" 
+                                class="join-item btn btn-xs btn-ghost border border-base-300"
+                                :class="filterStatus === 'aprobada' ? 'btn-primary' : 'btn-outline'"
+                            >
+                                Aprobadas
+                            </button>
+                            <button 
+                                @click="setFilter('rechazada')" 
+                                class="join-item btn btn-xs btn-ghost border border-base-300"
+                                :class="filterStatus === 'rechazada' ? 'btn-primary' : 'btn-outline'"
+                            >
+                                Rechazadas
+                            </button>
+                        </div>
+                    </div>
+                    <div class="join">
+                        <button 
+                            @click="calendar.prev()"
+                            class="join-item btn btn-xs btn-ghost border border-base-300"
+                        >
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button 
+                            @click="calendar.today()"
+                            class="join-item btn btn-xs btn-ghost border border-base-300"
+                        >
+                            Hoy
+                        </button>
+                        <button 
+                            @click="calendar.next()"
+                            class="join-item btn btn-xs btn-ghost border border-base-300"
+                        >
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="divider my-2"></div>
+
+                <h3 class="text-base font-semibold text-base-content mb-3">
+                    Reservas del día
+                    <span x-show="selectedDate" class="text-xs font-normal text-gray-500 ml-2" x-text="formatSelectedDate()"></span>
+                </h3>
+                
+                <!-- Estado de carga -->
+                <div x-show="loading" class="flex items-center justify-center py-6">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                </div>
+
+                <!-- Lista de reservas -->
+                <div x-show="!loading && selectedDate" class="space-y-2 max-h-80 overflow-y-auto">
+                    <template x-for="reserva in filteredReservas" :key="reserva.id">
+                        <div class="border border-gray-200 rounded-md p-3 hover:shadow-sm transition-shadow duration-200 bg-gray-50">
+                            <div class="flex items-start justify-between mb-2">
+                                <h4 class="font-medium text-sm text-base-content truncate" x-text="reserva.usuario_nombre"></h4>
+                                <span 
+                                    class="px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ml-2"
+                                    :class="{
+                                        'bg-orange-100 text-orange-800': reserva.estado === 'pendiente',
+                                        'bg-green-100 text-green-800': reserva.estado === 'aprobada',
+                                        'bg-red-100 text-red-800': reserva.estado === 'rechazada'
+                                    }"
+                                    x-text="reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)"
+                                ></span>
+                            </div>
+                            <div class="text-xs text-base-content space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-gray-400 w-3"></i>
+                                    <span x-text="reserva.espacio_nombre" class="truncate"></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-clock text-gray-400 w-3"></i>
+                                    <span x-text="`${reserva.hora_inicio} - ${reserva.hora_fin}`"></span>
+                                </div>
+                                <div x-show="reserva.motivo" class="flex items-start gap-2">
+                                    <i class="fas fa-comment text-gray-400 w-3 mt-0.5 flex-shrink-0"></i>
+                                    <span x-text="reserva.motivo" class="break-words text-gray-600 line-clamp-2"></span>
+                                </div>
+                            </div>
+                            {% if perms.reservas.change_reserva %}
+                            <div class="mt-2 flex gap-3">
+                                <button 
+                                    @click="editReserva(reserva)"
+                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                >
+                                    Editar
+                                </button>
+                                <button 
+                                    @click="viewDetails(reserva)"
+                                    class="text-xs text-base-content hover:text-gray-800 font-medium"
+                                >
+                                    Ver detalles
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </template>
+                    <div x-show="filteredReservas.length === 0" class="text-center py-6 text-base-content/60">
+                        <i class="fas fa-calendar-times text-2xl mb-2"></i>
+                        <p class="text-sm">No hay reservas para este día</p>
+                    </div>
+                </div>
+
+                <!-- Mensaje inicial -->
+                <div x-show="!selectedDate && !loading" class="text-center py-6 text-base-content/60">
+                    <i class="fas fa-calendar-day text-2xl mb-2"></i>
+                    <p class="text-sm">Selecciona una fecha en el calendario</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos personalizados para FullCalendar */
+    .fc .fc-toolbar-chunk .fc-button-primary {
+        background-color: #2563eb;
+        border-color: #2563eb;
+        color: white;
+    }
+
+    .fc .fc-toolbar-chunk .fc-button-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+    }
+
+    .fc .fc-daygrid-day.fc-day-today {
+        background-color: rgba(37, 99, 235, 0.1);
+    }
+
+    .fc .fc-daygrid-day:hover {
+        background-color: rgba(156, 163, 175, 0.1);
+        cursor: pointer;
+    }
+
+    .fc .fc-event {
+        border: none;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 1px 4px;
+        margin: 0.5px 0;
+        min-height: 16px;
+        line-height: 1.2;
+    }
+
+    .fc .fc-event-title {
+        font-weight: 600;
+        font-size: 0.7rem;
+    }
+
+    .fc .fc-daygrid-event {
+        margin-top: 1px;
+        margin-bottom: 1px;
+    }
+
+    .fc .fc-daygrid-day-events {
+        margin-bottom: 2px;
+    }
+
+    /* Utilidad para truncar texto a 2 líneas */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Responsive calendar */
+    @media (max-width: 1024px) {
+        .fc .fc-toolbar {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .fc .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    function reservasCalendar(config = {}) {
+        return {
+            // Configuración
+            reservasJsonUrl: config.reservasJsonUrl || '/api/reservas-json/',
+            reservasByDateUrl: config.reservasByDateUrl || '/api/reservas-by-date-json/',
+            editUrlTemplate: config.editUrlTemplate || '/reservas/edit/RESERVATION_ID/',
+            calendarId: config.calendarId || 'main',
+
+            // Estado
+            filterStatus: 'all',
+            selectedDate: null,
+            reservas: [],
+            loading: false,
+            calendar: null,
+
+            // Inicialización
+            init() {
+                this.$nextTick(() => {
+                    this.initCalendar();
+                });
+
+                // Escuchar eventos de fecha seleccionada
+                window.addEventListener('fecha-seleccionada', (event) => {
+                    this.selectedDate = event.detail;
+                    this.loadReservasForDate(this.selectedDate);
+                });
+            },
+
+            // Propiedades computadas
+            get filteredReservas() {
+                if (this.filterStatus === 'all') {
+                    return this.reservas;
+                }
+                return this.reservas.filter(r => r.estado === this.filterStatus);
+            },
+
+            // Métodos
+            initCalendar() {
+                const calendarEl = document.getElementById(`calendar-${this.calendarId}`);
+                if (!calendarEl) {
+                    console.error(`Calendar element with id 'calendar-${this.calendarId}' not found`);
+                    return;
+                }
+
+                this.calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: 'es',
+                    firstDay: 1, // Lunes como primer día
+                    validRange: {
+                        start: new Date() // Solo fechas futuras
+                    },
+                    headerToolbar: {
+                        left: '',
+                        center: 'title',
+                        right: ''
+                    },
+                    buttonText: {
+                        today: 'Hoy',
+                        month: 'Mes',
+                        week: 'Semana',
+                        day: 'Día'
+                    },
+                    events: this.fetchEvents.bind(this),
+                    dateClick: this.handleDateClick.bind(this),
+                    eventClick: this.handleEventClick.bind(this),
+                    height: 'auto',
+                    aspectRatio: 1.8
+                });
+
+                this.calendar.render();
+                window.calendarInstance = this.calendar;
+            },
+
+            async fetchEvents(fetchInfo, successCallback, failureCallback) {
+                try {
+                    const start = fetchInfo.startStr;
+                    const end = fetchInfo.endStr;
+                    const status = this.filterStatus !== 'all' ? this.filterStatus : '';
+                    
+                    const url = `${this.reservasJsonUrl}?start=${start}&end=${end}${status ? `&status=${status}` : ''}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    const events = this.mapEvents(data);
+                    successCallback(events);
+                } catch (error) {
+                    console.error('Error fetching events:', error);
+                    failureCallback(error);
+                }
+            },
+
+            mapEvents(events) {
+                return events.map(event => {
+                    // Calcular total de reservas
+                    const total = (event.pendiente_count || 0) + (event.aprobada_count || 0) + (event.rechazada_count || 0);
+                    
+                    if (total === 0) return null;
+                    
+                    // Determinar el estado predominante
+                    let backgroundColor, borderColor, estado;
+                    if (event.aprobada_count > event.pendiente_count && event.aprobada_count > event.rechazada_count) {
+                        backgroundColor = '#10b981';
+                        borderColor = '#10b981';
+                        estado = 'aprobada';
+                    } else if (event.pendiente_count > event.rechazada_count) {
+                        backgroundColor = '#f59e0b';
+                        borderColor = '#f59e0b';
+                        estado = 'pendiente';
+                    } else {
+                        backgroundColor = '#ef4444';
+                        borderColor = '#ef4444';
+                        estado = 'rechazada';
+                    }
+                    
+                    // Crear título resumido
+                    let title = `${total} reserva${total > 1 ? 's' : ''}`;
+                    
+                    // Agregar detalles si hay múltiples estados
+                    const estados = [];
+                    if (event.aprobada_count > 0) estados.push(`${event.aprobada_count}A`);
+                    if (event.pendiente_count > 0) estados.push(`${event.pendiente_count}P`);
+                    if (event.rechazada_count > 0) estados.push(`${event.rechazada_count}R`);
+                    
+                    if (estados.length > 1) {
+                        title += ` (${estados.join('|')})`;
+                    }
+                    
+                    return {
+                        title: title,
+                        start: event.fecha_uso,
+                        allDay: true,
+                        backgroundColor: backgroundColor,
+                        borderColor: borderColor,
+                        textColor: 'white',
+                        extendedProps: { 
+                            estado: estado,
+                            aprobadas: event.aprobada_count || 0,
+                            pendientes: event.pendiente_count || 0,
+                            rechazadas: event.rechazada_count || 0,
+                            total: total
+                        }
+                    };
+                }).filter(event => event !== null);
+            },
+
+            handleDateClick(info) {
+                const fecha = info.dateStr;
+                this.handleFechaSeleccionada(fecha);
+            },
+
+            handleEventClick(info) {
+                info.jsEvent.preventDefault();
+                const start = info.event.start;
+                const dateStr = start.toISOString().slice(0, 10);
+                this.handleFechaSeleccionada(dateStr);
+            },
+
+            handleFechaSeleccionada(fecha) {
+                this.selectedDate = fecha.trim();
+                this.loadReservasForDate(this.selectedDate);
+                
+                // Disparar evento personalizado para compatibilidad
+                window.dispatchEvent(new CustomEvent('fecha-seleccionada', {
+                    detail: fecha.trim()
+                }));
+            },
+
+            async loadReservasForDate(fecha) {
+                if (!fecha) return;
+                
+                this.loading = true;
+                try {
+                    const status = this.filterStatus !== 'all' ? this.filterStatus : 'all';
+                    const url = `${this.reservasByDateUrl}?fecha=${fecha}&status=${status}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    this.reservas = await response.json();
+                } catch (error) {
+                    console.error('Error loading reservas:', error);
+                    this.reservas = [];
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            setFilter(status) {
+                this.filterStatus = status;
+                if (this.calendar) {
+                    this.calendar.refetchEvents();
+                }
+                if (this.selectedDate) {
+                    this.loadReservasForDate(this.selectedDate);
+                }
+            },
+
+            navigateCalendar(action) {
+                if (!this.calendar) return;
+                
+                switch (action) {
+                    case 'prev':
+                        this.calendar.prev();
+                        break;
+                    case 'next':
+                        this.calendar.next();
+                        break;
+                    case 'today':
+                        this.calendar.today();
+                        break;
+                }
+            },
+
+            formatSelectedDate() {
+                if (!this.selectedDate) return '';
+                const date = new Date(this.selectedDate + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            },
+
+            // Acciones para las reservas
+            editReserva(reserva) {
+                if (reserva.edit_url) {
+                    window.location.href = reserva.edit_url;
+                } else if (this.editUrlTemplate) {
+                    const url = this.editUrlTemplate.replace('RESERVATION_ID', reserva.id);
+                    window.location.href = url;
+                } else {
+                    console.log('Editar reserva:', reserva);
+                }
+            },
+
+            viewDetails(reserva) {
+                // Implementar vista de detalles
+                console.log('Ver detalles de reserva:', reserva);
+                // Aquí puedes abrir un modal con más detalles o disparar un evento personalizado
+                window.dispatchEvent(new CustomEvent('reserva-details', {
+                    detail: reserva
+                }));
+            }
+        }
+    }
+</script>
