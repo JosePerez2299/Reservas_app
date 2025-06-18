@@ -1,0 +1,925 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen" x-data="reservasCalendar()">
+    <div class="container mx-auto">
+        <!-- Header Section -->
+        <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div class="flex-1">
+                   <h1 class="text-3xl font-bold text-base-content">Calendario de Reservas</h1>
+                </div>
+
+                {% if crud_urls.create %}
+                <div class="flex items-center gap-3">
+                    <button class="btn btn-primary btn-sm gap-2 open-modal-btn" 
+                            data-url="{% url crud_urls.create %}"
+                            data-success-callback="reloadRow">
+                        <i class="fas fa-plus text-xs"></i>
+                        Crear {{model.label|slice:":-1"|lower}}
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Columna Izquierda: Lista de Reservas -->
+            <div class="lg:w-1/3 xl:w-1/4">
+                <div class="bg-base-100 rounded-2xl shadow-sm sticky top-24">
+                    <div class="p-6 border-b border-base-300">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h2 class="text-lg font-bold" x-text="selectedDate ? 'Reservas del ' + formatDate(selectedDate) : 'Reservas del día'"></h2>
+                                <p class="text-sm text-base-content/70">
+                                    <span x-text="dailyReservas.length"></span> reservas encontradas
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3" x-show="selectedDate" x-transition>
+                                <button class="btn btn-primary btn-sm gap-2">
+                                    <i class="fas fa-plus text-xs"></i>
+                                    Añadir 
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto" style="max-height: calc(85vh - 200px);">
+                        <div class="p-6 space-y-4">
+                            <template x-if="loadingDaily">
+                                <div class="text-center text-base-content/60 py-8">
+                                    <span class="loading loading-spinner loading-lg"></span>
+                                </div>
+                            </template>
+                            <template x-if="!loadingDaily && !selectedDate">
+                                <div class="text-center text-base-content/60 py-8">
+                                    <i class="fas fa-hand-pointer fa-2x mb-3"></i>
+                                    <p>Selecciona un día en el calendario para ver sus reservas.</p>
+                                </div>
+                            </template>
+                            <template x-if="!loadingDaily && selectedDate && dailyReservas.length === 0">
+                                <div class="text-center text-base-content/60 py-8">
+                                    <i class="fas fa-calendar-times fa-2x mb-3"></i>
+                                    <p>No hay reservas para este día.</p>
+                                </div>
+                            </template>
+                            <template x-for="reserva in paginatedReservas" :key="reserva.id">
+                                <div class="card card-compact bg-base-200/50 shadow-sm transition-transform duration-200 hover:scale-[1.02]">
+                                    <div class="card-body">
+                                        <div @click="openReservaModal(reserva)" class="cursor-pointer">
+                                            <h3 class="card-title text-base" x-text="reserva.espacio_nombre"></h3>
+                                            <p class="text-xs text-base-content/80 flex items-center gap-2">
+                                                <i class="fas fa-user w-3"></i>
+                                                <span x-text="reserva.usuario_nombre"></span>
+                                            </p>
+                                            <p class="text-xs text-base-content/80 flex items-center gap-2">
+                                                <i class="fas fa-calendar-alt w-3"></i>
+                                                <span x-text="formatCardDate(reserva.fecha_uso)"></span>
+                                            </p>
+                                            <p class="text-xs text-base-content/80 flex items-center gap-2">
+                                                <i class="fas fa-clock w-3"></i>
+                                                <span x-text="`${reserva.hora_inicio} - ${reserva.hora_fin}`"></span>
+                                            </p>
+                                        </div>
+                                        <div class="card-actions justify-between items-center mt-4">
+                                            <span class="badge badge-sm"
+                                                :class="{
+                                                    'badge-warning': reserva.estado === 'pendiente',
+                                                    'badge-success': reserva.estado === 'aprobada',
+                                                    'badge-error': reserva.estado === 'rechazada'
+                                                }"
+                                                x-text="getEstadoText(reserva.estado)">
+                                            </span>
+
+                                            <div class="dropdown dropdown-end">
+                                                <label tabindex="0" class="btn btn-ghost btn-circle btn-xs" @click.stop>
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </label>
+                                                <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-300 rounded-box w-36 text-sm">
+                                                    <template x-if="canModerate && reserva.estado === 'pendiente'">
+                                                        <>
+                                                            <li><a @click.stop="handleCardAction('approve', reserva)"><i class="fas fa-check w-4"></i>Aprobar</a></li>
+                                                            <li><a @click.stop="handleCardAction('reject', reserva)"><i class="fas fa-times w-4"></i>Rechazar</a></li>
+                                                        </>
+                                                    </template>
+                                                    <template x-if="canEdit(reserva)">
+                                                        <li><a class="open-modal-btn" :data-url="reserva.edit_url" data-success-callback="reloadPage"><i class="fas fa-edit w-4"></i>Editar</a></li>
+                                                    </template>
+                                                    <template x-if="canDelete(reserva)">
+                                                        <li><a @click.stop="handleCardAction('delete', reserva)"><i class="fas fa-trash w-4"></i>Eliminar</a></li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <!-- Controles de Paginación -->
+                            <div x-show="totalPages > 1" class="p-4 border-t border-base-300">
+                                <div class="flex justify-between items-center">
+                                    <button @click="prevPage" :disabled="currentPage === 1" class="btn btn-sm btn-ghost">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <span class="text-sm font-medium">
+                                        Página <span x-text="currentPage"></span> de <span x-text="totalPages"></span>
+                                    </span>
+                                    <button @click="nextPage" :disabled="currentPage === totalPages" class="btn btn-sm btn-ghost">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Controles y Calendario -->
+            <div class="lg:w-2/3 xl:w-3/4">
+                <!-- Controls Section -->
+                <div class="bg-base-100 rounded-2xl shadow-sm p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                        <!-- Left Side -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div class="text-sm font-medium bg-base-200/50 px-4 py-2 rounded-lg">
+                                {% with start=page_obj.start_index end=page_obj.end_index total=paginator.count %}
+                                    <span class="text-primary font-semibold">{{ total }}</span> {{model.label}} en total | Mostrando {{ start }}-{{ end }}
+                                {% endwith %}
+                            </div>
+                            
+                      
+                        </div>
+
+                        <!-- Left Side -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                            <div class="join">
+                                <button @click="setFilter('all')" class="join-item btn btn-sm" :class="filterStatus === 'all' ? 'btn-primary' : 'btn-ghost border border-base-300'">Todas</button>
+                                <button @click="setFilter('pendiente')" class="join-item btn btn-sm" :class="filterStatus === 'pendiente' ? 'btn-primary' : 'btn-ghost border border-base-300'">Pendientes</button>
+                                <button @click="setFilter('aprobada')" class="join-item btn btn-sm" :class="filterStatus === 'aprobada' ? 'btn-primary' : 'btn-ghost border border-base-300'">Aprobadas</button>
+                                <button @click="setFilter('rechazada')" class="join-item btn btn-sm" :class="filterStatus === 'rechazada' ? 'btn-primary' : 'btn-ghost border border-base-300'">Rechazadas</button>
+                            </div>
+                        </div>
+
+                        <!-- Right Side - Calendar View Controls -->
+                        <div class="flex items-center gap-4">
+                            <div class="join">
+                                <button @click="calendar.prev()" class="join-item btn btn-sm btn-ghost border border-base-300">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button @click="calendar.today()" class="join-item btn btn-sm btn-ghost border border-base-300">
+                                    Hoy
+                                </button>
+                                <button @click="calendar.next()" class="join-item btn btn-sm btn-ghost border border-base-300">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leyenda -->
+                    <div class="mt-4 pt-4 border-t border-base-300 flex items-center justify-end gap-x-4 text-xs text-base-content/80">
+                        <span class="font-semibold text-base-content">Leyenda:</span>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-warning p-2"></span>
+                            <span>Pendientes</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-success p-2"></span>
+                            <span>Aprobadas</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-error p-2"></span>
+                            <span>Rechazadas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Container -->
+                <div class="bg-base-100 rounded-2xl shadow-sm p-6">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para detalles de reserva -->
+        <div x-show="showEventModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 overflow-y-auto"
+             @click.self="showEventModal = false"
+             style="display: none;">
+            
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"></div>
+                
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" x-text="selectedEvent?.title || 'Detalles de la Reserva'"></h3>
+                                
+                                <template x-if="selectedEvent">
+                                    <div class="space-y-3">
+                                        <div>
+                                            <span class="font-medium text-gray-700">Espacio:</span>
+                                            <span x-text="selectedEvent.extendedProps.espacio_nombre"></span>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="font-medium text-gray-700">Solicitante:</span>
+                                            <span x-text="selectedEvent.extendedProps.usuario_nombre"></span>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="font-medium text-gray-700">Fecha y Hora:</span>
+                                            <span x-text="formatEventDateTime(selectedEvent)"></span>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="font-medium text-gray-700">Estado:</span>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full ml-2"
+                                                  :class="{
+                                                      'bg-green-100 text-green-800': selectedEvent.extendedProps.estado === 'aprobada',
+                                                      'bg-yellow-100 text-yellow-800': selectedEvent.extendedProps.estado === 'pendiente',
+                                                      'bg-red-100 text-red-800': selectedEvent.extendedProps.estado === 'rechazada'
+                                                  }"
+                                                  x-text="getEstadoText(selectedEvent.extendedProps.estado)">
+                                            </span>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="font-medium text-gray-700">Motivo:</span>
+                                            <p class="text-gray-600 mt-1" x-text="selectedEvent.extendedProps.motivo"></p>
+                                        </div>
+                                        
+                                        <div x-show="selectedEvent.extendedProps.motivo_admin">
+                                            <span class="font-medium text-gray-700">Observaciones:</span>
+                                            <p class="text-gray-600 mt-1" x-text="selectedEvent.extendedProps.motivo_admin"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-3">
+                        <!-- Botones de acción -->
+                        <template x-if="selectedEvent && selectedEvent.extendedProps.estado === 'pendiente' && canModerate">
+                            <div class="flex gap-2">
+                                <button @click="handleEventAction('approve', selectedEvent)"
+                                        class="btn btn-success btn-sm">
+                                    <i class="fas fa-check mr-1"></i>
+                                    Aprobar
+                                </button>
+                                <button @click="handleEventAction('reject', selectedEvent)"
+                                        class="btn btn-error btn-sm">
+                                    <i class="fas fa-times mr-1"></i>
+                                    Rechazar
+                                </button>
+                            </div>
+                        </template>
+                        
+                        <template x-if="selectedEvent && canEdit(selectedEvent.extendedProps)">
+                            <button @click="handleEventAction('edit', selectedEvent)"
+                                    class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit mr-1"></i>
+                                Editar
+                            </button>
+                        </template>
+                        
+                        <template x-if="selectedEvent && canDelete(selectedEvent.extendedProps)">
+                            <button @click="handleEventAction('delete', selectedEvent)"
+                                    class="btn btn-error btn-sm">
+                                <i class="fas fa-trash mr-1"></i>
+                                Eliminar
+                            </button>
+                        </template>
+                        
+                        <button @click="showEventModal = false"
+                                class="btn btn-ghost btn-sm">
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Estilo para los puntos de evento */
+        .fc-daygrid-day-frame .fc-event-dot {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        .fc-daygrid-day-frame .fc-event-dot::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--fallback-p, oklch(var(--p)));
+        }
+        .fc-daygrid-event {
+            background-color: transparent !important;
+            border: none !important;
+        }
+        .fc-event-title {
+             display: none; /* Ocultar el título/hora del evento */
+        }
+
+        .event-count-tag .fc-event-main {
+            background: transparent !important;
+            border: none !important;
+        }
+        
+        .fc-event-count-tag-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-wrap: wrap;
+        }
+
+        /* FullCalendar custom styling */
+        .fc {
+            font-family: inherit;
+        }
+        
+        .fc-theme-standard .fc-scrollgrid {
+            border: 1px solid #e5e7eb;
+        }
+        
+        .fc-theme-standard td, .fc-theme-standard th {
+            border-color: #e5e7eb;
+        }
+        
+        .fc-button-primary {
+            background-color: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+        }
+        
+        .fc-button-primary:hover {
+            background-color: #2563eb !important;
+            border-color: #2563eb !important;
+        }
+        
+        .fc-event-pendiente {
+            background-color: #fbbf24 !important;
+            border-color: #f59e0b !important;
+            color: #92400e !important;
+        }
+        
+        .fc-event-aprobada {
+            background-color: #34d399 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+        }
+        
+        .fc-event-rechazada {
+            background-color: #f87171 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        
+        .fc-event {
+            cursor: pointer;
+        }
+        
+        .fc-daygrid-day-number {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .fc-day-today {
+            background-color: transparent !important; /* Quitamos el fondo de la celda de hoy */
+        }
+        
+        .fc-day-today .fc-daygrid-day-number {
+            background: oklch(var(--n) / .15); /* Usamos un color neutral del tema con opacidad */
+            color: oklch(var(--nc));
+            border-radius: 9999px;
+            font-weight: 600;
+            padding: 2px 8px;
+            min-width: 28px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .fc-day-past {
+            background-color: #f9fafb;
+        }
+        
+        .fc-day-past .fc-daygrid-day-number {
+            color: #9ca3af;
+        }
+
+        /* Estilo para el día seleccionado */
+        .day-selected .fc-daygrid-day-frame {
+            background-color: oklch(var(--b2)) !important; /* Usamos un color de fondo del tema */
+            border-radius: 8px;
+        }
+
+        /* Estilo para el botón "more" */
+        .fc-daygrid-more-link {
+            background-color: #6b7280 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 2px 6px !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            margin: 1px 2px !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+        }
+
+        .fc-daygrid-more-link:hover {
+            background-color: #4b5563 !important;
+            color: white !important;
+        }
+
+        /* Popover de eventos adicionales */
+        .fc-popover {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .fc-popover-header {
+            background-color: #f9fafb !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            padding: 8px 12px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+        }
+
+        .fc-popover-body {
+            padding: 8px !important;
+        }
+
+        /* Altura fija para las celdas del calendario */
+        .fc-daygrid-day-frame {
+            min-height: 100px !important; /* Altura mínima consistente */
+        }
+
+        /* Limitar altura de contenido de eventos */
+        .fc-daygrid-day-events {
+            margin-bottom: 0 !important;
+        }
+
+        /* Estilos para eventos truncados */
+        .fc-event-title-truncated {
+            font-size: 11px;
+            line-height: 1.2;
+        }
+    </style>
+
+    <!-- FullCalendar Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/index.global.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/locales/es.global.min.js"></script>
+
+    <script>
+        function reservasCalendar() {
+            return {
+                calendar: null,
+                showEventModal: false,
+                selectedEvent: null,
+                
+                // Paginación
+                currentPage: 1,
+                itemsPerPage: 8,
+
+                // Filtro
+                filterStatus: 'all', // 'all', 'pendiente', 'aprobada', 'rechazada'
+
+                // Estado de la UI
+                dailyReservas: [],
+                selectedDate: null,
+                loadingDaily: false,
+
+                // User permissions (esto vendría del backend)
+                canModerate: {{ request.user.is_moderador|yesno:"true,false" }},
+                userId: {{ request.user.id }},
+
+                // Configuración para truncar títulos
+                maxTitleLength: 15, // Máximo número de caracteres para el título
+
+                init() {
+                    this.$nextTick(() => {
+                        this.initCalendar();
+                    });
+                },
+
+                initCalendar() {
+                    const calendarEl = document.getElementById('calendar');
+                    
+                    this.calendar = new FullCalendar.Calendar(calendarEl, {
+                        locale: 'es',
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: '', // Controles de navegación personalizados
+                            center: 'title',
+                            right: '' // Controlado por Alpine.js
+                        },
+                        height: 'auto',
+                        selectable: true,
+                        selectMirror: true,
+                        
+                        // Configuración para limitar eventos mostrados
+                        dayMaxEvents: 3, // Máximo 3 eventos visibles por día
+                        moreLinkClick: 'popover', // Mostrar popover al hacer clic en "more"
+                        moreLinkText: function(num) {
+                            return `+${num} más`;
+                        },
+                        
+                        weekNumbers: false,
+                        navLinks: false,
+                        
+                        // Configuración de horarios
+                        slotMinTime: '07:00:00',
+                        slotMaxTime: '22:00:00',
+                        slotDuration: '01:00:00',
+                        
+                        // Eventos
+                        events: (fetchInfo, successCallback, failureCallback) => {
+                            this.fetchReservationCounts(fetchInfo, successCallback, failureCallback);
+                        },
+
+                        // Event handlers
+                        dateClick: (info) => {
+                            this.handleDateClick(info.date);
+                        },
+                        
+                        eventClick: (info) => {
+                           this.handleDateClick(info.event.start);
+                        },
+
+                        // Deshabilitar select para usar dateClick
+                        selectable: false,
+
+                        eventClassNames: (arg) => {
+                            if (arg.event.extendedProps.isCount) {
+                                return ['event-count-tag'];
+                            }
+                            return [`fc-event-${arg.event.extendedProps.estado}`];
+                        },
+                        
+                        // Personalización de contenido del evento
+                        eventContent: (arg) => {
+                            if (arg.event.extendedProps && arg.event.extendedProps.isCount) {
+                                return {
+                                    html: `<div class="fc-event-count-tag-container">
+                                        ${arg.event.extendedProps.pendiente_count > 0 ? `<span class="badge badge-warning mr-1">${arg.event.extendedProps.pendiente_count}</span>` : ''}
+                                        ${arg.event.extendedProps.aprobada_count > 0 ? `<span class="badge badge-success mr-1">${arg.event.extendedProps.aprobada_count}</span>` : ''}
+                                        ${arg.event.extendedProps.rechazada_count > 0 ? `<span class="badge badge-error">${arg.event.extendedProps.rechazada_count}</span>` : ''}
+                                    </div>`
+                                };
+                            }
+
+                            const estado = arg.event.extendedProps.estado;
+                            const iconClass = {
+                                'pendiente': 'fas fa-clock',
+                                'aprobada': 'fas fa-check-circle',
+                                'rechazada': 'fas fa-times-circle'
+                            }[estado] || 'fas fa-calendar';
+                            
+                            // Truncar el título si es muy largo
+                            const originalTitle = arg.event.title;
+                            const truncatedTitle = this.truncateTitle(originalTitle);
+                            
+                            return {
+                                html: `
+                                    <div class="fc-event-main-frame">
+                                        <div class="fc-event-title-container">
+                                            <div class="fc-event-title fc-sticky" title="${originalTitle}">
+                                                <i class="${iconClass}" style="margin-right: 4px; font-size: 10px;"></i>
+                                                <span class="fc-event-title-truncated">${truncatedTitle}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `
+                            };
+                        },
+
+                        // Personalizar el texto del popover
+                        eventDidMount: function(info) {
+                            // Agregar tooltip con el título completo
+                            info.el.setAttribute('title', info.event.extendedProps.espacio_nombre);
+                        },
+
+                        datesSet: (dateInfo) => {
+                            this.reapplyHighlight();
+                        }
+                    });
+                    
+                    this.calendar.render();
+                },
+
+                fetchReservationCounts(fetchInfo, successCallback, failureCallback) {
+                    const start = fetchInfo.startStr;
+                    const end = fetchInfo.endStr;
+                    const url = `{% url 'reservas_json' %}?start=${start}&end=${end}&status=${this.filterStatus}`;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            const events = data.map(item => ({
+                                title: `P: ${item.pendiente_count}, A: ${item.aprobada_count}, R: ${item.rechazada_count}`,
+                                start: item.date,
+                                allDay: true,
+                                extendedProps: {
+                                    isCount: true,
+                                    pendiente_count: item.pendiente_count,
+                                    aprobada_count: item.aprobada_count,
+                                    rechazada_count: item.rechazada_count
+                                }
+                            }));
+                            successCallback(events);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching reservation counts:', error);
+                            failureCallback(error);
+                        })
+                        .finally(() => {
+                            this.loadingDaily = false;
+                        });
+                },
+
+                handleDateClick(date) {
+                    const dateStr = date.toISOString().split('T')[0];
+
+                    // Quitar el estilo del día previamente seleccionado
+                    if (this.selectedDate) {
+                        const prevCell = this.calendar.el.querySelector(`.fc-day[data-date='${this.selectedDate}']`);
+                        if (prevCell) {
+                            prevCell.classList.remove('day-selected');
+                        }
+                    }
+
+                    this.selectedDate = dateStr;
+
+                    // Aplicar estilo al nuevo día seleccionado
+                    const newCell = this.calendar.el.querySelector(`.fc-day[data-date='${this.selectedDate}']`);
+                    if (newCell) {
+                        newCell.classList.add('day-selected');
+                    }
+                    
+                    this.currentPage = 1;
+                    this.dailyReservas = [];
+                    this.loadingDaily = true;
+                    
+                    const url = `{% url 'reservas_by_date_json' %}?date=${dateStr}&status=${this.filterStatus}`;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.dailyReservas = data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching daily reservations:', error);
+                            this.dailyReservas = [];
+                        })
+                        .finally(() => {
+                            this.loadingDaily = false;
+                        });
+                },
+
+                setFilter(status) {
+                    this.filterStatus = status;
+                    this.calendar.refetchEvents();
+                    if (this.selectedDate) {
+                        this.handleDateClick(new Date(this.selectedDate));
+                    }
+                },
+                
+                get sortedReservas() {
+                    return [...this.dailyReservas].sort((a, b) => new Date(a.fecha_uso + 'T' + a.hora_inicio) - new Date(b.fecha_uso + 'T' + b.hora_inicio));
+                },
+
+                get totalPages() {
+                    return Math.ceil(this.dailyReservas.length / this.itemsPerPage);
+                },
+
+                get paginatedReservas() {
+                    const start = (this.currentPage - 1) * this.itemsPerPage;
+                    const end = start + this.itemsPerPage;
+                    return this.sortedReservas.slice(start, end);
+                },
+
+                nextPage() {
+                    if (this.currentPage < this.totalPages) {
+                        this.currentPage++;
+                    }
+                },
+
+                prevPage() {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                    }
+                },
+
+                formatDate(dateString) {
+                    const date = new Date(dateString + 'T00:00:00');
+                    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                },
+
+                formatCardDate(dateString) {
+                    const date = new Date(dateString + 'T00:00:00'); // Asegurar que se interprete como fecha local
+                    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+                    return date.toLocaleDateString('es-ES', options);
+                },
+
+                highlightEvent(reservaId) {
+                    const event = this.calendar.getEventById(reservaId.toString());
+                    if (event) {
+                        this.showEventDetails(event);
+                    }
+                },
+
+                // Función para truncar títulos
+                truncateTitle(title) {
+                    if (title.length <= this.maxTitleLength) {
+                        return title;
+                    }
+                    return title.substring(0, this.maxTitleLength - 3) + '...';
+                },
+
+                showEventDetails(event) {
+                    this.selectedEvent = event;
+                    this.showEventModal = true;
+                },
+
+                handleCardAction(action, reserva) {
+                    const eventObject = {
+                        title: reserva.espacio_nombre,
+                        start: `${reserva.fecha_uso}T${reserva.hora_inicio}`,
+                        end: `${reserva.fecha_uso}T${reserva.hora_fin}`,
+                        extendedProps: reserva
+                    };
+                    this.handleEventAction(action, eventObject);
+                },
+
+                handleEventAction(action, event) {
+                    const reserva = event.extendedProps;
+                    
+                    switch(action) {
+                        case 'edit':
+                            const editButton = document.querySelector(`.open-modal-btn[data-url='${reserva.edit_url}']`);
+                            if(editButton) {
+                                editButton.click();
+                            }
+                            break;
+                            
+                        case 'approve':
+                            this.updateReservaStatus(reserva.id, 'aprobada');
+                            break;
+                            
+                        case 'reject':
+                            this.updateReservaStatus(reserva.id, 'rechazada');
+                            break;
+                            
+                        case 'delete':
+                            Swal.fire({
+                                title: '¿Estás seguro?',
+                                text: "¡No podrás revertir esto!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Sí, ¡elimínalo!',
+                                cancelButtonText: 'Cancelar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    this.deleteReserva(reserva.id);
+                                }
+                            });
+                            break;
+                    }
+                    
+                    if (this.showEventModal) {
+                        this.showEventModal = false;
+                    }
+                },
+
+                updateReservaStatus(reservaId, nuevoEstado) {
+                    const url = `/reserva/edit/${reservaId}/`;
+                    const data = { 'estado': nuevoEstado, 'csrfmiddlewaretoken': '{{ csrf_token }}' };
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: new URLSearchParams(data)
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('¡Actualizado!', `La reserva ha sido ${nuevoEstado}.`, 'success');
+                            this.handleDateClick(new Date(this.selectedDate)); // Recargar lista
+                            this.calendar.refetchEvents(); // Recargar calendario
+                        } else {
+                            throw new Error('Falló la actualización del estado.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'No se pudo actualizar la reserva.', 'error');
+                    });
+                },
+
+                deleteReserva(reservaId) {
+                    const url = `/reserva/delete/${reservaId}/`;
+                    
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            Swal.fire('¡Eliminado!', 'La reserva ha sido eliminada.', 'success');
+                             this.handleDateClick(new Date(this.selectedDate));
+                             this.calendar.refetchEvents();
+                        } else {
+                            throw new Error('Falló la eliminación.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire('Error', 'No se pudo eliminar la reserva.', 'error');
+                    });
+                },
+
+                canEdit(reserva) {
+                    return reserva.usuario_id === this.userId && reserva.estado === 'pendiente';
+                },
+
+                canDelete(reserva) {
+                    return reserva.usuario_id === this.userId && (reserva.estado === 'pendiente' || {{ request.user.is_admin|yesno:"true,false" }});
+                },
+
+                getEstadoText(estado) {
+                    const estados = {
+                        'pendiente': 'Pendiente',
+                        'aprobada': 'Aprobada',
+                        'rechazada': 'Rechazada'
+                    };
+                    return estados[estado] || estado;
+                },
+
+                formatEventDateTime(event) {
+                    const start = new Date(event.start);
+                    const end = new Date(event.end);
+                    
+                    const dateOptions = { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    };
+                    
+                    const timeOptions = { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    };
+                    
+                    const dateStr = start.toLocaleDateString('es-ES', dateOptions);
+                    const startTime = start.toLocaleTimeString('es-ES', timeOptions);
+                    const endTime = end.toLocaleTimeString('es-ES', timeOptions);
+                    
+                    return `${dateStr}, ${startTime} - ${endTime}`;
+                },
+
+                // --- MANEJO DEL MODAL ---
+                openReservaModal(reserva) {
+                    // Adaptamos la estructura de la reserva al formato que espera el modal (similar a FullCalendar event)
+                    this.selectedEvent = {
+                        title: reserva.espacio_nombre,
+                        start: `${reserva.fecha_uso}T${reserva.hora_inicio}`,
+                        end: `${reserva.fecha_uso}T${reserva.hora_fin}`,
+                        extendedProps: reserva
+                    };
+                    this.showEventModal = true;
+                },
+
+                reapplyHighlight() {
+                    this.$nextTick(() => {
+                        if (this.selectedDate) {
+                            const cell = this.calendar.el.querySelector(`.fc-day[data-date='${this.selectedDate}']`);
+                            if (cell) {
+                                cell.classList.add('day-selected');
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</div>
+{% endblock %}

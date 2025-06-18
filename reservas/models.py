@@ -235,6 +235,7 @@ class Reserva(models.Model):
         ordering = ['fecha_uso', 'hora_inicio']
         indexes = [
             models.Index(fields=['espacio', 'fecha_uso']),
+            models.Index(fields=['fecha_uso']),
         ]
         constraints = [
             # Evita que un mismo usuario haga dos reservas el mismo día en el mismo espacio

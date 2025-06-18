@@ -15,11 +15,121 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django_filters.views import FilterView
 from reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from reservas.library.filters.reservas import ReservaFilter
 from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
-from django.db.models import Q
+from django.db.models import Q, Count
+from django.http import JsonResponse
+from datetime import datetime
 
+
+def reservas_json(request):
+    """
+    Devuelve un conteo de reservas por día para un rango de fechas,
+    opcionalmente filtrado por estado.
+    Usado por el calendario para mostrar indicadores de actividad.
+    """
+    start_str = request.GET.get('start')
+    end_str = request.GET.get('end')
+    status = request.GET.get('status')
+
+    try:
+        start_date = datetime.fromisoformat(start_str.split('T')[0])
+        end_date = datetime.fromisoformat(end_str.split('T')[0])
+    except (ValueError, TypeError):
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    queryset = Reserva.objects.filter(
+        fecha_uso__gte=start_date,
+        fecha_uso__lte=end_date,
+    )
+
+    possible_states = ['pendiente', 'aprobada', 'rechazada']
+
+    if status and status in possible_states:
+        queryset = queryset.filter(estado=status)
+    else: 
+        queryset = queryset.filter(estado__in=possible_states)
+
+    daily_counts = queryset.values('fecha_uso').annotate(
+        pendiente_count=Count('id', filter=Q(estado='pendiente')),
+        aprobada_count=Count('id', filter=Q(estado='aprobada')),
+        rechazada_count=Count('id', filter=Q(estado='rechazada'))
+    ).order_by('fecha_uso')
+
+    data = [
+        {
+            'date': item['fecha_uso'].strftime('%Y-%m-%d'),
+            'pendiente_count': item['pendiente_count'],
+            'aprobada_count': item['aprobada_count'],
+            'rechazada_count': item['rechazada_count'],
+        }
+        for item in daily_counts
+        if item['pendiente_count'] > 0 or item['aprobada_count'] > 0 or item['rechazada_count'] > 0
+    ]
+    return JsonResponse(data, safe=False)
+
+
+def reservas_by_date_json(request):
+    """
+    Devuelve una lista detallada de reservas para una fecha específica.
+    """
+    date_str = request.GET.get('date')
+    status = request.GET.get('status')
+
+    try:
+        target_date = datetime.fromisoformat(date_str).date()
+    except (ValueError, TypeError, AttributeError):
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    reservas = Reserva.objects.filter(fecha_uso=target_date)
+
+    if status and status != 'all':
+        reservas = reservas.filter(estado=status)
+    
+    reservas_values = reservas.values(
+        'id', 'usuario_id', 'espacio_id', 'fecha_uso', 'hora_inicio',
+        'hora_fin', 'estado', 'motivo', 'motivo_admin', 'aprobado_por_id',
+        'usuario__first_name', 'usuario__last_name', 'usuario__username',
+        'espacio__nombre'
+    ).order_by('hora_inicio')
+
+    data = []
+    for r in reservas_values:
+        full_name = f"{r['usuario__first_name']} {r['usuario__last_name']}".strip()
+        data.append({
+            'id': r['id'],
+            'usuario_id': r['usuario_id'],
+            'usuario_nombre': full_name or r['usuario__username'],
+            'espacio_id': r['espacio_id'],
+            'espacio_nombre': r['espacio__nombre'],
+            'fecha_uso': r['fecha_uso'].strftime('%Y-%m-%d'),
+            'hora_inicio': r['hora_inicio'].strftime('%H:%M'),
+            'hora_fin': r['hora_fin'].strftime('%H:%M'),
+            'estado': r['estado'],
+            'motivo': r['motivo'],
+            'motivo_admin': r['motivo_admin'] or '',
+            'aprobado_por': r['aprobado_por_id'],
+            'edit_url': reverse('reserva_edit', args=[r['id']]),
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+class CalendarioReservasView(LoginRequiredMixin, FilterView):
+    """
+    Muestra el calendario de reservas
+    """
+    template_name = 'reservas/calendario.html'
+    model = Reserva
+    permission_required = 'reservas.view_reserva'
+    filterset_fields = '__all__'
+    paginate_by = 10
+    can_export = True
+    filterset_class = ReservaFilter
+    
+    
+    
 
 class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView):
     """
