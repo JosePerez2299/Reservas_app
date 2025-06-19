@@ -86,6 +86,7 @@ class ReservaUpdateForm(forms.ModelForm):
         
         if user.is_usuario:
             self.fields['estado'].disabled = True
+            self.fields['motivo_admin'].disabled = True
 
         if not user.is_admin and user.is_moderador:
             if self.instance.espacio.ubicacion != user.ubicacion or self.instance.espacio.piso != user.piso:
