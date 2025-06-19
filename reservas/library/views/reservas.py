@@ -16,12 +16,13 @@ from django_filters.views import FilterView
 from reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy, reverse
-from reservas.library.filters.reservas import ReservaFilter
+from reservas.library.filters.reservas import *
 from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime
 from django.views import View
+from django.views.generic import TemplateView
 
 class Reservas_json(LoginRequiredMixin, PermissionRequiredMixin,View):
     """
@@ -90,6 +91,8 @@ def reservas_by_date_json(request):
         'espacio__nombre'
     ).order_by('hora_inicio')
 
+
+
     data = []
     for r in reservas_values:
         full_name = f"{r['usuario__first_name']} {r['usuario__last_name']}".strip()
@@ -109,21 +112,28 @@ def reservas_by_date_json(request):
             'edit_url': reverse('reserva_edit', args=[r['id']]),
         })
 
+    print(data)
+
     return JsonResponse(data, safe=False)
 
 
-class CalendarioReservasView(LoginRequiredMixin, FilterView):
+class CalendarioReservasView(LoginRequiredMixin, TemplateView):
     """
     Muestra el calendario de reservas
     """
     template_name = 'reservas/calendario.html'
+
+
+class ReservasByDate(FilterView):
+    """
+    Muestra una lista de reservas filtradas por fecha
+    """
     model = Reserva
     permission_required = 'reservas.view_reserva'
-    filterset_fields = '__all__'
+    template_name = 'includes/reservas_cardslist.html'
     paginate_by = 10
-    can_export = True
-    filterset_class = ReservaFilter
-    
+    filterset_class = ReservaFilterCards
+    context_object_name = 'reservas'        
     
     
 

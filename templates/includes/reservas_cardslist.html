@@ -1,0 +1,107 @@
+{% if reservas %}
+  <div  class="w-full max-w-2xl mx-auto p-2">
+    {% for reserva in reservas %}
+      <div class="border-l-8 border-l-warning  shadow-xl  collapse collapse-arrow bg-base-100 border-b border-base-300 rounded-lg mb-2">
+        <!-- Radio con mismo name para agrupar, checked en el primero -->
+        <input 
+          type="radio" 
+          name="reservas-accordion" 
+
+        />
+        <!-- Título compacto -->
+        <div class="collapse-title flex items-center justify-between">
+            
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <!-- Avatar o inicial -->
+
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span class="text-xs font-medium text-blue-600">
+                      {{ reserva.usuario.first_name|first|default:reserva.usuario.username|first|upper }}
+                    </span>
+                </div>
+ 
+            <!-- Info principal -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-2">
+                <h4 class="font-medium text-gray-900 text-sm truncate">
+                  {{ reserva.usuario.get_full_name|default:reserva.usuario.username|truncatechars:15 }}
+                </h4>
+                {% if reserva.estado == 'pendiente' %}
+                
+                <div class="badge p-1 badge-xs badge-warning">P</div>
+                {% elif reserva.estado == 'aprobada' %}
+                <div class="badge p-1 badge-xs badge-success">A</div>
+                {% elif reserva.estado == 'rechazada' %}
+                <div class="badge p-1 badge-xs badge-error">R</div>
+                {% endif %}
+              </div>
+              <p class="text-xs text-gray-500 truncate">{{ reserva.espacio.nombre|truncatechars:15 }}</p>
+            </div>
+          </div>
+          <!-- Hora -->
+          <div class="text-right">
+            <div class="text-xs font-medium text-gray-900">
+              {{ reserva.hora_inicio|time:"H:i a" }}
+            </div>
+            <div class="text-xs text-gray-500">
+              {{ reserva.hora_fin|time:"H:i a" }}
+            </div>
+          </div>
+        </div>
+        <!-- Contenido expandido -->
+        <div class="collapse-content">
+          <div class="px-3 pt-2 pb-3 border-t border-base-300 bg-base-50">
+            <!-- Detalles adicionales -->
+            <div class="grid grid-cols-2 gap-3 mb-3 text-xs">
+              <div>
+                <span class="text-gray-500">Fecha:</span>
+                <span class="ml-1 text-gray-900">{{ reserva.fecha_uso|date:"d/m/Y" }}</span>
+              </div>
+              <div>
+                <span class="text-gray-500">Estado:</span>
+                {% if reserva.estado == 'pendiente' %}
+                
+                <span class="text-warning">Pendiente</span>
+                {% elif reserva.estado == 'aprobada' %}
+                <span class="text-success">Aprobada</span>
+                {% elif reserva.estado == 'rechazada' %}
+                <span class="text-error">Rechazada</span>
+                {% endif %}
+        
+              </div>
+            </div>
+            {% if reserva.observaciones %}
+            <div class="mb-3">
+              <span class="text-xs text-gray-500">Observaciones:</span>
+              <p class="text-xs text-gray-700 mt-1 line-clamp-2">{{ reserva.observaciones }}</p>
+            </div>
+            {% endif %}
+            {% if perms.reservas.change_reserva %}
+            <div class="flex gap-2">
+              <a
+                href="{% url 'reserva_edit' reserva.id %}"
+                class="btn btn-xs btn-primary flex-1"
+              >
+                <i class="fas fa-edit mr-1"></i>Editar
+              </a>
+              <button
+                type="button"
+                class="btn btn-xs btn-ghost flex-1"
+                onclick="console.log('Ver detalles de reserva:', {{ reserva.id }})"
+              >
+                <i class="fas fa-eye mr-1"></i>Ver detalles
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-8 text-gray-500">
+    <i class="fas fa-calendar-times text-3xl mb-3 text-gray-300"></i>
+    <p class="text-sm">No hay reservas para este día</p>
+    <p class="text-xs text-gray-400 mt-1">con el filtro seleccionado</p>
+  </div>
+{% endif %}

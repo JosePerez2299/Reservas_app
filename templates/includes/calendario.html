@@ -48,6 +48,11 @@
                             @click="setFilter('all')" 
                             class="btn btn-xs"
                             :class="filterStatus === 'all' ? 'btn-primary' : 'btn-ghost border'"
+                            hx-trigger="click"
+                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-target="#reservas-list"
+                            hx-vals='{"estado": ""}'
+                            hx-include="[name='fecha_uso']"
                         >
                             Todas
                         </button>
@@ -55,6 +60,11 @@
                             @click="setFilter('pendiente')" 
                             class="btn btn-xs"
                             :class="filterStatus === 'pendiente' ? 'btn-warning' : 'btn-ghost border'"
+                            hx-trigger="click"
+                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-target="#reservas-list"
+                            hx-vals='{"estado": "pendiente"}'
+                            hx-include="[name='fecha_uso']"
                         >
                             Pendientes
                         </button>
@@ -62,6 +72,11 @@
                             @click="setFilter('aprobada')" 
                             class="btn btn-xs"
                             :class="filterStatus === 'aprobada' ? 'btn-success' : 'btn-ghost border'"
+                            hx-trigger="click"
+                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-target="#reservas-list"
+                            hx-vals='{"estado": "aprobada"}'
+                            hx-include="[name='fecha_uso']"
                         >
                             Aprobadas
                         </button>
@@ -69,6 +84,11 @@
                             @click="setFilter('rechazada')" 
                             class="btn btn-xs"
                             :class="filterStatus === 'rechazada' ? 'btn-error' : 'btn-ghost border'"
+                            hx-trigger="click"
+                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-target="#reservas-list"
+                            hx-vals='{"estado": "rechazada"}'
+                            hx-include="[name='fecha_uso']"
                         >
                             Rechazadas
                         </button>
@@ -91,86 +111,19 @@
                         Reservas del día
                     </h3>
                     <div x-show="selectedDate" class="text-sm text-gray-500 mt-1" x-text="formatSelectedDate()"></div>
+                    <!-- Campo oculto para almacenar la fecha seleccionada -->
+                    <input type="hidden" name="fecha_uso" x-model="selectedDate" />
                 </div>
                 
-                <!-- Contenido del panel -->
+                <!-- Contenido del panel con HTMX -->
                 <div class="p-4 flex-1 flex flex-col min-h-0">
-                    <!-- Estado de carga -->
-                    <div x-show="loading" class="flex items-center justify-center py-8">
-                        <div class="loading loading-spinner loading-md"></div>
-                        <span class="ml-2 text-sm text-gray-600">Cargando reservas...</span>
-                    </div>
-
-                    <!-- Lista de reservas -->
-                    <div x-show="!loading && selectedDate" class="space-y-3 overflow-y-auto flex-1 pr-2">
-                        <template x-for="reserva in filteredReservas" :key="reserva.id">
-                            <div class="border border-base-200 rounded-lg p-4 bg-base-200/50">
-                                <!-- Header de la reserva -->
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="font-medium text-gray-900 truncate" x-text="reserva.usuario_nombre"></h4>
-                                        <p class="text-sm text-gray-600 truncate" x-text="reserva.espacio_nombre"></p>
-                                    </div>
-                                    <div class="ml-3 flex-shrink-0">
-                                        <span 
-                                            class="badge"
-                                            :class="{
-                                                'badge-warning': reserva.estado === 'pendiente',
-                                                'badge-success': reserva.estado === 'aprobada',
-                                                'badge-error': reserva.estado === 'rechazada'
-                                            }"
-                                            x-text="reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)"
-                                        ></span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Detalles de la reserva -->
-                                <div class="space-y-2 text-sm text-gray-600">
-                                    <div class="flex items-center gap-2">
-                                        <i class="fas fa-clock w-4 text-center"></i>
-                                        <span x-text="`${reserva.hora_inicio} - ${reserva.hora_fin}`"></span>
-                                    </div>
-                                    <div x-show="reserva.motivo" class="flex items-start gap-2">
-                                        <i class="fas fa-comment w-4 text-center mt-0.5 flex-shrink-0"></i>
-                                        <span x-text="reserva.motivo" class="break-words line-clamp-3"></span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Acciones -->
-                                {% if perms.reservas.change_reserva %}
-                                <div class="mt-3 pt-3 border-t border-base-200 flex gap-2">
-                                    <button 
-                                        @click="editReserva(reserva)"
-                                        class="btn btn-xs btn-primary"
-                                    >
-                                        <i class="fas fa-edit"></i>
-                                        Editar
-                                    </button>
-                                    <button 
-                                        @click="viewDetails(reserva)"
-                                        class="btn btn-xs btn-ghost"
-                                    >
-                                        <i class="fas fa-eye"></i>
-                                        Detalles
-                                    </button>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </template>
-                        
-                        <!-- Sin reservas -->
-                        <div x-show="filteredReservas.length === 0" class="text-center py-8 text-gray-500">
-                            <i class="fas fa-calendar-times text-3xl mb-3 text-gray-300"></i>
-                            <p class="text-sm">No hay reservas para este día</p>
-                            <p class="text-xs text-gray-400 mt-1">con el filtro seleccionado</p>
+                    <div id="reservas-list" class="space-y-3 overflow-y-auto flex-1 pr-2">
+                        <!-- Mensaje inicial -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-day text-3xl mb-3 text-gray-300"></i>
+                            <p class="text-sm">Selecciona una fecha en el calendario</p>
+                            <p class="text-xs text-gray-400 mt-1">para ver las reservas del día</p>
                         </div>
-                    </div>
-
-                    <!-- Mensaje inicial -->
-                    <div x-show="!selectedDate && !loading" class="text-center py-8 text-gray-500">
-                        <i class="fas fa-calendar-day text-3xl mb-3 text-gray-300"></i>
-                        <p class="text-sm">Selecciona una fecha en el calendario</p>
-                        <p class="text-xs text-gray-400 mt-1">para ver las reservas del día</p>
                     </div>
                 </div>
             </div>
@@ -223,6 +176,17 @@
         overflow: hidden;
     }
 
+    /* Loading indicator para HTMX */
+    .htmx-indicator {
+        display: none;
+    }
+    .htmx-request .htmx-indicator {
+        display: inline;
+    }
+    .htmx-request.htmx-indicator {
+        display: inline;
+    }
+
     /* Responsive */
     @media (max-width: 1280px) {
         .fc .fc-toolbar {
@@ -249,8 +213,6 @@
             // Estado
             filterStatus: 'all',
             selectedDate: null,
-            reservas: [],
-            loading: false,
             calendar: null,
 
             // Inicialización
@@ -262,16 +224,8 @@
                 // Escuchar eventos de fecha seleccionada
                 window.addEventListener('fecha-seleccionada', (event) => {
                     this.selectedDate = event.detail;
-                    this.loadReservasForDate(this.selectedDate);
+                    this.loadReservasWithHTMX(this.selectedDate);
                 });
-            },
-
-            // Propiedades computadas
-            get filteredReservas() {
-                if (this.filterStatus === 'all') {
-                    return this.reservas;
-                }
-                return this.reservas.filter(r => r.estado === this.filterStatus);
             },
 
             // Métodos
@@ -408,8 +362,10 @@
 
             handleFechaSeleccionada(fecha) {
                 this.selectedDate = fecha.trim();
-                this.loadReservasForDate(this.selectedDate);
                 this.highlightSelectedDate(fecha.trim());
+                
+                // Cargar reservas con HTMX
+                this.loadReservasWithHTMX(this.selectedDate);
                 
                 // Disparar evento personalizado para compatibilidad
                 window.dispatchEvent(new CustomEvent('fecha-seleccionada', {
@@ -431,26 +387,17 @@
                 }
             },
 
-            async loadReservasForDate(fecha) {
+            loadReservasWithHTMX(fecha) {
                 if (!fecha) return;
                 
-                this.loading = true;
-                try {
-                    const status = this.filterStatus !== 'all' ? this.filterStatus : 'all';
-                    const url = `${this.reservasByDateUrl}?fecha=${fecha}&status=${status}`;
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    
-                    this.reservas = await response.json();
-                } catch (error) {
-                    console.error('Error loading reservas:', error);
-                    this.reservas = [];
-                } finally {
-                    this.loading = false;
-                }
+                // Disparar evento HTMX personalizado para cargar reservas
+                const estado = this.filterStatus === 'all' ? '' : this.filterStatus;
+                
+                // Usar htmx.ajax para hacer la petición
+                htmx.ajax('GET', `http://127.0.0.1:8000/reservas/fecha/?fecha_uso=${fecha}&estado=${estado}`, {
+                    target: '#reservas-list',
+                    swap: 'innerHTML'
+                });
             },
 
             setFilter(status) {
@@ -458,8 +405,9 @@
                 if (this.calendar) {
                     this.calendar.refetchEvents();
                 }
+                // Si hay una fecha seleccionada, recargar las reservas con el nuevo filtro
                 if (this.selectedDate) {
-                    this.loadReservasForDate(this.selectedDate);
+                    this.loadReservasWithHTMX(this.selectedDate);
                 }
             },
 
@@ -472,25 +420,6 @@
                     month: 'long',
                     day: 'numeric'
                 });
-            },
-
-            // Acciones para las reservas
-            editReserva(reserva) {
-                if (reserva.edit_url) {
-                    window.location.href = reserva.edit_url;
-                } else if (this.editUrlTemplate) {
-                    const url = this.editUrlTemplate.replace('RESERVATION_ID', reserva.id);
-                    window.location.href = url;
-                } else {
-                    console.log('Editar reserva:', reserva);
-                }
-            },
-
-            viewDetails(reserva) {
-                console.log('Ver detalles de reserva:', reserva);
-                window.dispatchEvent(new CustomEvent('reserva-details', {
-                    detail: reserva
-                }));
             }
         }
     }

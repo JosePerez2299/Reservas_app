@@ -154,7 +154,7 @@ def get_td_html(context, obj, field):
                 hora_inicio = getattr(obj, 'hora_inicio', None)
                 hora_fin = getattr(obj, 'hora_fin', None)
                 if fecha_uso == hoy and hora_inicio and hora_fin:
-                    if hora_inicio.time() < ahora < hora_fin.time():
+                    if hora_inicio < ahora < hora_fin:
                         return format_html(
                             '<p class="badge p-1 badge-lg badge-success text-base-100">En uso</p>'
                         )

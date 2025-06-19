@@ -1,6 +1,7 @@
 import django_filters
 from reservas.models import Reserva, Espacio, Ubicacion
 from django import forms
+
 class ReservaFilter(django_filters.FilterSet):
     usuario = django_filters.CharFilter(
         field_name='usuario__username',
@@ -51,6 +52,24 @@ class ReservaFilter(django_filters.FilterSet):
         lookup_expr='icontains',
         label='Estado',
         widget=forms.Select(attrs={'class': 'form-select', 'id': 'estado_filter'}),
+        choices=Reserva.Estado.choices,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+
+class ReservaFilterCards(django_filters.FilterSet):
+    fecha_uso = django_filters.DateFilter(
+        field_name='fecha_uso',
+        lookup_expr='exact',
+
+    )
+    
+    estado = django_filters.ChoiceFilter(
+        field_name='estado',
+        lookup_expr='exact',
         choices=Reserva.Estado.choices,
     )
 

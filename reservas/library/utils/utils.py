@@ -29,7 +29,10 @@ def get_all_cols(model):
 
 
 def get_stats(request):
-    logs = request.user.get_logs()[:5]
+    try:
+        logs = request.user.get_logs()[:5]
+    except:
+        logs = []
     if request.user.is_admin:
         stats = get_stats_administrador(request)
         stats['logs'] = logs
