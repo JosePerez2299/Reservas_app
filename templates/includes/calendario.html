@@ -5,149 +5,173 @@
     reservasJsonUrl: '{% url 'reservas_json' %}',
     reservasByDateUrl: '{% url 'reservas_by_date_json' %}',
     editUrlTemplate: '{% url 'reserva_edit' 0 %}'.replace('0', 'RESERVATION_ID')
-})" class="mx-auto">
+})" class="w-full">
     
     <!-- Calendario y Lista de Reservas -->
-    <div class="flex flex-col lg:flex-row justify-between items-start gap-6">
-        <!-- Calendario -->
-        <div class="flex-1 bg-base-100 rounded-xl shadow-sm p-6">
-            <div>
-                <div class="rounded-lg shadow-sm">
-                    <div id="calendar-{{ calendar_id|default:'main' }}" class=""></div>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        
+        <!-- Calendario - Ocupa 2/3 del ancho en pantallas grandes -->
+        <div class="xl:col-span-2">
+            <div class="bg-base-100 rounded-xl shadow-sm border border-base-200">
+                <!-- Header del calendario con controles -->
+                <div class="p-4 border-b border-base-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-lg font-semibold text-gray-900">Calendario de Reservas</h2>
+                        <div class="flex gap-2">
+                            <button 
+                                @click="calendar.prev()"
+                                class="btn btn-sm btn-outline"
+                            >
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button 
+                                @click="calendar.today()"
+                                class="btn btn-sm btn-outline"
+                            >
+                                Hoy
+                            </button>
+                            <button 
+                                @click="calendar.next()"
+                                class="btn btn-sm btn-outline"
+                            >
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtros de Estado -->
+                <div class="p-4 border-b border-base-200 bg-base-200/50">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-sm font-medium text-gray-700 mr-3">Mostrar:</span>
+                        <button 
+                            @click="setFilter('all')" 
+                            class="btn btn-xs"
+                            :class="filterStatus === 'all' ? 'btn-primary' : 'btn-ghost border'"
+                        >
+                            Todas
+                        </button>
+                        <button 
+                            @click="setFilter('pendiente')" 
+                            class="btn btn-xs"
+                            :class="filterStatus === 'pendiente' ? 'btn-warning' : 'btn-ghost border'"
+                        >
+                            Pendientes
+                        </button>
+                        <button 
+                            @click="setFilter('aprobada')" 
+                            class="btn btn-xs"
+                            :class="filterStatus === 'aprobada' ? 'btn-success' : 'btn-ghost border'"
+                        >
+                            Aprobadas
+                        </button>
+                        <button 
+                            @click="setFilter('rechazada')" 
+                            class="btn btn-xs"
+                            :class="filterStatus === 'rechazada' ? 'btn-error' : 'btn-ghost border'"
+                        >
+                            Rechazadas
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Calendario -->
+                <div class="p-4">
+                    <div id="calendar-{{ calendar_id|default:'main' }}"></div>
                 </div>
             </div>
         </div>
         
-        <!-- Lista de Reservas del Día Seleccionado -->
-        <div class="flex-1">
-            <div class="bg-white rounded-lg shadow-sm p-4 sticky top-4 h-fit">
-                <!-- Filtros de Estado -->
-                <div class="flex justify-between items-center md:flex-row flex-col gap-3 mb-4">
-                    <div>
-                        <label class="text-xs font-medium text-base-content mb-1 block">Filtrar por estado:</label>
-                        <div class="join">
-                            <button 
-                                @click="setFilter('all')" 
-                                class="join-item btn btn-xs btn-ghost border border-base-300"
-                                :class="filterStatus === 'all' ? 'btn-primary' : 'btn-outline'"
-                            >
-                                Todas
-                            </button>
-                            <button 
-                                @click="setFilter('pendiente')" 
-                                class="join-item btn btn-xs btn-ghost border border-base-300"
-                                :class="filterStatus === 'pendiente' ? 'btn-primary' : 'btn-outline'"
-                            >
-                                Pendientes
-                            </button>
-                            <button 
-                                @click="setFilter('aprobada')" 
-                                class="join-item btn btn-xs btn-ghost border border-base-300"
-                                :class="filterStatus === 'aprobada' ? 'btn-primary' : 'btn-outline'"
-                            >
-                                Aprobadas
-                            </button>
-                            <button 
-                                @click="setFilter('rechazada')" 
-                                class="join-item btn btn-xs btn-ghost border border-base-300"
-                                :class="filterStatus === 'rechazada' ? 'btn-primary' : 'btn-outline'"
-                            >
-                                Rechazadas
-                            </button>
-                        </div>
-                    </div>
-                    <div class="join">
-                        <button 
-                            @click="calendar.prev()"
-                            class="join-item btn btn-xs btn-ghost border border-base-300"
-                        >
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button 
-                            @click="calendar.today()"
-                            class="join-item btn btn-xs btn-ghost border border-base-300"
-                        >
-                            Hoy
-                        </button>
-                        <button 
-                            @click="calendar.next()"
-                            class="join-item btn btn-xs btn-ghost border border-base-300"
-                        >
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
+        <!-- Panel de Reservas - Ocupa 1/3 del ancho en pantallas grandes -->
+        <div class="xl:col-span-1">
+            <div class="bg-base-100 rounded-xl shadow-sm border border-base-200 sticky top-4 flex flex-col" style="height: calc(100vh - 2rem); max-height: 800px;">
+                <!-- Header del panel -->
+                <div class="p-4 border-b border-base-200">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        Reservas del día
+                    </h3>
+                    <div x-show="selectedDate" class="text-sm text-gray-500 mt-1" x-text="formatSelectedDate()"></div>
                 </div>
-
-                <div class="divider my-2"></div>
-
-                <h3 class="text-base font-semibold text-base-content mb-3">
-                    Reservas del día
-                    <span x-show="selectedDate" class="text-xs font-normal text-gray-500 ml-2" x-text="formatSelectedDate()"></span>
-                </h3>
                 
-                <!-- Estado de carga -->
-                <div x-show="loading" class="flex items-center justify-center py-6">
-                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                </div>
-
-                <!-- Lista de reservas -->
-                <div x-show="!loading && selectedDate" class="space-y-2 max-h-80 overflow-y-auto">
-                    <template x-for="reserva in filteredReservas" :key="reserva.id">
-                        <div class="border border-gray-200 rounded-md p-3 hover:shadow-sm transition-shadow duration-200 bg-gray-50">
-                            <div class="flex items-start justify-between mb-2">
-                                <h4 class="font-medium text-sm text-base-content truncate" x-text="reserva.usuario_nombre"></h4>
-                                <span 
-                                    class="px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ml-2"
-                                    :class="{
-                                        'bg-orange-100 text-orange-800': reserva.estado === 'pendiente',
-                                        'bg-green-100 text-green-800': reserva.estado === 'aprobada',
-                                        'bg-red-100 text-red-800': reserva.estado === 'rechazada'
-                                    }"
-                                    x-text="reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)"
-                                ></span>
-                            </div>
-                            <div class="text-xs text-base-content space-y-1">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-map-marker-alt text-gray-400 w-3"></i>
-                                    <span x-text="reserva.espacio_nombre" class="truncate"></span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-clock text-gray-400 w-3"></i>
-                                    <span x-text="`${reserva.hora_inicio} - ${reserva.hora_fin}`"></span>
-                                </div>
-                                <div x-show="reserva.motivo" class="flex items-start gap-2">
-                                    <i class="fas fa-comment text-gray-400 w-3 mt-0.5 flex-shrink-0"></i>
-                                    <span x-text="reserva.motivo" class="break-words text-gray-600 line-clamp-2"></span>
-                                </div>
-                            </div>
-                            {% if perms.reservas.change_reserva %}
-                            <div class="mt-2 flex gap-3">
-                                <button 
-                                    @click="editReserva(reserva)"
-                                    class="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                                >
-                                    Editar
-                                </button>
-                                <button 
-                                    @click="viewDetails(reserva)"
-                                    class="text-xs text-base-content hover:text-gray-800 font-medium"
-                                >
-                                    Ver detalles
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </template>
-                    <div x-show="filteredReservas.length === 0" class="text-center py-6 text-base-content/60">
-                        <i class="fas fa-calendar-times text-2xl mb-2"></i>
-                        <p class="text-sm">No hay reservas para este día</p>
+                <!-- Contenido del panel -->
+                <div class="p-4 flex-1 flex flex-col min-h-0">
+                    <!-- Estado de carga -->
+                    <div x-show="loading" class="flex items-center justify-center py-8">
+                        <div class="loading loading-spinner loading-md"></div>
+                        <span class="ml-2 text-sm text-gray-600">Cargando reservas...</span>
                     </div>
-                </div>
 
-                <!-- Mensaje inicial -->
-                <div x-show="!selectedDate && !loading" class="text-center py-6 text-base-content/60">
-                    <i class="fas fa-calendar-day text-2xl mb-2"></i>
-                    <p class="text-sm">Selecciona una fecha en el calendario</p>
+                    <!-- Lista de reservas -->
+                    <div x-show="!loading && selectedDate" class="space-y-3 overflow-y-auto flex-1 pr-2">
+                        <template x-for="reserva in filteredReservas" :key="reserva.id">
+                            <div class="border border-base-200 rounded-lg p-4 bg-base-200/50">
+                                <!-- Header de la reserva -->
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-medium text-gray-900 truncate" x-text="reserva.usuario_nombre"></h4>
+                                        <p class="text-sm text-gray-600 truncate" x-text="reserva.espacio_nombre"></p>
+                                    </div>
+                                    <div class="ml-3 flex-shrink-0">
+                                        <span 
+                                            class="badge"
+                                            :class="{
+                                                'badge-warning': reserva.estado === 'pendiente',
+                                                'badge-success': reserva.estado === 'aprobada',
+                                                'badge-error': reserva.estado === 'rechazada'
+                                            }"
+                                            x-text="reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)"
+                                        ></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Detalles de la reserva -->
+                                <div class="space-y-2 text-sm text-gray-600">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock w-4 text-center"></i>
+                                        <span x-text="`${reserva.hora_inicio} - ${reserva.hora_fin}`"></span>
+                                    </div>
+                                    <div x-show="reserva.motivo" class="flex items-start gap-2">
+                                        <i class="fas fa-comment w-4 text-center mt-0.5 flex-shrink-0"></i>
+                                        <span x-text="reserva.motivo" class="break-words line-clamp-3"></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Acciones -->
+                                {% if perms.reservas.change_reserva %}
+                                <div class="mt-3 pt-3 border-t border-base-200 flex gap-2">
+                                    <button 
+                                        @click="editReserva(reserva)"
+                                        class="btn btn-xs btn-primary"
+                                    >
+                                        <i class="fas fa-edit"></i>
+                                        Editar
+                                    </button>
+                                    <button 
+                                        @click="viewDetails(reserva)"
+                                        class="btn btn-xs btn-ghost"
+                                    >
+                                        <i class="fas fa-eye"></i>
+                                        Detalles
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </template>
+                        
+                        <!-- Sin reservas -->
+                        <div x-show="filteredReservas.length === 0" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-times text-3xl mb-3 text-gray-300"></i>
+                            <p class="text-sm">No hay reservas para este día</p>
+                            <p class="text-xs text-gray-400 mt-1">con el filtro seleccionado</p>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje inicial -->
+                    <div x-show="!selectedDate && !loading" class="text-center py-8 text-gray-500">
+                        <i class="fas fa-calendar-day text-3xl mb-3 text-gray-300"></i>
+                        <p class="text-sm">Selecciona una fecha en el calendario</p>
+                        <p class="text-xs text-gray-400 mt-1">para ver las reservas del día</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,65 +179,55 @@
 </div>
 
 <style>
-    /* Estilos personalizados para FullCalendar */
+    /* Estilos básicos para FullCalendar */
     .fc .fc-toolbar-chunk .fc-button-primary {
-        background-color: #2563eb;
-        border-color: #2563eb;
+        background-color: #3b82f6;
+        border-color: #3b82f6;
         color: white;
     }
 
-    .fc .fc-toolbar-chunk .fc-button-primary:hover {
-        background-color: #1d4ed8;
-        border-color: #1d4ed8;
-    }
-
     .fc .fc-daygrid-day.fc-day-today {
-        background-color: rgba(37, 99, 235, 0.1);
+        background-color: rgba(59, 130, 246, 0.1);
     }
 
-    .fc .fc-daygrid-day:hover {
-        background-color: rgba(156, 163, 175, 0.1);
+    .fc .fc-daygrid-day {
         cursor: pointer;
+    }
+
+    .fc .fc-daygrid-day.selected-date {
+        background-color: rgba(59, 130, 246, 0.2) !important;
+        border: 2px solid #3b82f6 !important;
     }
 
     .fc .fc-event {
         border: none;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        padding: 1px 4px;
-        margin: 0.5px 0;
-        min-height: 16px;
-        line-height: 1.2;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 2px 6px;
+        margin: 1px 0;
+        min-height: 18px;
+        line-height: 1.3;
     }
 
     .fc .fc-event-title {
-        font-weight: 600;
-        font-size: 0.7rem;
+        font-weight: 500;
+        font-size: 0.75rem;
     }
 
-    .fc .fc-daygrid-event {
-        margin-top: 1px;
-        margin-bottom: 1px;
-    }
-
-    .fc .fc-daygrid-day-events {
-        margin-bottom: 2px;
-    }
-
-    /* Utilidad para truncar texto a 2 líneas */
-    .line-clamp-2 {
+    /* Utilidad para truncar texto */
+    .line-clamp-3 {
         display: -webkit-box;
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
 
-    /* Responsive calendar */
-    @media (max-width: 1024px) {
+    /* Responsive */
+    @media (max-width: 1280px) {
         .fc .fc-toolbar {
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.5rem;
         }
         
         .fc .fc-toolbar-chunk {
@@ -271,9 +285,9 @@
                 this.calendar = new FullCalendar.Calendar(calendarEl, {
                     initialView: 'dayGridMonth',
                     locale: 'es',
-                    firstDay: 1, // Lunes como primer día
+                    firstDay: 1,
                     validRange: {
-                        start: new Date() // Solo fechas futuras
+                        start: new Date()
                     },
                     headerToolbar: {
                         left: '',
@@ -290,7 +304,7 @@
                     dateClick: this.handleDateClick.bind(this),
                     eventClick: this.handleEventClick.bind(this),
                     height: 'auto',
-                    aspectRatio: 1.8
+                    aspectRatio: 1.6
                 });
 
                 this.calendar.render();
@@ -321,56 +335,63 @@
 
             mapEvents(events) {
                 return events.map(event => {
-                    // Calcular total de reservas
-                    const total = (event.pendiente_count || 0) + (event.aprobada_count || 0) + (event.rechazada_count || 0);
+                    const pendientes = event.pendiente_count || 0;
+                    const aprobadas = event.aprobada_count || 0;
+                    const rechazadas = event.rechazada_count || 0;
+                    const total = pendientes + aprobadas + rechazadas;
                     
                     if (total === 0) return null;
                     
-                    // Determinar el estado predominante
-                    let backgroundColor, borderColor, estado;
-                    if (event.aprobada_count > event.pendiente_count && event.aprobada_count > event.rechazada_count) {
-                        backgroundColor = '#10b981';
-                        borderColor = '#10b981';
-                        estado = 'aprobada';
-                    } else if (event.pendiente_count > event.rechazada_count) {
-                        backgroundColor = '#f59e0b';
-                        borderColor = '#f59e0b';
-                        estado = 'pendiente';
-                    } else {
-                        backgroundColor = '#ef4444';
-                        borderColor = '#ef4444';
-                        estado = 'rechazada';
+                    // Crear múltiples eventos si hay diferentes tipos de reservas
+                    const eventosDelDia = [];
+                    
+                    if (aprobadas > 0) {
+                        eventosDelDia.push({
+                            title: `${aprobadas} Aprobada${aprobadas > 1 ? 's' : ''}`,
+                            start: event.fecha_uso,
+                            allDay: true,
+                            backgroundColor: '#22c55e',
+                            borderColor: '#22c55e',
+                            textColor: 'white',
+                            extendedProps: { 
+                                estado: 'aprobada',
+                                count: aprobadas
+                            }
+                        });
                     }
                     
-                    // Crear título resumido
-                    let title = `${total} reserva${total > 1 ? 's' : ''}`;
-                    
-                    // Agregar detalles si hay múltiples estados
-                    const estados = [];
-                    if (event.aprobada_count > 0) estados.push(`${event.aprobada_count}A`);
-                    if (event.pendiente_count > 0) estados.push(`${event.pendiente_count}P`);
-                    if (event.rechazada_count > 0) estados.push(`${event.rechazada_count}R`);
-                    
-                    if (estados.length > 1) {
-                        title += ` (${estados.join('|')})`;
+                    if (pendientes > 0) {
+                        eventosDelDia.push({
+                            title: `${pendientes} Pendiente${pendientes > 1 ? 's' : ''}`,
+                            start: event.fecha_uso,
+                            allDay: true,
+                            backgroundColor: '#f59e0b',
+                            borderColor: '#f59e0b',
+                            textColor: 'white',
+                            extendedProps: { 
+                                estado: 'pendiente',
+                                count: pendientes
+                            }
+                        });
                     }
                     
-                    return {
-                        title: title,
-                        start: event.fecha_uso,
-                        allDay: true,
-                        backgroundColor: backgroundColor,
-                        borderColor: borderColor,
-                        textColor: 'white',
-                        extendedProps: { 
-                            estado: estado,
-                            aprobadas: event.aprobada_count || 0,
-                            pendientes: event.pendiente_count || 0,
-                            rechazadas: event.rechazada_count || 0,
-                            total: total
-                        }
-                    };
-                }).filter(event => event !== null);
+                    if (rechazadas > 0) {
+                        eventosDelDia.push({
+                            title: `${rechazadas} Rechazada${rechazadas > 1 ? 's' : ''}`,
+                            start: event.fecha_uso,
+                            allDay: true,
+                            backgroundColor: '#ef4444',
+                            borderColor: '#ef4444',
+                            textColor: 'white',
+                            extendedProps: { 
+                                estado: 'rechazada',
+                                count: rechazadas
+                            }
+                        });
+                    }
+                    
+                    return eventosDelDia;
+                }).filter(event => event !== null).flat();
             },
 
             handleDateClick(info) {
@@ -388,11 +409,26 @@
             handleFechaSeleccionada(fecha) {
                 this.selectedDate = fecha.trim();
                 this.loadReservasForDate(this.selectedDate);
+                this.highlightSelectedDate(fecha.trim());
                 
                 // Disparar evento personalizado para compatibilidad
                 window.dispatchEvent(new CustomEvent('fecha-seleccionada', {
                     detail: fecha.trim()
                 }));
+            },
+
+            highlightSelectedDate(fecha) {
+                // Remover highlight anterior
+                const previousSelected = document.querySelector('.fc-daygrid-day.selected-date');
+                if (previousSelected) {
+                    previousSelected.classList.remove('selected-date');
+                }
+                
+                // Agregar highlight a la fecha seleccionada
+                const selectedCell = document.querySelector(`[data-date="${fecha}"]`);
+                if (selectedCell) {
+                    selectedCell.classList.add('selected-date');
+                }
             },
 
             async loadReservasForDate(fecha) {
@@ -427,22 +463,6 @@
                 }
             },
 
-            navigateCalendar(action) {
-                if (!this.calendar) return;
-                
-                switch (action) {
-                    case 'prev':
-                        this.calendar.prev();
-                        break;
-                    case 'next':
-                        this.calendar.next();
-                        break;
-                    case 'today':
-                        this.calendar.today();
-                        break;
-                }
-            },
-
             formatSelectedDate() {
                 if (!this.selectedDate) return '';
                 const date = new Date(this.selectedDate + 'T00:00:00');
@@ -467,9 +487,7 @@
             },
 
             viewDetails(reserva) {
-                // Implementar vista de detalles
                 console.log('Ver detalles de reserva:', reserva);
-                // Aquí puedes abrir un modal con más detalles o disparar un evento personalizado
                 window.dispatchEvent(new CustomEvent('reserva-details', {
                     detail: reserva
                 }));
