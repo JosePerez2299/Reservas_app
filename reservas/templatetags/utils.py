@@ -460,3 +460,15 @@ def get_message(logEntry):
         result["full_message"] = f"{actor_display} realizó una acción desconocida sobre {model} \"{obj_repr}\""
 
     return result
+
+@register.filter 
+def get_color_reserva(reserva: Reserva):
+    if reserva.estado == 'pendiente':
+        return 'warning'
+    elif reserva.estado == 'aprobada':
+        return 'success'
+    elif reserva.estado == 'rechazada':
+        return 'error'
+    else:
+        return 'info'
+    

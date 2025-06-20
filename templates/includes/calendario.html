@@ -49,7 +49,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'all' ? 'btn-primary' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-get="/reservas/fecha/"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": ""}'
                             hx-include="[name='fecha_uso']"
@@ -61,7 +61,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'pendiente' ? 'btn-warning' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-get="/reservas/fecha/"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "pendiente"}'
                             hx-include="[name='fecha_uso']"
@@ -73,7 +73,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'aprobada' ? 'btn-success' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-get="/reservas/fecha/"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "aprobada"}'
                             hx-include="[name='fecha_uso']"
@@ -85,7 +85,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'rechazada' ? 'btn-error' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="http://127.0.0.1:8000/reservas/fecha/"
+                            hx-get="/reservas/fecha/"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "rechazada"}'
                             hx-include="[name='fecha_uso']"
@@ -106,13 +106,34 @@
         <div class="xl:col-span-1">
             <div class="bg-base-100 rounded-xl shadow-sm border border-base-200 sticky top-4 flex flex-col" style="height: calc(100vh - 2rem); max-height: 800px;">
                 <!-- Header del panel -->
-                <div class="p-4 border-b border-base-200">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        Reservas del día
-                    </h3>
-                    <div x-show="selectedDate" class="text-sm text-gray-500 mt-1" x-text="formatSelectedDate()"></div>
-                    <!-- Campo oculto para almacenar la fecha seleccionada -->
-                    <input type="hidden" name="fecha_uso" x-model="selectedDate" />
+                <div class="flex justify-between items-center p-4 border-b border-base-200">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            Reservas del día
+                        </h3>
+                        <div x-show="selectedDate" class="text-sm text-gray-500 mt-1" x-text="formatSelectedDate()"></div>
+                        <!-- Campo oculto para almacenar la fecha seleccionada -->
+                        <input type="hidden" name="fecha_uso" x-model="selectedDate" />
+                        </div>
+                    <div>
+                        <button class="btn btn-ghost btn-sm gap-2 open-modal-btn" 
+                        data-url="#"
+                        data-success-callback="reloadRow">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                         </button>  
+                      <button class="btn btn-ghost btn-sm gap-2 open-modal-btn" 
+                    data-url="#"
+                    data-success-callback="reloadRow">
+                <i class="fas fa-arrow-right text-xs"></i>
+                     </button>  
+
+                     <button class="btn btn-ghost btn-sm gap-2 open-modal-btn" 
+                     data-url="#"
+                     data-success-callback="reloadRow">
+                 <i class="fas fa-arrow-left text-xs"></i>
+                      </button>  
+                    </div>
+
                 </div>
                 
                 <!-- Contenido del panel con HTMX -->
@@ -126,6 +147,13 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    
+
+                    
+                </div>
+
+
             </div>
         </div>
     </div>

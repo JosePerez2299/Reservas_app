@@ -1,7 +1,9 @@
+
+{% load utils %}
 {% if reservas %}
   <div  class="w-full max-w-2xl mx-auto p-2">
     {% for reserva in reservas %}
-      <div class="border-l-8 border-l-warning  shadow-xl  collapse collapse-arrow bg-base-100 border-b border-base-300 rounded-lg mb-2">
+      <div class="border-l-8 border-l-{{ reserva|get_color_reserva }} shadow-xl  collapse collapse-arrow bg-base-100 border-b border-base-300 rounded-lg mb-2">
         <!-- Radio con mismo name para agrupar, checked en el primero -->
         <input 
           type="radio" 
@@ -26,14 +28,9 @@
                 <h4 class="font-medium text-gray-900 text-sm truncate">
                   {{ reserva.usuario.get_full_name|default:reserva.usuario.username|truncatechars:15 }}
                 </h4>
-                {% if reserva.estado == 'pendiente' %}
                 
-                <div class="badge p-1 badge-xs badge-warning">P</div>
-                {% elif reserva.estado == 'aprobada' %}
-                <div class="badge p-1 badge-xs badge-success">A</div>
-                {% elif reserva.estado == 'rechazada' %}
-                <div class="badge p-1 badge-xs badge-error">R</div>
-                {% endif %}
+                <div class="badge p-1 badge-xs badge-{{ reserva|get_color_reserva }}">{{ reserva.estado|first|upper }}</div>
+               
               </div>
               <p class="text-xs text-gray-500 truncate">{{ reserva.espacio.nombre|truncatechars:15 }}</p>
             </div>
@@ -59,23 +56,19 @@
               </div>
               <div>
                 <span class="text-gray-500">Estado:</span>
-                {% if reserva.estado == 'pendiente' %}
-                
-                <span class="text-warning">Pendiente</span>
-                {% elif reserva.estado == 'aprobada' %}
-                <span class="text-success">Aprobada</span>
-                {% elif reserva.estado == 'rechazada' %}
-                <span class="text-error">Rechazada</span>
-                {% endif %}
-        
+                <span class="text-{{ reserva|get_color_reserva }}"> {{ reserva.estado|capfirst }}</span>
               </div>
+              <div class="col-span-2 border-t border-base-300">
+                <span class="text-gray-500">Espacio:</span>
+                <span class="text-gray-900">{{ reserva.espacio.nombre }}</span>
+                <div>
+                  <span class="text-gray-500">Motivo:</span>
+                  <span class="text-gray-900">{{ reserva.motivo|truncatechars:40 }}</span>
+                </div>
+              </div>
+ 
             </div>
-            {% if reserva.observaciones %}
-            <div class="mb-3">
-              <span class="text-xs text-gray-500">Observaciones:</span>
-              <p class="text-xs text-gray-700 mt-1 line-clamp-2">{{ reserva.observaciones }}</p>
-            </div>
-            {% endif %}
+
             {% if perms.reservas.change_reserva %}
             <div class="flex gap-2">
               <a
@@ -97,6 +90,19 @@
         </div>
       </div>
     {% endfor %}
+
+    {% if page_obj.has_other_pages %}
+      <div class="flex justify-between items-center mt-4">
+        <div class="flex gap-2">
+          {% if page_obj.has_previous %}
+            <a href="{%  url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}" class="btn btn-xs btn-ghost">Anterior</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a href="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}" class="btn btn-xs btn-ghost">Siguiente</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
   </div>
 {% else %}
   <div class="text-center py-8 text-gray-500">

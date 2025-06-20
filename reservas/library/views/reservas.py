@@ -133,7 +133,8 @@ class ReservasByDate(FilterView):
     template_name = 'includes/reservas_cardslist.html'
     paginate_by = 10
     filterset_class = ReservaFilterCards
-    context_object_name = 'reservas'        
+    context_object_name = 'reservas'   
+    ordering = ['hora_inicio']     
     
     
 
