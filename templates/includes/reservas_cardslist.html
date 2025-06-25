@@ -63,19 +63,37 @@
 
             {% if perms.reservas.change_reserva %}
             <div class="flex gap-2">
-              <a
+
+              {% if reserva.estado == 'pendiente' %}
+              <button
                 href="{% url 'reserva_edit' reserva.id %}"
-                class="btn btn-xs btn-primary flex-1"
+                class="btn btn-xs btn-primary flex-1 open-modal-btn" 
+                data-url="{% url 'reserva_edit' reserva.id %}"
+                data-success-callback="reloadRow"
               >
                 <i class="fas fa-edit mr-1"></i>Editar
-              </a>
-              <button
-                type="button"
-                class="btn btn-xs btn-ghost flex-1"
-                onclick="console.log('Ver detalles de reserva:', {{ reserva.id }})"
-              >
-                <i class="fas fa-eye mr-1"></i>Ver detalles
               </button>
+
+              <button
+              href="{% url 'reserva_delete' reserva.id %}"
+              class="btn btn-xs btn-error flex-1 open-modal-btn" 
+              data-url="{% url 'reserva_delete' reserva.id %}"
+              data-success-callback="reloadRow"
+            >
+              <i class="fas fa-trash mr-1"></i>Eliminar
+            </button>
+            {% endif %}
+              <button
+                href="{% url 'reserva_view' reserva.id %}"
+                class="btn btn-xs btn-ghost flex-1 open-modal-btn" 
+                data-url="{% url 'reserva_view' reserva.id %}"
+                data-success-callback="reloadRow"
+              >
+                <i class="fas fa-eye mr-1"></i>Ver
+              </button>
+
+
+            
             </div>
             {% endif %}
           </div>
