@@ -85,69 +85,75 @@
 
     <!-- Paginación con HTMX -->
     {% if page_obj.has_other_pages %}
-      <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
-        <!-- Información de paginación -->
-        <div class="text-xs text-gray-600">
-          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-          ({{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }})
-        </div>
-        
-        <!-- Controles de paginación -->
-        <div class="flex gap-2">
-          <!-- Botón Primera página -->
-          {% if page_obj.has_previous and page_obj.number > 2 %}
-            <button 
-              hx-get="{% url 'reservas_cards' %}?page=1{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
-              hx-target="#reservas-list"
-              hx-indicator="#loading-reservas"
-              class="btn btn-xs btn-ghost"
-              title="Primera página">
-              ««
-            </button>
-          {% endif %}
-
-          <!-- Botón Anterior -->
-          {% if page_obj.has_previous %}
-            <button 
-              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
-              hx-target="#reservas-list"
-              hx-indicator="#loading-reservas"
-              class="btn btn-xs btn-ghost">
-              « Anterior
-            </button>
-          {% endif %}
-
-          <!-- Botón Siguiente -->
-          {% if page_obj.has_next %}
-            <button 
-              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
-              hx-target="#reservas-list"
-              hx-indicator="#loading-reservas"
-              class="btn btn-xs btn-ghost">
-              Siguiente »
-            </button>
-          {% endif %}
-
-          <!-- Botón Última página -->
-          {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
-            <button 
-              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
-              hx-target="#reservas-list"
-              hx-indicator="#loading-reservas"
-              class="btn btn-xs btn-ghost"
-              title="Última página">
-              »»
-            </button>
-          {% endif %}
-        </div>
+    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-200 text-xs">
+      <!-- Información de paginación (opcional ocultarla en pantallas pequeñas) -->
+      <div class="text-gray-600 hidden sm:block">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        ({{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }})
       </div>
       
-      <!-- Indicador de carga -->
-      <div id="loading-reservas" class="htmx-indicator text-center py-2">
-        <div class="loading loading-spinner loading-sm"></div>
-        <span class="text-xs text-gray-500 ml-2">Cargando reservas...</span>
+      <!-- Controles de paginación compactos -->
+      <div class="flex items-center space-x-1">
+        <!-- Primera página -->
+        {% if page_obj.has_previous and page_obj.number > 2 %}
+          <button 
+            hx-get="{% url 'reservas_cards' %}?page=1{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-target="#reservas-list"
+            hx-indicator="#loading-reservas"
+            class="btn btn-xs btn-ghost p-1"
+            aria-label="Primera página" title="Primera">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+        {% endif %}
+  
+        <!-- Anterior -->
+        {% if page_obj.has_previous %}
+          <button 
+            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-target="#reservas-list"
+            hx-indicator="#loading-reservas"
+            class="btn btn-xs btn-ghost p-1"
+            aria-label="Página anterior" title="Anterior">
+            <i class="fas fa-angle-left"></i>
+          </button>
+        {% endif %}
+  
+        <!-- Indicador de página actual (solo icono o número) -->
+        <span class="px-2">{{ page_obj.number }}</span>
+  
+        <!-- Siguiente -->
+        {% if page_obj.has_next %}
+          <button 
+            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-target="#reservas-list"
+            hx-indicator="#loading-reservas"
+            class="btn btn-xs btn-ghost p-1"
+            aria-label="Página siguiente" title="Siguiente">
+            <i class="fas fa-angle-right"></i>
+          </button>
+        {% endif %}
+  
+        <!-- Última página -->
+        {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
+          <button 
+            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-target="#reservas-list"
+            hx-indicator="#loading-reservas"
+            class="btn btn-xs btn-ghost p-1"
+            aria-label="Última página" title="Última">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        {% endif %}
       </div>
-    {% endif %}
+    </div>
+    
+    <!-- Indicador de carga -->
+    <div id="loading-reservas" class="htmx-indicator text-center py-2">
+      <div class="loading loading-spinner loading-sm"></div>
+      <span class="text-xs text-gray-500 ml-2">Cargando...</span>
+    </div>
+  {% endif %}
+  
   </div>
 {% else %}
   <div class="text-center py-8 text-gray-500">
