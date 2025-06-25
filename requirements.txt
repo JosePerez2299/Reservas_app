@@ -5,3 +5,5 @@ django-compressor
 django-select2
 pandas
 django-auditlog
+django-crispy-forms
+crispy-tailwind
