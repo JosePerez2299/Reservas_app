@@ -1,29 +1,18 @@
-  <!-- Open the modal using ID.showModal() method -->
-<button class="{{button_class}}" id="{{modal_id}}_open" @click="{{modal_id}}.showModal()">{{button_text}}</button>
-<dialog id="{{modal_id}}" class="modal">
-  <div class="modal-box">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <div id="{{modal_id}}_content"></div>
-  </div>
-</dialog>
-<script>
-  (function() {
-    const openButton = document.getElementById('{{modal_id}}_open');
-    const content = document.getElementById('{{modal_id}}_content');
-    const modal = document.getElementById('{{modal_id}}');
-  
-    openButton.addEventListener('click', function() {
-      fetch('{{ content_url }}')
-        .then(response => response.text())
-        .then(html => {
-          content.innerHTML = html;
-          modal.showModal();  // Asegura que se muestre justo después de cargar (opcional)
-        })
-        .catch(error => {
-          console.error('Error fetching content:', error);
-        });
-    });
-  })();
-  </script>
+<!-- Modal actualizado para base.html -->
+ <dialog id="generic_modal" class="modal"
+ hx-on:htmx:after-swap="if(event.detail.target.id === 'generic_modal_content') this.showModal()"
+ hx-on:closeModal="this.close()"
+ hx-on:htmx:response-error="this.querySelector('#generic_modal_content').innerHTML = '<div class=\'p-6\'><div class=\'alert alert-error\'><span>Error al procesar la solicitud</span></div></div>'">
+
+   <div class="modal-box relative p-0 max-w-2xl">
+     <form method="dialog">
+       <!-- if there is a button in form, it will close the modal -->
+       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
+     </form>
+       <div id="generic_modal_content" hx-swap="innerHTML"></div>
+   </div>
+   <form method="dialog" class="modal-backdrop">
+       <button>close</button>
+   </form>
+ </dialog> 
+ {% comment %} Fin Modal {% endcomment %}

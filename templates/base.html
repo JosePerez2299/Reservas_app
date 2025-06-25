@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ReservaSpaces Dashboard</title>
+
     <script>
       // Cargar tema guardado antes de que se renderice la página
       (function() {
@@ -13,227 +15,46 @@
           }
       })();
     </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.css" rel="stylesheet">
+
+    {% block head %}
+    {% endblock head %}
+    
 </head>
 
 <body class="bg-base-200">
 
-    {% block navbar %}
     {% include "includes/navbar.html" %}
-    {% endblock navbar %}
-    
+
+    {% include "includes/alert_messages.html" %}
     <div class = 'min-h-screen container mx-auto p-4'>
+        {% block content %}
+        {% endblock content %}
+    </div>
 
-    {% block content %}
-    {% endblock content %}
-      </div>
-      {% comment %} Modal {% endcomment %}
-      <dialog id="generic_modal" class="modal">
-        <div class="modal-box">
-          <div class="modal-top">
-            <form method="dialog">
-              <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-            </form>
-          </div>
-          <div id="generic_modal_content" style="padding:0"></div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
-      {% comment %} Fin Modal {% endcomment %}
-  
-    <script>// Theme toggle functionality
-      document.addEventListener('DOMContentLoaded', function() {
-          const themeController = document.querySelector('.theme-controller');
-          
-          // Establecer el estado del checkbox según el tema actual
-          if (themeController) {
-              themeController.checked = document.documentElement.getAttribute('data-theme') === 'dark';
-              
-              // Manejar cambios futuros
-              themeController.addEventListener('change', function() {
-                  const theme = this.checked ? 'dark' : 'light';
-                  document.documentElement.setAttribute('data-theme', theme);
-                  localStorage.setItem('theme', theme);
-              });
-          }
-      });
-      
-      // Mobile menu functionality (puede permanecer igual)
-      document.addEventListener('click', function(e) {
-          const dropdowns = document.querySelectorAll('.dropdown[open]');
-          dropdowns.forEach(dropdown => {
-              if (!dropdown.contains(e.target)) {
-                  dropdown.removeAttribute('open');
-              }
-          });
-      });
-    </script>
+    {% include "includes/modal.html" %}
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-      ;(function() {
-        const modal   = document.getElementById('generic_modal');
-        const content = document.getElementById('generic_modal_content');
-      
-        // Función para inicializar Select2
-        function initializeSelect2() {
-          // Destruir instancias previas de Select2 para evitar conflictos
-          const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
-          existingSelect2.forEach(select => {
-            if ($(select).data('select2')) {
-              $(select).select2('destroy');
-            }
-          });
-      
-          // Inicializar Select2 en elementos django-select2
-          const selectElements = content.querySelectorAll('select.django-select2');
-          selectElements.forEach(select => {
-            $(select).select2({
-              theme: 'default',
-              width: '100%',
-              dropdownParent: modal
-            });
-          });
-        }
-      
-        // Abre el modal cargando el formulario por AJAX
-        async function openModal(url) {
-          content.innerHTML = '';
-          modal.showModal();
-          try {
-            const resp = await fetch(url, {
-              headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            const html = await resp.text();
-            content.innerHTML = html;
-            
-            // Inicializar Select2
-            initializeSelect2();
-            
-            bindForm();
-          } catch (err) {
-            console.error('Error cargando formulario:', err);
-            content.innerHTML = '<p class="p-4 text-red-600">Error cargando el formulario.</p>';
-          }
-        }
-      
-        // Intercepta el submit
-        function bindForm() {
-          const form = content.querySelector('form.ajax-form');
-          if (!form || form._bound) return;
-      
-          form._bound = true;
-          form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const fd = new FormData(form);
-            fetch(form.action, {
-              method: 'POST',
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-              },
-              body: fd
-            })
-            .then(resp => resp.json())
-            .then(data => {
-              if (data.success) {
-                modal.close();
-                Swal.fire({
-                  title: "¡Éxito!",
-                  text: "Datos enviados correctamente.",
-                  icon: "success",
-                  confirmButtonText: "Aceptar",
-                  confirmButtonColor: "#2196F3",
-                  allowOutsideClick: true,
-                  allowEscapeKey: true
-                }).then((result) => {
-                  if (data.redirect_url) {
-                    window.location.href = data.redirect_url;
-                  }
-                });
-              }
-              else {
-                // Reemplazar contenido y reinicializar Select2
-                content.innerHTML = data.html;
-                initializeSelect2(); 
-                bindForm();
-              }
-            })
-            .catch(err => {
-              console.error('Error en submit:', err);
-            });
-          });
-        }
-      
-        // Delegación de clicks para botones .open-modal-btn
-        document.addEventListener('click', function(e) {
-          const btn = e.target.closest('.open-modal-btn');
-          if (!btn) return;
-          e.preventDefault();
-          openModal(btn.dataset.url);
-        });
-      
-        // Limpiar Select2 al cerrar el modal
-        modal.addEventListener('close', function() {
-          const existingSelect2 = content.querySelectorAll('select.select2-hidden-accessible');
-          existingSelect2.forEach(select => {
-            if ($(select).data('select2')) {
-              $(select).select2('destroy');
-            }
-          });
-        });
-      })();
-      </script>
-      
-    <script>
-        function themeSwitcher() {
-          return {
-            // usamos booleano para simplificar el binding con el checkbox
-            dark: localStorage.getItem('theme') === 'dark',
-        
-            init() {
-              // al iniciar, aplicamos el tema según localStorage o preferencia del sistema
-              this.applyTheme(this.dark)
-            },
-        
-            toggle() {
-              // invocado al hacer click sobre el swap
-              this.dark = !this.dark
-              this.applyTheme(this.dark)
-            },
-        
-            applyTheme(isDark) {
-              // ponemos el atributo data-theme que DaisyUI utiliza
-              document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-              // guardamos la preferencia
-              localStorage.setItem('theme', isDark ? 'dark' : 'light')
-            }
-          }
-        }
-      </script>
+    {% block scripts %}
+    {% endblock scripts %}
   
-      <!-- Alpine Plugins -->
-      <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
-      <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-  
-      <!-- Alpine Core -->
-      <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-   
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>     
+
     {{ form.media.js }}
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script type="module" src="https://unpkg.com/cally"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.17/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Alpine Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Alpine Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>     
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="{% static 'src/js/base.js' %}"></script>
 </body>
 </html>

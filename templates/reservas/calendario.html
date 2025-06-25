@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load utils %}
 
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.css" rel="stylesheet">
+{% endblock head %}
+
 {% block content %}
  <!-- Header Section -->
  <div class="container mx-auto px-6 py-8 bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
@@ -33,3 +38,10 @@
 
 {% include "includes/calendario.html" %}
 {% endblock %}
+
+{% block scripts %}
+<script type="module" src="https://unpkg.com/cally"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.17/index.global.min.js"></script>
+{% endblock scripts %}

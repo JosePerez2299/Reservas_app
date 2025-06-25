@@ -25,10 +25,12 @@
 
                         {% if crud_urls.create %}
                         <div class="flex items-center gap-3">
-                            
-                            <button class="btn btn-primary btn-sm gap-2 open-modal-btn" 
-                                    data-url="{% url crud_urls.create %}"
-                                    data-success-callback="reloadRow">
+                            <button
+                                onclick="generic_modal.showModal()"
+                                class="btn btn-sm btn-primary"
+                                hx-get="{% url crud_urls.create %}"
+                                hx-target="#generic_modal_content"
+                                hx-swap="innerHTML">
                                 <i class="fas fa-plus text-xs"></i>
                                 Crear {{model.label|slice:":-1"|lower}}
                             </button>
@@ -162,19 +164,18 @@
                                     {% puede_editar obj as puede_editar_obj %}
                                     {% puede_eliminar obj as puede_eliminar_obj %}
                                     
-                                    {% if puede_editar_obj %}
-                                    {% if crud_urls.edit %}
-                                            <div class="tooltip" data-tip="Editar">
-                                                <button class="btn btn-ghost btn-sm h-8 w-8 p-0 open-modal-btn" 
-                                                data-url="{% url crud_urls.edit obj.pk %}"
-                                                data-success-callback="reloadRow" >
-                                                    <i class="fas fa-edit text-xs"></i>
-                                                </button>
-                                            </div>
+                                    {% if puede_editar_obj and crud_urls.edit %}
+                                        <div class="tooltip" data-tip="Editar">
+                                            <button
+                                            onclick="generic_modal.showModal()"
+                                            class="btn btn-ghost btn-sm h-8 w-8 p-0"
+                                            hx-get="{% url crud_urls.edit obj.pk %}"
+                                            hx-target="#generic_modal_content"
+                                            hx-swap="innerHTML">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                        </div>
                                     {% endif %}
-                                    {% endif %}
-                                    
-                                    
                                     
                                     {% if puede_eliminar_obj %}
                                     {% if crud_urls.delete %}
