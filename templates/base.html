@@ -19,9 +19,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
     <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.css" rel="stylesheet">
-
-    
-
 </head>
 
 <body class="bg-base-200">
@@ -136,7 +133,6 @@
           form.addEventListener('submit', function(e) {
             e.preventDefault();
             const fd = new FormData(form);
-            console.log(fd);
             fetch(form.action, {
               method: 'POST',
               headers: {
@@ -147,7 +143,6 @@
             })
             .then(resp => resp.json())
             .then(data => {
-              console.log(data);
               if (data.success) {
                 modal.close();
                 Swal.fire({
@@ -167,7 +162,7 @@
               else {
                 // Reemplazar contenido y reinicializar Select2
                 content.innerHTML = data.html;
-                initializeSelect2(); // ← Esta es la línea clave que faltaba
+                initializeSelect2(); 
                 bindForm();
               }
             })
@@ -233,23 +228,6 @@
    
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>     
-      
-      <script>
-        // Animaciones y interactividad adicional
-        document.addEventListener('DOMContentLoaded', function() {
-            // Agregar efectos de hover dinámicos
-            const cards = document.querySelectorAll('.card-hover');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px) scale(1.02)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
-        });
-    </script>
     {{ form.media.js }}
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script type="module" src="https://unpkg.com/cally"></script>

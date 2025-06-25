@@ -124,17 +124,30 @@ class CalendarioReservasView(LoginRequiredMixin, TemplateView):
     template_name = 'reservas/calendario.html'
 
 
-class ReservasByDate(FilterView):
+class ReservasByDate(PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de reservas filtradas por fecha
     """
     model = Reserva
     permission_required = 'reservas.view_reserva'
     template_name = 'includes/reservas_cardslist.html'
-    paginate_by = 10
+    paginate_by = 7
     filterset_class = ReservaFilterCards
     context_object_name = 'reservas'   
-    ordering = ['hora_inicio']     
+    ordering = ['hora_inicio']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Agregar parámetros actuales al contexto para la paginación
+        context['current_filters'] = self.request.GET.dict()
+        
+        # Si es una petición HTMX, podemos agregar información adicional
+        if self.request.headers.get('HX-Request'):
+            context['is_htmx'] = True
+            
+        return context
+ 
     
     
 

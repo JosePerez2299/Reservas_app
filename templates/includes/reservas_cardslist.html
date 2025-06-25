@@ -1,36 +1,29 @@
-
 {% load utils %}
 {% if reservas %}
-  <div  class="w-full max-w-2xl mx-auto p-2">
+  <div class="w-full max-w-2xl mx-auto p-2">
     {% for reserva in reservas %}
-      <div class="border-l-8 border-l-{{ reserva|get_color_reserva }} shadow-xl  collapse collapse-arrow bg-base-100 border-b border-base-300 rounded-lg mb-2">
+      <div class="border-l-8 border-l-{{ reserva|get_color_reserva }} shadow-xl collapse collapse-arrow bg-base-100 border-b border-base-300 rounded-lg mb-2">
         <!-- Radio con mismo name para agrupar, checked en el primero -->
         <input 
           type="radio" 
           name="reservas-accordion" 
-
         />
         <!-- Título compacto -->
         <div class="collapse-title flex items-center justify-between">
-            
           <div class="flex items-center space-x-3 flex-1 min-w-0">
             <!-- Avatar o inicial -->
-
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="text-xs font-medium text-blue-600">
-                      {{ reserva.usuario.first_name|first|default:reserva.usuario.username|first|upper }}
-                    </span>
-                </div>
- 
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span class="text-xs font-medium text-blue-600">
+                {{ reserva.usuario.first_name|first|default:reserva.usuario.username|first|upper }}
+              </span>
+            </div>
             <!-- Info principal -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center space-x-2">
                 <h4 class="font-medium text-gray-900 text-sm truncate">
                   {{ reserva.usuario.get_full_name|default:reserva.usuario.username|truncatechars:15 }}
                 </h4>
-                
                 <div class="badge p-1 badge-xs badge-{{ reserva|get_color_reserva }}">{{ reserva.estado|first|upper }}</div>
-               
               </div>
               <p class="text-xs text-gray-500 truncate">{{ reserva.espacio.nombre|truncatechars:15 }}</p>
             </div>
@@ -66,7 +59,6 @@
                   <span class="text-gray-900">{{ reserva.motivo|truncatechars:40 }}</span>
                 </div>
               </div>
- 
             </div>
 
             {% if perms.reservas.change_reserva %}
@@ -91,16 +83,69 @@
       </div>
     {% endfor %}
 
+    <!-- Paginación con HTMX -->
     {% if page_obj.has_other_pages %}
-      <div class="flex justify-between items-center mt-4">
+      <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+        <!-- Información de paginación -->
+        <div class="text-xs text-gray-600">
+          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+          ({{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }})
+        </div>
+        
+        <!-- Controles de paginación -->
         <div class="flex gap-2">
-          {% if page_obj.has_previous %}
-            <a href="{%  url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}" class="btn btn-xs btn-ghost">Anterior</a>
+          <!-- Botón Primera página -->
+          {% if page_obj.has_previous and page_obj.number > 2 %}
+            <button 
+              hx-get="{% url 'reservas_cards' %}?page=1{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+              hx-target="#reservas-list"
+              hx-indicator="#loading-reservas"
+              class="btn btn-xs btn-ghost"
+              title="Primera página">
+              ««
+            </button>
           {% endif %}
+
+          <!-- Botón Anterior -->
+          {% if page_obj.has_previous %}
+            <button 
+              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+              hx-target="#reservas-list"
+              hx-indicator="#loading-reservas"
+              class="btn btn-xs btn-ghost">
+              « Anterior
+            </button>
+          {% endif %}
+
+          <!-- Botón Siguiente -->
           {% if page_obj.has_next %}
-            <a href="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}" class="btn btn-xs btn-ghost">Siguiente</a>
+            <button 
+              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+              hx-target="#reservas-list"
+              hx-indicator="#loading-reservas"
+              class="btn btn-xs btn-ghost">
+              Siguiente »
+            </button>
+          {% endif %}
+
+          <!-- Botón Última página -->
+          {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
+            <button 
+              hx-get="{% url 'reservas_cards' %}?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+              hx-target="#reservas-list"
+              hx-indicator="#loading-reservas"
+              class="btn btn-xs btn-ghost"
+              title="Última página">
+              »»
+            </button>
           {% endif %}
         </div>
+      </div>
+      
+      <!-- Indicador de carga -->
+      <div id="loading-reservas" class="htmx-indicator text-center py-2">
+        <div class="loading loading-spinner loading-sm"></div>
+        <span class="text-xs text-gray-500 ml-2">Cargando reservas...</span>
       </div>
     {% endif %}
   </div>
@@ -111,3 +156,17 @@
     <p class="text-xs text-gray-400 mt-1">con el filtro seleccionado</p>
   </div>
 {% endif %}
+
+<!-- Estilos para el indicador de carga -->
+<style>
+  .htmx-indicator {
+    display: none;
+  }
+  .htmx-request .htmx-indicator {
+    display: block;
+  }
+  .htmx-request #reservas-list {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+</style>
