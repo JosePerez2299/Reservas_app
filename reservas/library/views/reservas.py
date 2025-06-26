@@ -9,6 +9,8 @@ Views para las reservas
 
 """
 
+from django.shortcuts import render
+
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from reservas.models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -202,7 +204,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     
 
    
-class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
+class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """
     Crea una nueva reserva
     """
@@ -212,7 +214,6 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.add_reserva'
     html_title = 'Crear Reserva'
-    url = 'reserva_create'
 
     def get_form_kwargs(self):
         """
@@ -221,6 +222,26 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+
+    def form_valid(self, form):
+        # 1) aseguramos asignar usuario y guardar
+        form.instance.usuario = self.request.user
+        self.object = form.save()
+
+        # 2) si viene por HTMX, devolvemos 200 con trigger
+        if self.request.headers.get('HX-Request') == 'true':
+            resp = HttpResponse(status=200)
+            resp['HX-Trigger'] = 'showSuccess'
+            return resp
+
+        # 3) si no, comportamiento normal (redirect)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Si es petición HTMX, devolvemos el form con errores y status 400
+        
+        context = self.get_context_data(form=form)
+        return render(self.request, self.template_name, context, status=200)
 
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):

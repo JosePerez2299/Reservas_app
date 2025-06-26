@@ -55,8 +55,29 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
-    <script src="{% static 'src/js/base.js' %}"></script>
 
+    <!-- Scripts base -->
+    <script src="{% static 'src/js/base.js' %}"></script>
+    <script>
+        document.body.addEventListener('showSuccess', () => {
+          Swal.fire({
+            icon: 'success',
+            title: '¡Listo!',
+            text: 'La reserva se ha creado correctamente.',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // refresca la lista de reservas (ajusta el selector a tu contenedor)
+              htmx.trigger('#reservas-list', 'refresh');
+            }
+          });
+        });
+      
+        // Opcional: si quieres un listener global que reconozca "refresh" events:
+        document.body.addEventListener('refresh', (evt) => {
+          htmx.trigger(evt.target, 'refresh');
+        });
+      </script>
     {% block scripts %}
     {% endblock scripts %}
   

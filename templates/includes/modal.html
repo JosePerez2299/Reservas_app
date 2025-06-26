@@ -1,18 +1,24 @@
-<!-- Modal actualizado para base.html -->
- <dialog id="generic_modal" class="modal"
- hx-on:htmx:after-swap="if(event.detail.target.id === 'generic_modal_content') this.showModal()"
- hx-on:closeModal="this.close()"
- hx-on:htmx:response-error="this.querySelector('#generic_modal_content').innerHTML = '<div class=\'p-6\'><div class=\'alert alert-error\'><span>Error al procesar la solicitud</span></div></div>'">
-
-   <div class="modal-box relative p-0 max-w-2xl">
-     <form method="dialog">
-       <!-- if there is a button in form, it will close the modal -->
-       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
-     </form>
-       <div id="generic_modal_content" hx-swap="innerHTML"></div>
-   </div>
-   <form method="dialog" class="modal-backdrop">
-       <button>close</button>
-   </form>
- </dialog> 
- {% comment %} Fin Modal {% endcomment %}
+<dialog id="generic_modal" class="modal"
+  hx-on:htmx:after-swap="
+    if (event.detail.target.id === 'generic_modal_content') this.showModal()
+  "
+  hx-on:showSuccess="
+    this.close();
+    this.nextElementSibling.remove();
+  "
+  hx-on:htmx:response-error="
+    const content = this.querySelector('#generic_modal_content');
+    content.innerHTML = event.detail.xhr.responseText;
+  "
+>
+  <div class="modal-box relative p-0 max-w-2xl">
+    <button
+      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10"
+      onclick="this.closest('dialog').close()"
+    >✕</button>
+    <div id="generic_modal_content" hx-swap="innerHTML"></div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
