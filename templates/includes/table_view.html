@@ -26,14 +26,14 @@
                         {% if crud_urls.create %}
                         <div class="flex items-center gap-3">
                             <button
-                                onclick="generic_modal.showModal()"
-                                class="btn btn-sm btn-primary"
+                                class="btn btn-primary"
                                 hx-get="{% url crud_urls.create %}"
                                 hx-target="#generic_modal_content"
                                 hx-swap="innerHTML">
                                 <i class="fas fa-plus text-xs"></i>
-                                Crear {{model.label|slice:":-1"|lower}}
-                            </button>
+                                Crear {{model.label|capfirst|slice:':-1'}}
+                                </button>
+
                         </div>
                         {% endif %}
                     </div>

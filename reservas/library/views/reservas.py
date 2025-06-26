@@ -8,9 +8,8 @@ Views para las reservas
 * ReservaDeleteView: Elimina una reserva existente
 
 """
-
+import json
 from django.shortcuts import render
-
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from reservas.models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -69,56 +68,6 @@ class Reservas_json(LoginRequiredMixin, PermissionRequiredMixin,View):
         return JsonResponse(list(daily_counts), safe=False)
 
 
-def reservas_by_date_json(request):
-    """
-    Devuelve una lista detallada de reservas para una fecha específica.
-    """
-    date_str = request.GET.get('fecha')
-    status = request.GET.get('status')
-
-    try:
-        target_date = datetime.fromisoformat(date_str).date()
-    except (ValueError, TypeError, AttributeError):
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
-
-    reservas = Reserva.objects.filter(fecha_uso=target_date)
-
-    if status and status != 'all':
-        reservas = reservas.filter(estado=status)
-    
-    reservas_values = reservas.values(
-        'id', 'usuario_id', 'espacio_id', 'fecha_uso', 'hora_inicio',
-        'hora_fin', 'estado', 'motivo', 'motivo_admin', 'aprobado_por_id',
-        'usuario__first_name', 'usuario__last_name', 'usuario__username',
-        'espacio__nombre'
-    ).order_by('hora_inicio')
-
-
-
-    data = []
-    for r in reservas_values:
-        full_name = f"{r['usuario__first_name']} {r['usuario__last_name']}".strip()
-        data.append({
-            'id': r['id'],
-            'usuario_id': r['usuario_id'],
-            'usuario_nombre': full_name or r['usuario__username'],
-            'espacio_id': r['espacio_id'],
-            'espacio_nombre': r['espacio__nombre'],
-            'fecha_uso': r['fecha_uso'].strftime('%Y-%m-%d'),
-            'hora_inicio': r['hora_inicio'].strftime('%H:%M'),
-            'hora_fin': r['hora_fin'].strftime('%H:%M'),
-            'estado': r['estado'],
-            'motivo': r['motivo'],
-            'motivo_admin': r['motivo_admin'] or '',
-            'aprobado_por': r['aprobado_por_id'],
-            'edit_url': reverse('reserva_edit', args=[r['id']]),
-        })
-
-    print(data)
-
-    return JsonResponse(data, safe=False)
-
-
 class CalendarioReservasView(LoginRequiredMixin, TemplateView):
     """
     Muestra el calendario de reservas
@@ -151,8 +100,6 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
         return context
  
     
-    
-
 class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView):
     """
     Muestra una lista de reservas con un formulario de filtrado
@@ -204,45 +151,28 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     
 
    
-class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    """
-    Crea una nueva reserva
-    """
-    model = Reserva
+class ReservaCreateView(CreateView):
     form_class = ReservaCreateForm
     template_name = 'reservas/reservas_create.html'
-    success_url = reverse_lazy('reserva')
-    permission_required = 'reservas.add_reserva'
-    html_title = 'Crear Reserva'
+    
 
     def get_form_kwargs(self):
-        """
-        Pasa el objeto request al formulario
-        """
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+    def form_invalid(self, form):
+        print("Formulario inválido")
+        # Retorna el mismo partial con errores (HTTP 200)
+        return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        # 1) aseguramos asignar usuario y guardar
-        form.instance.usuario = self.request.user
-        self.object = form.save()
-
-        # 2) si viene por HTMX, devolvemos 200 con trigger
-        if self.request.headers.get('HX-Request') == 'true':
-            resp = HttpResponse(status=200)
-            resp['HX-Trigger'] = 'showSuccess'
-            return resp
-
-        # 3) si no, comportamiento normal (redirect)
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        # Si es petición HTMX, devolvemos el form con errores y status 400
+        form.save()
+        print("Formulario válido")
         
-        context = self.get_context_data(form=form)
-        return render(self.request, self.template_name, context, status=200)
-
+        response = HttpResponse(status=204)
+        # disparamos showMessage con payload sencillo
+        response['HX-Trigger'] = json.dumps({'showMessage': '¡OK :D!'})
+        return response
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):
     """
