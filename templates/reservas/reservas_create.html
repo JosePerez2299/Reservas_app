@@ -1,0 +1,27 @@
+{% load tailwind_filters %}
+<h2 class="text-center text-2xl text-base-content/80 font-bold">{{title}}</h2>
+<div class="p-2 mt-2 rounded-box">
+  <form method="POST" action="{{url}}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-success">Guardar</button>
+  </form>
+</div>
+
+<script>
+  // Este script se ejecuta cuando HTMX termine de cargar el contenido
+  document.addEventListener('htmx:afterSettle', function(event) {
+    // Solo ejecutar si el contenido se cargó en nuestro modal
+    if (event.detail.target.id === 'generic_modal_content') {
+      $("#id_espacio").select2({
+        dropdownParent: $('#generic_modal'),
+        width: '100%'   
+      });
+
+      $("#id_usuario").select2({
+        dropdownParent: $('#generic_modal'),
+        width: '100%'   
+      });
+    }
+  });
+</script>

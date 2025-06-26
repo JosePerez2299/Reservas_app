@@ -208,7 +208,7 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     model = Reserva
     form_class = ReservaCreateForm
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/reservas_create.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.add_reserva'
     html_title = 'Crear Reserva'
