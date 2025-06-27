@@ -1,34 +1,29 @@
+
 {% load tailwind_filters %}
-<h2 class="text-center text-2xl text-base-content/80 font-bold">{{title}}</h2>
-<div class="p-2 mt-2 rounded-box">
-  <form
-    method="POST"
-    hx-post="{% url 'reserva_create' %}"
-    hx-target="#generic_modal_content"
-    hx-swap="innerHTML"
-  >
-  
-  
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-success">Guardar</button>
-  </form>
+{% load utils %}
+{% load crispy_forms_tags %}
+
+
+<div class="p-4 mt-2 rounded-box">
+  <div class="flex items-center gap-3 mb-2">
+    <div class="text-2xl text-primary">
+
+      <li class=" fas fa-info-circle"></li>
+
+    </div>
+    <h1 class="text-3xl font-bold text-base-content">{{title}}</h1>
+</div>
+  <div class="px-8 py-4 mt-2 rounded-box bg-base-200">
+    <form
+      method="POST"
+      hx-post="{{url}}"
+      hx-target="#generic_modal_content"
+      hx-swap="innerHTML"
+    >
+      {% csrf_token %}
+      {# Renderiza solo el formulario con crispy, sin botón adicional #}
+      {% crispy form %}
+    </form>
+  </div>
 </div>
 
-<script>
-  // Este script se ejecuta cuando HTMX termine de cargar el contenido
-  document.addEventListener('htmx:afterSettle', function(event) {
-    // Solo ejecutar si el contenido se cargó en nuestro modal
-    if (event.detail.target.id === 'generic_modal_content') {
-      $("#id_espacio").select2({
-        dropdownParent: $('#generic_modal'),
-        width: '100%'   
-      });
-
-      $("#id_usuario").select2({
-        dropdownParent: $('#generic_modal'),
-        width: '100%'   
-      });
-    }
-  });
-</script>

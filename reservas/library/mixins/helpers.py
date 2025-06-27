@@ -9,38 +9,23 @@ from django.urls import reverse_lazy
 from django.db.models.functions import Lower
 from django.db import models
 from django.conf import settings
+import json
 
 class AjaxFormMixin:
-    def post(self, request, *args, **kwargs):
-        # Llamamos al dispatch normal para procesar form_valid/form_invalid
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return super().post(request, *args, **kwargs)
-        # No es AJAX: comportamiento normal
-        return super().post(request, *args, **kwargs)
+    def success_message(self):
+        return 'Su peticion se ha procesado correctamente'
 
     def form_invalid(self, form):
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            # Solo AJAX: devolvemos HTML del form con errores
-            html = render_to_string(
-                self.template_name, 
-                self.get_context_data(form=form), 
-                request=self.request
-            )
-            return JsonResponse({'success': False, 'html': html})
-
-        # No es ajax
-        return super().form_invalid(form)
+        # Retorna el mismo partial con errores (HTTP 200)
+        return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
-        # Guardamos instancia
-        self.object = form.save()
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'redirect_url': self.get_success_url()
-            })
-        # No AJAX: redirección normal
-        return super().form_valid(form)
+        form.save()
+        
+        response = HttpResponse(status=204)
+        # disparamos showMessage con payload sencillo
+        response['HX-Trigger'] = json.dumps({'showMessage': self.success_message()})
+        return response
 
 class FormContextMixin:
     def get_context_data(self, **kwargs):

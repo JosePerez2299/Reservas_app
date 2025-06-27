@@ -16,14 +16,20 @@
       })();
     </script>
 
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
 
-
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- Select2 css -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 js -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     {% block head %}
     {% endblock head %}
@@ -43,8 +49,7 @@
     {% include "includes/modal.html" %}
 
  
-
-    {{ form.media.js }}
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Alpine Plugins -->
@@ -54,11 +59,31 @@
     <!-- Alpine Core -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
+    <!-- Htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <!-- Scripts base -->
     <script src="{% static 'src/js/base.js' %}"></script>
-    
+
+    <!-- Scripts personalizados -->
+    <script> 
+        document.addEventListener('htmx:afterSettle', function(event) {
+            // Asegurarnos de que sea el contenido de nuestro modal
+            if (event.detail.target.id === 'generic_modal_content') {
+              // Buscar todos los selects dentro del modal
+              const $modalContent = $(event.detail.target);
+              $modalContent.find('select').each(function() {
+                const $sel = $(this);
+                // Evitar volver a inicializar un select2 ya creado
+                $sel.select2({
+                  dropdownParent: $('#generic_modal'), // selector de tu modal padre
+                  width: '100%'
+                });
+              });
+            }
+          });
+    </script>
+
     {% block scripts %}
     {% endblock scripts %}
 </body>

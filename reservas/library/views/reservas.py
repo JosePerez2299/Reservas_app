@@ -150,29 +150,26 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     
     
 
-   
-class ReservaCreateView(CreateView):
+
+class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     form_class = ReservaCreateForm
     template_name = 'reservas/reservas_create.html'
+    permission_required = 'reservas.add_reserva'
     
+    def success_message(self):
+        return 'Reserva creada correctamente'
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('reserva_create')
+        ctx['title'] = 'Crear Reserva'
+        return ctx
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-    def form_invalid(self, form):
-        print("Formulario inválido")
-        # Retorna el mismo partial con errores (HTTP 200)
-        return self.render_to_response(self.get_context_data(form=form))
 
-    def form_valid(self, form):
-        form.save()
-        print("Formulario válido")
-        
-        response = HttpResponse(status=204)
-        # disparamos showMessage con payload sencillo
-        response['HX-Trigger'] = json.dumps({'showMessage': '¡OK :D!'})
-        return response
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):
     """
