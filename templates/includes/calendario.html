@@ -3,7 +3,7 @@
 
 <div x-data="reservasCalendar({
     reservasJsonUrl: '{% url 'reservas_json' %}',
-    reservasByDateUrl: '{% url 'reservas_by_date_json' %}',
+    reservasByDateUrl: '{% url 'reservas_by_date' %}',
     editUrlTemplate: '{% url 'reserva_edit' 0 %}'.replace('0', 'RESERVATION_ID')
 })" class="w-full">
     
@@ -49,7 +49,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'all' ? 'btn-primary' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="/reservas/fecha/"
+                            hx-get="{% url 'reservas_by_date' %}"   
                             hx-target="#reservas-list"
                             hx-vals='{"estado": ""}'
                             hx-include="[name='fecha_uso']"
@@ -61,7 +61,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'pendiente' ? 'btn-warning' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="/reservas/fecha/"
+                            hx-get="{% url 'reservas_by_date' %}"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "pendiente"}'
                             hx-include="[name='fecha_uso']"
@@ -73,7 +73,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'aprobada' ? 'btn-success' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="/reservas/fecha/"
+                            hx-get="{% url 'reservas_by_date' %}"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "aprobada"}'
                             hx-include="[name='fecha_uso']"
@@ -85,7 +85,7 @@
                             class="btn btn-xs"
                             :class="filterStatus === 'rechazada' ? 'btn-error' : 'btn-ghost border'"
                             hx-trigger="click"
-                            hx-get="/reservas/fecha/"
+                            hx-get="{% url 'reservas_by_date' %}"
                             hx-target="#reservas-list"
                             hx-vals='{"estado": "rechazada"}'
                             hx-include="[name='fecha_uso']"

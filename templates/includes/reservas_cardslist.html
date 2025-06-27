@@ -115,7 +115,7 @@
         <!-- Primera página -->
         {% if page_obj.has_previous and page_obj.number > 2 %}
           <button 
-            hx-get="{% url 'reservas_cards' %}?page=1{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-get="{% url 'reservas_by_date' %}?page=1{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
             hx-target="#reservas-list"
             hx-indicator="#loading-reservas"
             class="btn btn-xs btn-ghost p-1"
@@ -127,7 +127,7 @@
         <!-- Anterior -->
         {% if page_obj.has_previous %}
           <button 
-            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-get="{% url 'reservas_by_date' %}?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
             hx-target="#reservas-list"
             hx-indicator="#loading-reservas"
             class="btn btn-xs btn-ghost p-1"
@@ -142,7 +142,7 @@
         <!-- Siguiente -->
         {% if page_obj.has_next %}
           <button 
-            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.next_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-get="{% url 'reservas_by_date' %}?page={{ page_obj.next_page_number }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
             hx-target="#reservas-list"
             hx-indicator="#loading-reservas"
             class="btn btn-xs btn-ghost p-1"
@@ -154,7 +154,7 @@
         <!-- Última página -->
         {% if page_obj.has_next and page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
           <button 
-            hx-get="{% url 'reservas_cards' %}?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
+            hx-get="{% url 'reservas_by_date' %}?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_uso %}&fecha_uso={{ request.GET.fecha_uso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}"
             hx-target="#reservas-list"
             hx-indicator="#loading-reservas"
             class="btn btn-xs btn-ghost p-1"

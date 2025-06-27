@@ -70,6 +70,7 @@
         document.addEventListener('htmx:afterSettle', function(event) {
             // Asegurarnos de que sea el contenido de nuestro modal
             if (event.detail.target.id === 'generic_modal_content') {
+              console.log('Modal abierto');
               // Buscar todos los selects dentro del modal
               const $modalContent = $(event.detail.target);
               $modalContent.find('select').each(function() {

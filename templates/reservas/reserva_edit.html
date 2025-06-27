@@ -1,44 +1,96 @@
-{% load form_style %}
+{% load tailwind_filters %}
+{% load utils %}
+{% load crispy_forms_tags %}
 
-{% block body %}
-
-  {{ form.media.css }}
-  <h2 class="text-center text-2xl text-base-content/80 font-bold">{{ title }}</h2>
-  <div class="p-2 mt-2 rounded-box">
-    <form
-      x-data="{ estadoValue: '{{ form.instance.estado }}' }"
-      class="ajax-form"
-      id="form-modal"
-      method="POST"
-      action="{{ url }}"
-    >
-      {% csrf_token %}
-
-      {% for field in form %}
-        {% if field.name == 'estado' %}
-          <div @change="estadoValue = $event.target.value">
-            {{ field|mystyle }}
-          </div>
-        {% elif field.name == 'motivo_admin' %}
-          <div
-            x-show="estadoValue === 'aprobada' || estadoValue === 'rechazada'"
-            x-cloak
-            x-effect="
-              if (!(estadoValue === 'aprobada' || estadoValue === 'rechazada')) {
-                const ta = document.getElementById('id_motivo_admin');
-                if (ta) ta.value = null;
-              }
-            "
-          >
-            {{ field|mystyle }}
-          </div>
-        {% else %}
-          {{ field|mystyle }}
-        {% endif %}
-      {% endfor %}
-
-      <button type="submit" class="btn btn-success">Guardar</button>
-    </form>
+<div class="p-4 bg-base-100">
+  <!-- Header simplificado -->
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+      <i class="fas fa-calendar-check text-sm"></i>
+    </div>
+    <div>
+      <h1 class="text-lg font-bold">{{title}}</h1>
+      <p class="text-xs text-base-content/60">Detalles de la reserva</p>
+    </div>
   </div>
-  {{ form.media.js }}
-{% endblock %}
+
+  <!-- Cards Usuario y Espacio - más compactas -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <!-- Usuario -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-user text-primary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Usuario</span>
+      </div>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 bg-primary text-primary-content rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-xs"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-sm truncate">{{object.usuario}}</p>
+        </div>
+      </div>
+      
+      {% if object.usuario.email %}
+      <div class="flex items-center gap-2">
+        <i class="fas fa-envelope text-info text-xs"></i>
+        <span class="text-xs text-base-content/70 truncate">{{object.usuario.email}}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Espacio -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-building text-secondary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Espacio</span>
+      </div>
+      
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-door-open text-primary text-xs"></i>
+          <span class="font-medium text-sm truncate">{{object.espacio}}</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <i class="fas fa-tag text-secondary text-xs"></i>
+          <span class="text-xs text-base-content/70">{{object.espacio.tipo}}</span>
+        </div>
+        
+        <div class="flex items-center gap-3 text-xs text-base-content/60">
+          <div class="flex items-center gap-1">
+            <i class="fas fa-map-marker-alt text-accent"></i>
+            <span>{{object.espacio.ubicacion}}</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <i class="fas fa-layer-group text-info"></i>
+            <span>P{{object.espacio.piso}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if object.fecha_inicio and object.fecha_fin %}
+  <!-- Horarios más compactos -->
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <div class="bg-success/10 border border-success/20 rounded-lg p-2">
+      <div class="flex items-center gap-1 mb-1">
+        <i class="fas fa-play text-success text-xs"></i>
+        <span class="text-xs text-success font-medium">Inicio</span>
+      </div>
+      <p class="text-sm font-medium">{{object.fecha_inicio|date:"d/m/y H:i"}}</p>
+    </div>
+    <div class="bg-error/10 border border-error/20 rounded-lg p-2">
+      <div class="flex items-center gap-1 mb-1">
+        <i class="fas fa-stop text-error text-xs"></i>
+        <span class="text-xs text-error font-medium">Fin</span>
+      </div>
+      <p class="text-sm font-medium">{{object.fecha_fin|date:"d/m/y H:i"}}</p>
+    </div>
+  </div>
+  {% endif %}
+
+ {% include "includes/partial_form_ajax.html" %}
+</div>

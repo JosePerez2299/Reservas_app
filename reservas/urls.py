@@ -38,7 +38,7 @@ urlpatterns = [
     path('calendario/', CalendarioReservasView.as_view(), name='calendario'),
     path('api/reservas/', Reservas_json.as_view(), name='reservas_json'),
 
-    path('reservas/fecha/', ReservasByDate.as_view(), name='reservas_cards'),
+    path('reservas/fecha/', ReservasByDate.as_view(), name='reservas_by_date'),
 ]
 
 # Manejador de error 404

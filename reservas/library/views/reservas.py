@@ -171,7 +171,7 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         return kwargs
 
 
-class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView ):
+class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView ):
     """
     Edita una reserva existente
     """
@@ -180,9 +180,15 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     template_name = 'reservas/reserva_edit.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.change_reserva'
-    html_title = 'Editar Reserva'
-    url = 'reserva_edit'
 
+    def success_message(self):
+        return 'Reserva creada correctamente'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('reserva_create')
+        ctx['title'] = 'Crear Reserva'
+        return ctx
     def get_form_kwargs(self):
         """
         Pasa el objeto request al formulario
