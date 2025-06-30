@@ -25,7 +25,7 @@ from datetime import datetime
 from django.views import View
 from django.views.generic import TemplateView
 
-class Reservas_json(LoginRequiredMixin, PermissionRequiredMixin,View):
+class ReservasMonthlyCount(LoginRequiredMixin, PermissionRequiredMixin,View):
     """
     Devuelve un conteo de reservas por día para un rango de fechas,
     opcionalmente filtrado por estado.
@@ -177,17 +177,18 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     model = Reserva
     form_class = ReservaUpdateForm  
-    template_name = 'reservas/reserva_edit.html'
+    template_name = 'reservas/reservas_edit.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.change_reserva'
 
     def success_message(self):
-        return 'Reserva creada correctamente'
+        return 'Reserva editada correctamente'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['url'] = reverse_lazy('reserva_create')
-        ctx['title'] = 'Crear Reserva'
+        ctx['url'] = reverse_lazy('reserva_edit', args=[self.object.pk])
+        ctx['title'] = 'Editar Reserva'
+        ctx['subtitle'] = 'Detalles de la reserva'
         return ctx
     def get_form_kwargs(self):
         """
@@ -198,7 +199,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         return kwargs
 
 
-class ReservaDetailView(LoginRequiredMixin, FormContextMixin, DetailView):
+class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DetailView):
     """
     Muestra los detalles de una reserva
     """

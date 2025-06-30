@@ -1,0 +1,25 @@
+{% load tailwind_filters %}
+{% load utils %}
+{% load crispy_forms_tags %}
+
+<div class="p-4 bg-base-100">
+
+  {% block header %}
+  <!-- Header simplificado -->
+  <div class="flex items-center gap-3 mb-4">
+    <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+      <i class="fas fa-edit text-sm"></i>
+    </div>
+    <div>
+      <h1 class="text-lg font-bold">{{title}}</h1>
+      <p class="text-xs text-base-content/60">{{subtitle|default:""}}</p>
+    </div>
+  </div>
+  {% endblock header %}
+
+  {% block subheader %}
+  
+  {% endblock subheader %}
+
+ {% include "includes/partial_form_ajax.html" %}
+</div>
