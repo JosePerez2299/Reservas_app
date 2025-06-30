@@ -232,7 +232,7 @@ class Reserva(models.Model):
     class Meta:
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
-        ordering = ['fecha_uso', 'hora_inicio']
+        ordering = ['-fecha_uso', 'hora_inicio']
         indexes = [
             models.Index(fields=['espacio', 'fecha_uso']),
             models.Index(fields=['fecha_uso']),

@@ -14,13 +14,18 @@
 
 
              {# Dropdowns por cada modelo con permisos #}
-             <li><a href={% url 'dashboard' %} class=''{%if current_section == 'dashboard' %}active{% endif %}><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+             <li><a href={% url 'dashboard' %} class=''{%if current_section == 'dashboard' %}active{% endif %}>{% get_icon 'dashboard' %} Dashboard</a></li>
 
              {# Dropdowns por cada modelo con permisos #}
              {% for item in dashboard_access %}
 
-             <li><a href={% url item.model.url %} class=''{%if current_section == item.model.url %}active{% endif %}><i class="fas fa-tachometer-alt mr-2"></i> {{ item.model.label|capfirst }}</a></li>
+             <li>
+             <a href={% url item.model.url %} class=''{%if current_section == item.model.url %}active{% endif %}>
+                 {% get_icon item.model.label|lower %}
+             {{ item.model.label|capfirst }}</a></li>
           {% endfor %}
+
+          <li><a href={% url 'calendario' %} class=''{%if current_section == 'calendario' %}active{% endif %}><i class="fas fa-calendar"></i> Calendario</a></li>
 
           </ul>
       </div>
@@ -35,16 +40,20 @@
   
   <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1 gap-1">
-        <li><a href={% url 'dashboard' %} class="{% if current_section == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+        <li><a href={% url 'dashboard' %} class="{% if current_section == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
 
-                           {# Dropdowns por cada modelo con permisos #}
-                           {% for item in dashboard_access %}
+        {# Dropdowns por cada modelo con permisos #}
+        {% for item in dashboard_access %}
 
-                           <li>
-                            <a href={% url item.model.url %} class="{% if current_section == item.model.url %}active{% endif %}">
-                              {% get_icon item.model.label|lower %}
-                            {{ item.model.label|capfirst }}</a></li>
-                        {% endfor %}
+        <li>
+        <a href={% url item.model.url %} class="{% if current_section == item.model.url %}active{% endif %}">
+            {% get_icon item.model.label|lower %}
+            {{ item.model.label|capfirst }}
+        </a>
+        </li>
+        {% endfor %}
+
+        <li><a href={% url 'calendario' %} class="{% if current_section == 'calendario' %}active{% endif %}"><i class="fas fa-calendar"></i> Calendario</a></li>
 
       </ul>
   </div>
