@@ -6,9 +6,11 @@ from django.conf import settings
 from django.db.models import Case, When, Value, CharField
 from django.contrib.contenttypes.models import ContentType
 from reservas.models import *
+from reservas.library.filters.logs import LogFilter
+from reservas.library.mixins.helpers import ListCrudMixin, SmartOrderingMixin
+from django_filters.views import FilterView
 
-
-class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  SmartOrderingMixin,ListView ):
+class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  SmartOrderingMixin, FilterView ):
     """
     Muestra una lista de logs con un formulario de filtrado
     """
@@ -16,14 +18,13 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     permission_required = 'auditlog.view_logentry' 
     template_name = 'reservas/actividad_table.html'
     paginate_by = 10
+    filterset_class = LogFilter
     cols = {
-        'id': 'ID',
-        'actor': 'Actor',
-        'object_id': 'Objeto',
+        'id': 'Log ID',
+        'actor': 'Usuario',
         'object_repr': 'Recurso',
+        'tipo': 'Modulo',
         'action_label': 'Acción',
-        'tipo': 'Tipo',
-
         'timestamp': 'Fecha',
     }
 
