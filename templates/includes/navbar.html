@@ -34,14 +34,14 @@
   </div>
   
   <div class="navbar-center hidden lg:flex">
-      <ul class="menu menu-horizontal px-1">
-        <li><a href={% url 'dashboard' %}><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+      <ul class="menu menu-horizontal px-1 gap-1">
+        <li><a href={% url 'dashboard' %} class="{% if current_section == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
 
                            {# Dropdowns por cada modelo con permisos #}
                            {% for item in dashboard_access %}
 
                            <li>
-                            <a href={% url item.model.url %}>
+                            <a href={% url item.model.url %} class="{% if current_section == item.model.url %}active{% endif %}">
                               {% get_icon item.model.label|lower %}
                             {{ item.model.label|capfirst }}</a></li>
                         {% endfor %}
