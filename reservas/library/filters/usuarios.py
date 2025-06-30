@@ -3,6 +3,8 @@ from django import forms
 from reservas.models import Usuario, Ubicacion
 from django.contrib.auth.models import Group
 from django.conf import settings
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Div, Field, Row, Column
 
 class UsuarioFilter(django_filters.FilterSet):
     username = django_filters.CharFilter(
@@ -22,7 +24,7 @@ class UsuarioFilter(django_filters.FilterSet):
         queryset=Ubicacion.objects.all(),
         label='Ubicación',
         widget=forms.Select(attrs={'class': 'form-select', 'id': 'ubicacion_filter'}),
-        empty_label='Todas las ubicaciones'
+        empty_label='Todas'
     )
     
     piso = django_filters.NumberFilter(
@@ -57,6 +59,29 @@ class UsuarioFilter(django_filters.FilterSet):
                 widget=forms.Select(attrs={'class': 'form-select'}),
                 empty_label='Todos los grupos'
             )
+
+
+        self.form.helper = FormHelper()
+        self.form.helper.form_method = 'get'
+        self.form.helper.form_class = 'space-y-4 p-4 border rounded-lg'
+        self.form.helper.label_class = 'font-semibold'
+        self.form.helper.field_class = 'w-full'
+
+        self.form.helper.layout = Layout(
+            Div(
+                Field('username', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('email', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Row(
+                Column('ubicacion', css_class='w-2/3'),
+                Column('piso', css_class='w-1/3'),
+            ),
+            Submit('submit', 'Filtrar', css_class='btn btn-primary w-full mt-4')
+        )
 
     class Meta:
         model = Usuario

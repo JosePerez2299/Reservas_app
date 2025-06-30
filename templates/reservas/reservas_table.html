@@ -15,31 +15,32 @@
 {% endblock %}
 
 {% block table_actions %}
-<div class="join">
-  <a
-    href="{% url 'reserva' %}?usuario={{ request.user.username }}"
-    class="join-item btn btn-sm btn-ghost border border-base-300 gap-2"
-  >
-    <i class="fas fa-user text-xs"></i>
-    <span>Mis reservas</span>
-  </a>
-{% if request.user.is_moderador %}
-  <a
-  href="{% url 'reserva' %}?estado=pendiente&piso={{ request.user.piso }}&ubicacion={{ request.user.ubicacion.id }}"
-  class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
->
-  <i class="fas fa-check text-xs"></i>
-  <span>Por aprobar</span>
-</a>
-{% elif request.user.is_admin %}
-  <a
-  href="{% url 'reserva' %}?estado=pendiente"
-  class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
->
-  <i class="fas fa-check text-xs"></i>
-  <span>Por aprobar</span>
-</a>
-{% endif %}
-</div>
+  {% if not request.user.is_usuario %}
+    <div class="join">
+      <a
+        href="{% url 'reserva' %}?usuario={{ request.user.username }}"
+        class="join-item btn btn-sm btn-ghost border border-base-300 gap-2"
+      >
+        <i class="fas fa-user text-xs"></i>
+        <span>Mis reservas</span>
+      </a>
+    {% if request.user.is_moderador %}
+      <a
+      href="{% url 'reserva' %}?estado=pendiente&piso={{ request.user.piso }}&ubicacion={{ request.user.ubicacion.id }}"
+      class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
+    >
+      <i class="fas fa-check text-xs"></i>
+      <span>Por aprobar</span>
+    </a>
+    {% elif request.user.is_admin %}
+      <a
+      href="{% url 'reserva' %}?estado=pendiente"
+      class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
+    >
+      <i class="fas fa-check text-xs"></i>
+      <span>Por aprobar</span>
+    </a>
+    {% endif %}
+    </div>
+  {% endif %}
 {% endblock %}
-

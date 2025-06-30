@@ -13,19 +13,15 @@
           <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
 
 
-             {# Dropdowns por cada modelo con permisos #}
-             <li><a href={% url 'dashboard' %} class=''{%if current_section == 'dashboard' %}active{% endif %}>{% get_icon 'dashboard' %} Dashboard</a></li>
 
              {# Dropdowns por cada modelo con permisos #}
              {% for item in dashboard_access %}
 
              <li>
-             <a href={% url item.model.url %} class=''{%if current_section == item.model.url %}active{% endif %}>
-                 {% get_icon item.model.label|lower %}
-             {{ item.model.label|capfirst }}</a></li>
+             <a href={% url item.url %} class=''{%if current_section == item.url %}active{% endif %}>
+                 {% get_icon item.label|lower %}
+             {{ item.label|capfirst }}</a></li>
           {% endfor %}
-
-          <li><a href={% url 'calendario' %} class=''{%if current_section == 'calendario' %}active{% endif %}><i class="fas fa-calendar"></i> Calendario</a></li>
 
           </ul>
       </div>
@@ -40,20 +36,16 @@
   
   <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1 gap-1">
-        <li><a href={% url 'dashboard' %} class="{% if current_section == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-
         {# Dropdowns por cada modelo con permisos #}
         {% for item in dashboard_access %}
-
         <li>
-        <a href={% url item.model.url %} class="{% if current_section == item.model.url %}active{% endif %}">
-            {% get_icon item.model.label|lower %}
-            {{ item.model.label|capfirst }}
+        <a href={% url item.url %} class="{% if current_section == item.url %}active{% endif %}">
+            {% get_icon item.label|lower %}
+            {{ item.label|capfirst }}
         </a>
         </li>
         {% endfor %}
 
-        <li><a href={% url 'calendario' %} class="{% if current_section == 'calendario' %}active{% endif %}"><i class="fas fa-calendar"></i> Calendario</a></li>
 
       </ul>
   </div>
@@ -82,7 +74,7 @@
             <p class="p-1 text-sm text-center text-base-content/70" >{{ user.username|upper }}</p>
             <hr>
               <li><a><i class="fas fa-user mr-2"></i>Perfil</a></li>
-
+              <li><a href={% url 'log' %}><i class="fas fa-history mr-2"></i>Actividad</a></li>
               <form method="post" action="{% url 'logout' %}">
                   {% csrf_token %}
                   <li><button type="submit"><i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión</button></li>
