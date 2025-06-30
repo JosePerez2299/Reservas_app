@@ -72,7 +72,10 @@ def get_td_html(context, obj, field):
         if nombre_url:
             try:
                 url = reverse(nombre_url, args=[obj.id])
-                return format_html('<a href="{}" class="link text-info text-center btn btn-ghost open-modal-btn " data-url="{} " data-success-callback="reloadRow">{}</a>', url, url, obj.id)
+                return format_html(
+                    '<button onclick="generic_modal.showModal()"class="cursor-pointer link link-primary" hx-get={} hx-target="#generic_modal_content" hx-swap="innerHTML">{}</button>',
+                    url, obj.id
+                )
             except Exception:
                 pass
         return format_html("{}", obj.id)

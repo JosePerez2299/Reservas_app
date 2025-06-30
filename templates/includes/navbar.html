@@ -28,7 +28,8 @@
       <!-- Logo y nombre -->
       <div class="flex items-center">
           <img src="{% static 'src/images/logo.svg' %}" alt="Logo" class="h-8 w-auto mr-2">
-          <span class="font-bold text-primary text-md sm:text-xl">ReservaSpaces</span>
+          <div class="divider divider-horizontal m-0"></div>
+          <span class="font-bold text-primary text-sm"> {{user.grupo|capfirst}}</span>
       </div>
   </div>
   
@@ -62,7 +63,7 @@
               <div class="w-10 rounded-full">
                   <div class="avatar placeholder">
                       <div class="bg-neutral text-neutral-content rounded-full w-10">
-                          <span class="text-xs">JD</span>
+                          <span class="text-xs">{{user.username|slice:'0:2'|upper}}</span>
                       </div>
                   </div>
               </div>

@@ -49,12 +49,13 @@
                                     <span class="text-primary font-semibold">{{ total }}</span> {{model.label}} en total | Mostrando {{ start }}-{{ end }}
                                 {% endwith %}
                             </div>
-                            
                             <div class="join">
-                                <button class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+                                {% if can_export %}
+                                <a class="join-item btn btn-sm btn-ghost border border-base-300 gap-2" href="{% url model.url %}?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}export=csv">
                                     <i class="fas fa-download text-xs"></i>
                                     <span>Exportar</span>
-                                </button>
+                                </a>
+                                {% endif %}
                                 <label for="my-drawer" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
                                     <i class="fas fa-filter text-xs"></i>
                                     <span>Filtros</span>
@@ -64,7 +65,7 @@
                                     <span>Limpiar</span>
                                 </a>
                             </div>
-                        </div>
+                                        </div>
 
                         <!-- Right Side -->
                         <div class="flex items-center gap-4">

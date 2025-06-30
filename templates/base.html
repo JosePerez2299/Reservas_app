@@ -38,9 +38,10 @@
 
 <body class="bg-base-200">
 
-    {% include "includes/navbar.html" %}
+    {% if user.is_authenticated %}
+      {% include "includes/navbar.html" %}
+    {% endif %}
 
-    {% include "includes/alert_messages.html" %}
     <div class = 'min-h-screen container mx-auto p-4'>
         {% block content %}
         {% endblock content %}

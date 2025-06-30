@@ -133,12 +133,10 @@ class ReservaUpdateForm(forms.ModelForm):
             if self.instance.espacio.ubicacion != user.ubicacion or self.instance.espacio.piso != user.piso:
                 self.fields['estado'].disabled = True
                 self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
-   # Helper y layout con Tailwind
+        
+        # Helper y layout con Tailwind
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        
-        # IMPORTANTE: Desactivar el renderizado automático del form tag
-        # ya que lo manejas manualmente en el template
         self.helper.form_tag = False
 
         self.helper.layout = Layout(
