@@ -146,7 +146,7 @@ class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
         return ctx
 
 
-class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
+class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
     Elimina un usuario existente
     """
@@ -154,7 +154,13 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('usuario') 
     permission_required = 'reservas.delete_usuario'
-    html_title = 'Eliminar Usuario'
-    url = 'usuario_delete'
+    url = 'reserva_delete'
 
+    details = [ 
+        {'label': 'Username', 'value': 'username'},
+        {'label': 'Email', 'value': 'email'},
+        {'label': 'Ubicación', 'value': 'ubicacion'},
+        {'label': 'Piso', 'value': 'piso'},
+        {'label': 'Grupo', 'value': 'grupo'},
+    ]
 

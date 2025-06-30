@@ -210,7 +210,7 @@ class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     html_title = 'Detalles de Reserva'
     url = reverse_lazy('reserva_view')
 
-class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
+class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
     Elimina una reserva existente
     """
@@ -218,5 +218,16 @@ class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('reserva') 
     permission_required = 'reservas.delete_reserva'
-    html_title = 'Eliminar Reserva'
     url = 'reserva_delete'
+
+    details = [ 
+        {'label': 'Fecha de uso', 'value': 'fecha_uso'},
+        {'label': 'Usuario', 'value': 'usuario'},
+        {'label': 'Estado', 'value': 'estado'},
+        {'label': 'Aprobado por', 'value': 'aprobado_por'},
+        {'label': 'Espacio', 'value': 'espacio'},
+        {'label': 'Motivo', 'value': 'motivo'},
+        {'label': 'Hora inicio', 'value': 'hora_inicio'},
+        {'label': 'Hora fin', 'value': 'hora_fin'},
+    ]
+

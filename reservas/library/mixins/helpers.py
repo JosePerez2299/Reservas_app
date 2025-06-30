@@ -26,6 +26,37 @@ class AjaxFormMixin:
         # disparamos showMessage con payload sencillo
         response['HX-Trigger'] = json.dumps({'showMessage': self.success_message()})
         return response
+        
+class AjaxDeleteMixin:
+    """
+    Mixin para añadir un HX-Trigger a las respuestas de DeleteView.
+    """
+    success_message = "Eliminación exitosa"
+
+    def form_valid(self, form):
+        # 1) Obtén el objeto antes de borrarlo (por si necesitas datos)
+        obj = self.get_object()
+
+        # 2) Aquí puedes disparar tu evento "antes" si lo necesitas,
+        #    p.ej. logger, signals, etc.
+        #    do_something_before_delete(obj)
+
+        # 3) Borra el objeto
+        response = super().delete(form)
+
+        response = HttpResponse(status=204)
+        response["HX-Trigger"] = json.dumps({
+            "showMessage": self.success_message
+        })
+        return response
+
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['model'] = self.model.__name__
+        ctx['url'] = reverse_lazy(self.url, args=[self.object.pk])
+        ctx['details'] = [{'label': detail['label'], 'value': str(getattr(self.object, detail['value']) )} for detail in self.details]
+        return ctx
 
 class FormContextMixin:
     def get_context_data(self, **kwargs):

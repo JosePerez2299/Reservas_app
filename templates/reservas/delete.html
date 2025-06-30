@@ -1,13 +1,60 @@
-{% load form_style %}
+{% load utils crispy_forms_tags %}
+<div class="rounded-box p-4">
+  <!-- Header simplificado -->
+  <div class="flex justify-between items-center gap-3 mb-4">
+    <div class="flex items-center gap-3"> 
+      <div class="w-10 h-10 bg-error text-primary-content rounded-full flex items-center justify-center">
+        <i class="fas fa-trash text-sm"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold">Eliminar {{model}}</h1>
+        <p class="text-xs text-base-content/60">{{model}} #{{ object.pk }}</p>
+      </div>
+    </div>
+  </div> 
 
-{% block body %}
-  <h2 class="text-center text-2xl text-base-content/80 font-bold">{{title}}</h2>
-  <div class="p-2 mt-2 rounded-box ">
-    <form method="POST" action="{{url}}">
+  <div class="divider"></div>
+  <div class=" rounded-box ">
+    <div class="p-2 mb-2">
+      <p class="text-lg  text-error font-bold">¿Esta seguro de eliminar esta instancia de {{model}}?</p>
+
+     
+    </div>
+    
+    <ul class="list-disc list-inside">
+      {% for detail in details %}
+
+      {% if detail.value  != 'None' %}
+        <li>
+          <span class="font-semibold">{{detail.label}}:</span>
+          {% if detail.value == 'True' %}
+            <span class="badge badge-success">Sí</span>
+          {% elif detail.value == 'False' %}
+            <span class="badge badge-error">No</span>
+          {% else %}
+            {{detail.value}}
+          {% endif %}
+        </li> 
+      {% endif %}
+      {% endfor %}
+    </ul>
+    <div class="modal-action">
+      <form 
+      id="confirm-delete-form" 
+      method="post" 
+      action="{% url 'reserva_delete' object.pk %}"
+      hx-post="{% url 'reserva_delete' object.pk %}"
+      hx-target="#generic_modal_content"   
+      hx-trigger="submit"
+      hx-swap="none"
+    >
       {% csrf_token %}
-      {{ form|mystyle }}
-      <button type="submit" class="btn btn-success">Guardar</button>
+      <button type="submit" class="btn btn-error">Eliminar</button>
     </form>
+    
+    </div>
+
   </div>
-{% endblock %}
+</div>
+
 

@@ -92,7 +92,7 @@ class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     html_title = 'Detalles de Espacio'
     url = 'espacio_view'
 
-class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DeleteView):
+class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
     Elimina un espacio existente
     """
@@ -100,5 +100,12 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, FormContext
     permission_required = 'reservas.delete_espacio'
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('espacio') 
-    html_title = 'Eliminar Espacio'
     url = 'espacio_delete'
+    details = [ 
+        {'label': 'Nombre', 'value': 'nombre'},
+        {'label': 'Tipo', 'value': 'tipo'},
+        {'label': 'Capacidad', 'value': 'capacidad'},
+        {'label': 'Ubicación', 'value': 'ubicacion'},
+        {'label': 'Piso', 'value': 'piso'},
+        {'label': 'Disponible', 'value': 'disponible'},
+    ]

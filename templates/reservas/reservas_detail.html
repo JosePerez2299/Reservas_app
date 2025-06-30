@@ -1,139 +1,182 @@
+{% load utils %}
 <!-- reserva_detail.html -->
-<div class="p-6 max-w-md mx-auto" x-data="{ showDetails: false }">
-<!-- Header de la reserva -->
-<div class="text-center mb-6">
-  <div class="mx-auto h-18 w-18 bg-primary flex items-center justify-center rounded-full">
-    <div class="text-primary-content text-2xl font-bold">
-      <span class="text-primary-content/70 text-xl">#{{ object.pk }}</span>
+<div class="p-6 max-w-2xl mx-auto bg-base-100 rounded-xl shadow-lg" x-data="{ showDetails: false }">
+
+  <!-- Header simplificado -->
+  <div class="flex justify-between items-center gap-3 mb-4">
+    <div class="flex items-center gap-3"> 
+      <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+        <i class="fas fa-eye text-sm"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold">Detalle de Reserva</h1>
+        <p class="text-xs text-base-content/60">Reserva #{{ object.pk }}</p>
+      </div>
+    </div>
+
+    <div>
+    {% get_td_html object 'estado' %}
+    </div>
+  </div> 
+
+  <!-- Cards Usuario y Espacio - más compactas -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <!-- Usuario -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-user text-primary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Usuario</span>
+      </div>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 bg-primary text-primary-content rounded-full flex items-center justify-center">
+          <i class="fas fa-user text-xs"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-sm truncate">{{object.usuario}}</p>
+        </div>
+      </div>
+      
+      {% if object.usuario.email %}
+      <div class="flex items-center gap-2">
+        <i class="fas fa-envelope text-info text-xs"></i>
+        <span class="text-xs text-base-content/70 truncate">{{object.usuario.email}}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Espacio -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-building text-secondary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Espacio</span>
+      </div>
+      
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-door-open text-primary text-xs"></i>
+          <span class="font-medium text-sm truncate">{{object.espacio}}</span>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <i class="fas fa-tag text-secondary text-xs"></i>
+          <span class="text-xs text-base-content/70">{{object.espacio.tipo}}</span>
+        </div>
+        
+        <div class="flex items-center gap-3 text-xs text-base-content/60">
+          <div class="flex items-center gap-1">
+            <i class="fas fa-map-marker-alt text-accent"></i>
+            <span>{{object.espacio.ubicacion}}</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <i class="fas fa-layer-group text-info"></i>
+            <span>P{{object.espacio.piso}}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  
-  <h2 class="text-2xl font-bold text-base-content">{{ object.espacio.nombre }}</h2>
-  <p class="text-base-content/70">{{ object.fecha_uso|date:"d/m/Y" }}</p>
-</div>
 
-  <!-- Información básica -->
-  <div class="space-y-4">
-    <!-- Estado -->
-    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70">Estado</span>
-      <div class="flex items-center gap-2">
-        {% if object.estado == 'aprobada' %}
-          <div class="w-2 h-2 bg-success rounded-full"></div>
-          <div class="badge badge-success badge-sm">{{ object.get_estado_display }}</div>
-        {% elif object.estado == 'pendiente' %}
-          <div class="w-2 h-2 bg-warning rounded-full"></div>
-          <div class="badge badge-warning badge-sm">{{ object.get_estado_display }}</div>
-        {% elif object.estado == 'rechazada' %}
-          <div class="w-2 h-2 bg-error rounded-full"></div>
-          <div class="badge badge-error badge-sm">{{ object.get_estado_display }}</div>
+
+  <!-- Información de fecha y hora -->
+  <div class="bg-base-200 rounded-xl p-6 mb-8">
+    <h3 class="text-md font-semibold text-base-content/70 mb-4">Fecha y Horario</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600">{{ object.fecha_uso|date:"d" }}</div>
+        <div class="text-sm text-gray-600">{{ object.fecha_uso|date:"M Y" }}</div>
+        <div class="text-xs text-gray-500 uppercase">Fecha</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-purple-600">{{ object.hora_inicio }}</div>
+        <div class="text-xs text-gray-500 uppercase">Hora inicio</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-pink-600">{{ object.hora_fin }}</div>
+        <div class="text-xs text-gray-500 uppercase">Hora fin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motivo de la reserva -->
+  <div class="mb-6">
+    <label class="block text-sm font-semibold text-base-content/70 mb-3">Motivo de reserva</label>
+    <div class="bg-base-200 rounded-xl p-4 border-l-4 border-blue-500">
+      <p class="text-base-content/70">{{ object.motivo }}</p>
+    </div>
+  </div>
+
+  <!-- Botón para mostrar más detalles -->
+  <button 
+    @click="showDetails = !showDetails"
+    class="w-full py-3 px-4 bg-primary/10 hover:bg-primary/20 hover:text-primary-content rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 mb-6"
+  >
+    <span x-text="showDetails ? 'Ocultar detalles adicionales' : 'Mostrar detalles adicionales'" class="font-medium text-base-content"></span>
+    <svg class="w-4 h-4 transform transition-transform text-base-content" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <!-- Detalles adicionales (colapsable) -->
+  <div x-show="showDetails" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95">
+    <div class="bg-primary/5 rounded-xl p-6 space-y-6">
+      <!-- Información del espacio -->
+      <div>
+        <h4 class="text-lg font-semibold text-base-content mb-4">Información del Espacio</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-base-100  rounded-lg p-4 text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ object.espacio.capacidad }}</div>
+            <div class="text-sm text-gray-500">Capacidad máxima</div>
+          </div>
+          <div class="bg-base-100  rounded-lg p-4 text-center">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              {{ object.espacio.get_tipo_display }}
+            </div>
+            <div class="text-sm text-base-content/60 mt-1">Tipo de espacio</div>
+          </div>
+          <div class="bg-base-100 rounded-lg p-4 text-center">
+            {% if object.espacio.disponible %}
+              <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                Disponible
+              </div>
+            {% else %}
+              <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                No disponible
+              </div>
+            {% endif %}
+            <div class="text-sm text-base-content/60 mt-1">Estado del espacio</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información administrativa -->
+      {% if object.aprobado_por or object.motivo_admin %}
+      <div>
+        <h4 class="text-lg font-semibold text-base-content mb-4">Información Administrativa</h4>
+        
+        {% if object.aprobado_por %}
+        <div class="bg-base-100 rounded-lg p-4 mb-4">
+          <label class="block text-sm font-medium text-base-content mb-2">Gestionado por</label>
+          <p class="text-base-content font-semibold">{{ object.aprobado_por.username }}</p>
+        </div>
+        {% endif %}
+
+        {% if object.motivo_admin %}
+        <div class="bg-base-100 rounded-lg p-4">
+          <label class="block text-sm font-medium text-base-content mb-3">
+            {% if object.estado == 'aprobada' %}
+              Mensaje de aprobación
+            {% else %}
+              Motivo de rechazo
+            {% endif %}
+          </label>
+          <div class="bg-base-100 rounded-lg p-4 border-l-4 {% if object.estado == 'aprobada' %}border-green-500{% else %}border-red-500{% endif %}">
+            <p class="text-base-content">{{ object.motivo_admin }}</p>
+          </div>
+        </div>
         {% endif %}
       </div>
-    </div>
-
-    <!-- Usuario -->
-    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70">Usuario</span>
-      <span class="text-sm font-semibold">{{ object.usuario.username }}</span>
-    </div>
-
-    <!-- Horario -->
-    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70">Horario</span>
-      <span class="text-sm font-semibold">{{ object.hora_inicio }} - {{ object.hora_fin }}</span>
-    </div>
-
-    <!-- Ubicación -->
-    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70">Ubicación</span>
-      <span class="text-sm font-semibold">{{ object.espacio.ubicacion.nombre }}</span>
-    </div>
-
-    <!-- Piso -->
-    <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70">Piso</span>
-      <span class="text-sm font-semibold">Piso {{ object.espacio.piso }}</span>
-    </div>
-
-    <!-- Motivo -->
-    <div class="p-3 bg-base-200 rounded-lg">
-      <span class="text-sm font-medium text-base-content/70 block mb-2">Motivo</span>
-      <p class="text-sm text-base-content bg-base-100 p-2 rounded border-l-4 border-primary">
-        {{ object.motivo }}
-      </p>
-    </div>
-
-    <!-- Botón para mostrar más detalles -->
-    <button 
-      @click="showDetails = !showDetails"
-      class="btn btn-ghost btn-sm w-full"
-      :class="{ 'btn-active': showDetails }"
-    >
-      <span x-text="showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'"></span>
-      <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-      </svg>
-    </button>
-
-    <!-- Detalles adicionales (colapsable) -->
-    <div x-show="showDetails" x-transition class="space-y-3 pt-2">
-      <!-- Tipo de espacio -->
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Tipo de espacio</span>
-        <div class="badge badge-outline badge-sm">{{ object.espacio.get_tipo_display }}</div>
-      </div>
-
-      <!-- Capacidad -->
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Capacidad</span>
-        <span class="text-sm">{{ object.espacio.capacidad }} personas</span>
-      </div>
-
-      <!-- Gestionado por -->
-      {% if object.aprobado_por %}
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Gestionado por</span>
-        <span class="text-sm font-semibold">{{ object.aprobado_por.username }}</span>
-      </div>
       {% endif %}
-
-      <!-- Motivo de admin -->
-      {% if object.motivo_admin %}
-      <div class="p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70 block mb-2">
-          {% if object.estado == 'aprobada' %}
-            Mensaje de aprobación
-          {% else %}
-            Motivo de rechazo
-          {% endif %}
-        </span>
-        <p class="text-sm text-base-content bg-base-100 p-2 rounded border-l-4 
-                  {% if object.estado == 'aprobada' %}border-success{% else %}border-error{% endif %}">
-          {{ object.motivo_admin }}
-        </p>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Información adicional del espacio -->
-  <div class="mt-6 p-4 bg-secondary/10 rounded-lg">
-    <h3 class="text-sm font-semibold text-secondary mb-2">Información del Espacio</h3>
-    <div class="flex justify-between items-center text-center">
-      <div class="flex flex-col">
-        <div class="text-lg font-bold text-secondary">{{ object.espacio.capacidad }}</div>
-        <div class="text-xs text-base-content/70">Capacidad</div>
-      </div>
-      <div class="flex flex-col">
-        <div class="text-lg font-bold text-secondary">{{ object.espacio.piso }}</div>
-        <div class="text-xs text-base-content/70">Piso</div>
-      </div>
-      <div class="flex flex-col">
-        <div class="badge badge-secondary badge-sm">
-          {% if object.espacio.disponible %}Disponible{% else %}No disponible{% endif %}
-        </div>
-        <div class="text-xs text-base-content/70">Estado</div>
-      </div>
     </div>
   </div>
 </div>

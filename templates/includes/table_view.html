@@ -99,8 +99,8 @@
                 </div>
 
                 <!-- Data Table -->
-                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 overflow-hidden">
-                    <div class="overflow-x-auto">
+                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 ">
+                    <div class="">
                         <table class="table table-md text-sm">
                             <thead class="bg-base-200/70">
                                 <tr class="border-b border-base-300">
@@ -151,57 +151,136 @@
                                     </td>
 
                                     {% endfor %}
+{% if actions %}
+<td class="">
+    <div class="p-2 flex items-center justify-center">
+        
+        {# Botones principales siempre visibles #}
+        <div class="flex gap-1">
+            {# Ver detalles #}
+            {% if crud_urls.view %}
+            <div class="tooltip" data-tip="Ver detalles">
+                <button
+                    onclick="generic_modal.showModal()"
+                    class="btn btn-ghost btn-sm h-8 w-8 p-0"
+                    hx-get="{% url crud_urls.view obj.pk %}"
+                    hx-target="#generic_modal_content"
+                    hx-swap="innerHTML"
+                ><i class="fas fa-eye text-xs"></i></button>
+            </div>
+            {% endif %}
 
-                                    <!-- Actions -->
+            {# Editar #}
+            {% puede_editar obj as puede_editar_obj %}
+            {% if puede_editar_obj and crud_urls.edit %}
+            <div class="tooltip" data-tip="Editar">
+                <button
+                    onclick="generic_modal.showModal()"
+                    class="btn btn-ghost btn-sm h-8 w-8 p-0"
+                    hx-get="{% url crud_urls.edit obj.pk %}"
+                    hx-target="#generic_modal_content"
+                    hx-swap="innerHTML"
+                ><i class="fas fa-edit text-xs"></i></button>
+            </div>
+            {% endif %}
+        </div>
 
-                                    {% if actions %}
-                                    {% if crud_urls.view %}
-                                    <td class="py-4">
-                                        <div class="flex items-center justify-center gap-1">
-                                            <div class="tooltip" data-tip="Ver detalles">
-                                                <button
-                                                onclick="generic_modal.showModal()"
-                                                class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                                                hx-get="{% url crud_urls.view obj.pk %}"
-                                                hx-target="#generic_modal_content"
-                                                hx-swap="innerHTML">
-                                                    <i class="fas fa-eye text-xs"></i>
-                                                </button>
-                                            </div>
-                                    {% endif %} 
-                                    {% puede_editar obj as puede_editar_obj %}
-                                    {% puede_eliminar obj as puede_eliminar_obj %}
-                                    
-                                    {% if puede_editar_obj and crud_urls.edit %}
-                                        <div class="tooltip" data-tip="Editar">
-                                            <button
-                                            onclick="generic_modal.showModal()"
-                                            class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                                            hx-get="{% url crud_urls.edit obj.pk %}"
-                                            hx-target="#generic_modal_content"
-                                            hx-swap="innerHTML">
-                                                <i class="fas fa-edit text-xs"></i>
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    {% if puede_eliminar_obj %}
-                                    {% if crud_urls.delete %}
-                                            <div class="tooltip" data-tip="Eliminar">
-                                                <button
-                                                onclick="generic_modal.showModal()"
-                                                class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                                                hx-get="{% url crud_urls.delete obj.pk %}"
-                                                hx-target="#generic_modal_content"
-                                                hx-swap="innerHTML">
-                                                    <i class="text-error hover:bg-error/10 fas fa-trash text-xs"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    {% endif %}
-                                    </td>
-                                   {% endif %}
+        {# Dropdown para acciones adicionales #}
+        {% puede_eliminar obj as puede_eliminar_obj %}
+        {% puede_aprobar obj as puede_aprobar_obj %}
+        {% if puede_eliminar_obj or puede_aprobar_obj %}
+{# Dropdown para acciones adicionales #}
+{% puede_eliminar obj as puede_eliminar_obj %}
+{% puede_aprobar obj as puede_aprobar_obj %}
+{% if puede_eliminar_obj or puede_aprobar_obj %}
+<div class="dropdown dropdown-end ml-1" data-adaptive-dropdown>
+    <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-8 w-8 p-0">
+        <i class="fas fa-ellipsis-v text-xs"></i>
+    </div>
+    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[999] w-40 p-2 shadow-lg border border-base-300">
+        
+        {# Eliminar #}
+        {% if puede_eliminar_obj and crud_urls.delete %}
+        <li>
+            <button
+                onclick="generic_modal.showModal()"
+                class="flex items-center gap-2 text-error hover:bg-error/10"
+                hx-get="{% url crud_urls.delete obj.pk %}"
+                hx-target="#generic_modal_content"
+                hx-swap="innerHTML"
+            >
+                <i class="fas fa-trash text-xs"></i>
+                Eliminar
+            </button>
+        </li>
+        {% endif %}
+
+        {# Aprobar #}
+        {% if puede_aprobar_obj %}
+        <li>
+            <button
+                onclick="generic_modal.showModal()"
+                class="flex items-center gap-2 text-success hover:bg-success/10"
+                hx-target="#generic_modal_content"
+                hx-swap="innerHTML"
+            >
+                <i class="fas fa-check text-xs"></i>
+                Aprobar
+            </button>
+        </li>
+        <li>
+            <button
+                onclick="generic_modal.showModal()"
+                class="flex items-center gap-2 text-error hover:bg-error/10"
+                hx-target="#generic_modal_content"
+                hx-swap="innerHTML"
+            >
+                <i class="fas fa-times text-xs"></i>
+                Rechazar
+            </button>
+        </li>
+        {% endif %}
+
+    </ul>
+</div>
+{% endif %}
+
+<script>
+// Script para hacer dropdowns adaptativos
+document.addEventListener('DOMContentLoaded', function() {
+const adaptiveDropdowns = document.querySelectorAll('[data-adaptive-dropdown]');
+
+adaptiveDropdowns.forEach(dropdown => {
+const button = dropdown.querySelector('[role="button"]');
+
+button.addEventListener('click', function() {
+// Esperar un frame para que el dropdown se abra
+requestAnimationFrame(() => {
+const rect = dropdown.getBoundingClientRect();
+const viewportHeight = window.innerHeight;
+const dropdownMenu = dropdown.querySelector('.dropdown-content');
+
+if (dropdownMenu) {
+const menuHeight = 200; // Altura aproximada del menú
+
+// Si no hay espacio abajo, posicionar arriba
+if (rect.bottom + menuHeight > viewportHeight) {
+dropdown.classList.add('dropdown-top');
+} else {
+dropdown.classList.remove('dropdown-top');
+}
+}
+});
+});
+});
+});
+</script>
+        {% endif %}
+
+    </div>
+</td>
+{% endif %}
+
                                 </tr>
                                 {% empty %}
                                 <tr>
