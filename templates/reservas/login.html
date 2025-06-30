@@ -8,15 +8,21 @@
 {% endblock navbar %}
 
 {% block content %}
-<div class="min-h-screen bg-base-200 flex flex-col justify-center items-center p-4">
+<div class="fixed inset-0 w-screen h-screen m-0 p-0 overflow-hidden">
+  <!-- Background image with light overlay -->
+  <div class="absolute inset-0 w-screen h-screen m-0 p-0">
+    <img src="{% static 'src/images/CANTV.jpg' %}" alt="Background" class="absolute inset-0 w-full h-full object-cover m-0 p-0">
+    <div class="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
+  </div>
 
-  <div class="w-full max-w-md">
+  <div class="fixed inset-0 flex items-center justify-center p-4 z-10">
+    <div class="w-full max-w-md bg-base-100/95 rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-sm">
     <!-- Logo -->
     <div class="flex justify-center mb-8">
       <img src="{% static 'src/images/logo.svg' %}" alt="Logo" class="h-12">
     </div>
 
-    <div class="bg-base-100 rounded-2xl shadow-xl p-6 sm:p-8">
+
       <h1 class="text-2xl sm:text-3xl font-bold text-center text-base-content mb-2">
         Bienvenido de Vuelta
       </h1>
@@ -46,9 +52,7 @@
             <input type="checkbox" name="remember" class="checkbox checkbox-primary checkbox-xs sm:checkbox-sm mr-2" />
             <span class="text-base-content/80">Recordarme</span>
           </label>
-          <a href="#" class="font-medium text-primary hover:text-primary-focus transition-colors duration-300">
-            ¿Olvidaste tu contraseña?
-          </a>
+
         </div>
 
         <div class="pt-4">
@@ -57,12 +61,6 @@
           </button>
         </div>
       </form>
-    </div>
-
-    <div class="text-center mt-6 text-sm">
-      <p class="text-base-content/60">
-        ¿No tienes una cuenta? <a href="#" class="font-medium text-primary hover:underline">Contacta al administrador</a>.
-      </p>
     </div>
   </div>
 </div>
