@@ -69,30 +69,39 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
                 output_field=CharField()
             )
         )
+
         if self.request.user.is_admin:
             qs = qs.filter(Q(groups__name__in=[settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO]))
-        else:
+        elif self.request.user.is_moderador:
             qs = qs.filter(Q(groups__name=settings.GRUPOS.USUARIO))
         
         return qs
 
 
-class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
+class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     """
     Crea un nuevo usuario
     """
     model = Usuario
     form_class = UsuarioCreateForm
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/usuarios_create.html'
     success_url = reverse_lazy('usuario')
     permission_required = 'reservas.add_usuario'
-    html_title = 'Crear Usuario'
     url = 'usuario_create'
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('usuario_create')
+        ctx['title'] = 'Crear Usuario'
+        ctx['subtitle'] = 'Información del usuario'
+        return ctx
+    
 
 
 class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):

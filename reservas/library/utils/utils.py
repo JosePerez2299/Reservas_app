@@ -92,7 +92,7 @@ def get_stats_administrador(request):
         'cards': cards,
         'today': datetime.now(),
         'month_summary': month_summary,
-        'proximas_reservas': proximas_reservas,
+        'next_reservas': proximas_reservas,
     }
 
     return reservas_stats
@@ -134,8 +134,9 @@ def get_stats_usuario(request):
 
     reservas_stats = {
         'cards': cards,
+        'today': datetime.now(),
         'month_summary': month_summary,
-        'proximas_reservas': proximas_reservas,
+        'next_reservas': proximas_reservas,
     }
 
     return reservas_stats   
@@ -153,7 +154,7 @@ def get_stats_moderador(request):
     reservas_mes = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, fecha_uso__month=month, fecha_uso__year=year).count()
     reservas_aprobadas_mes = Reserva.objects.filter(estado=Reserva.Estado.APROBADA, aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
     reservas_rechazadas_mes = Reserva.objects.filter(estado=Reserva.Estado.RECHAZADA, aprobado_por=request.user, fecha_uso__month=month, fecha_uso__year=year).count()
-    reservas_pendientes_mes = Reserva.objects.filter(estado=Reserva.Estado.PENDIENTE, fecha_uso__month=month, fecha_uso__year=year).count()
+    reservas_pendientes_mes = Reserva.objects.filter(estado=Reserva.Estado.PENDIENTE, espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso,fecha_uso__month=month, fecha_uso__year=year).count()
 
     reservas_aprobadas_percent = (reservas_aprobadas_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
     reservas_pendientes_percent = (reservas_pendientes_mes / reservas_mes) * 100 if reservas_mes > 0 else 0
@@ -161,9 +162,11 @@ def get_stats_moderador(request):
 
     proximas_reservas = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
 
+
+    print(month)
     cards = [
         {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'reserva', 'color': 'text-success'},
-        {'title': 'Reservas Pendientes', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},
+        {'title': 'Reservas Pendientes (por revisar)', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},
         {'title': 'Reservas Rechazadas', 'value': reservas_rechazadas, 'icon': 'reserva', 'color': 'text-error'},
     ]
 
@@ -178,8 +181,9 @@ def get_stats_moderador(request):
 
     reservas_stats = {
         'cards': cards,
+        'today': datetime.now(),
         'month_summary': month_summary,
-        'proximas_reservas': proximas_reservas,
+        'next_reservas': proximas_reservas,
     }
 
     return reservas_stats

@@ -5,12 +5,14 @@ from django.contrib.auth import password_validation
 from django_select2.forms import Select2Widget
 from reservas.models import Usuario
 from django.conf import settings
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Div, Field, Submit, Row
 
 
 class UsuarioCreateForm(UserCreationForm):
     # Tu formulario de creación original permanece igual
     groups = forms.ModelChoiceField(
-        queryset=Group.objects.exclude(name=settings.GRUPOS.ADMINISTRADOR),
+        queryset=Group.objects.filter(name__in=[ settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO]),
         required=False,
         widget=forms.RadioSelect,
         label='Grupo',
@@ -20,15 +22,6 @@ class UsuarioCreateForm(UserCreationForm):
     class Meta:
         model = Usuario
         fields = ['username', 'email', 'password1', 'password2', 'ubicacion', 'piso', 'groups']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control'}),
-            'ubicacion': Select2Widget(attrs={'class': 'form-control'}),
-            'piso': forms.NumberInput(attrs={'class': 'form-control'}),
-            'groups': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        }
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }
@@ -50,6 +43,47 @@ class UsuarioCreateForm(UserCreationForm):
             # Si no es admin, ocultar el campo groups y mantener el grupo "usuario" por defecto
             self.fields['groups'].widget = forms.HiddenInput()
             self.fields['groups'].required = False
+
+          
+        # Helper y layout con Tailwind
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = False
+
+        self.helper.layout = Layout(
+            Div(
+                Field('username', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('email', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('password1', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('password2', css_class="input input-bordered w-full"),
+                css_class="mb-6"
+            ),
+            
+            Div(
+                Field('ubicacion', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('piso', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('groups', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Submit('submit', 'Guardar', css_class="btn btn-primary w-full"),
+            )
+        )
     
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -120,6 +154,48 @@ class UsuarioUpdateForm(forms.ModelForm):
         if not (user and user.is_admin):
             self.fields['groups'].widget = forms.HiddenInput()
             self.fields['groups'].required = False
+
+
+       
+        # Helper y layout con Tailwind
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = False
+
+        self.helper.layout = Layout(
+            Div(
+                Field('username', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('email', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('password1', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('password2', css_class="input input-bordered w-full"),
+                css_class="mb-6"
+            ),
+            
+            Div(
+                Field('ubicacion', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('piso', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Field('groups', css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+            Div(
+                Submit('submit', 'Guardar', css_class="btn btn-primary w-full"),
+            )
+        )
 
     def clean(self):
         cleaned_data = super().clean()
