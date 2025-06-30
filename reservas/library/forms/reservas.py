@@ -125,15 +125,6 @@ class ReservaUpdateForm(forms.ModelForm):
         user = self.request.user
         super().__init__(*args, **kwargs)
 
-        if user.is_usuario:
-            self.fields['estado'].disabled = True
-            self.fields['motivo_admin'].disabled = True
-
-        if not user.is_admin and user.is_moderador:
-            if self.instance.espacio.ubicacion != user.ubicacion or self.instance.espacio.piso != user.piso:
-                self.fields['estado'].disabled = True
-                self.fields['estado'].help_text = "No puedes aprobar o rechazar reservas de espacios de otra ubicación o piso"
-        
         # Helper y layout con Tailwind
         self.helper = FormHelper()
         self.helper.form_method = 'post'
@@ -164,10 +155,3 @@ class ReservaUpdateForm(forms.ModelForm):
                 Submit('submit', 'Guardar', css_class="btn btn-primary w-full"),
             )
         )
-    def clean(self):
-        cleaned_data = super().clean()
-        estado = cleaned_data.get('estado')
-        
-        if estado in [Reserva.Estado.APROBADA, Reserva.Estado.RECHAZADA]:
-            if hasattr(self, 'instance') and self.instance:
-                self.instance.aprobado_por = self.request.user

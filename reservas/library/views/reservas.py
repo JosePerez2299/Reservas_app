@@ -163,6 +163,7 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         ctx = super().get_context_data(**kwargs)
         ctx['url'] = reverse_lazy('reserva_create')
         ctx['title'] = 'Crear Reserva'
+        ctx['subtitle'] = 'Informacion de la reserva'
         return ctx
     
     def get_form_kwargs(self):

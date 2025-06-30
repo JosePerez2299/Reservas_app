@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% load form_style %}
 {% load utils %}
+{% load crispy_forms_tags %}
+{% load tailwind_filters %}
 {% load widget_tweaks %}
 {% load model_extras %}
 {% load querystring %}
@@ -60,12 +61,15 @@
                                     <i class="fas fa-filter text-xs"></i>
                                     <span>Filtros</span>
                                 </label>
-                                <a href="{{request.path}}" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+                                <a href="{{request.path}}" class="join-item btn btn-sm btn-outline btn-error border border-base-300 gap-2">
                                     <i class="fas fa-times text-xs"></i>
                                     <span>Limpiar</span>
                                 </a>
                             </div>
-                                        </div>
+
+                            {% block table_actions %}
+                            {% endblock %}
+                        </div>
 
                         <!-- Right Side -->
                         <div class="flex items-center gap-4">
@@ -306,12 +310,11 @@
     <!-- Sidebar -->
     <div class="drawer-side">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <div class="min-h-full w-80 bg-base-100 border-l border-base-300">
+        <div class="min-h-screen w-80 bg-base-100 border-l border-base-300">
             <div class="p-6">
                 <h2 class="text-lg font-bold text-base-content mb-6">Filtros</h2>
                 <form class="space-y-4">
-                    {{ filter.form|mystyle }}
-                    <button type="submit" class="btn btn-primary w-full">Aplicar Filtros</button>
+                    {% crispy filter.form %}
                 </form>
             </div>
         </div>
