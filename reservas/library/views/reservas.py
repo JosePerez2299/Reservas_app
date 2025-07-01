@@ -162,7 +162,6 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         qs = qs.filter(condiciones)
         return qs
     
-
 class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     form_class = ReservaCreateForm
     template_name = 'reservas/reservas_create.html'
@@ -182,7 +181,13 @@ class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        fecha_uso = self.request.GET.get('fecha_uso')
+        if fecha_uso:
+            initial['fecha_uso'] = fecha_uso
+        return initial
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView ):
     """

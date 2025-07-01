@@ -105,7 +105,7 @@
         <div class="xl:col-span-1">
             <div class="bg-base-100 rounded-xl shadow-sm border border-base-200 sticky top-4 flex flex-col" >
                 <!-- Header del panel -->
-                <div class=" p-4 border-b border-base-200">
+                <div class="flex justify-between p-4 border-b border-base-200">
                     <div class="mb-2">
                         <h3 class="text-lg font-semibold text-gray-900">
                             Reservas del día
@@ -114,8 +114,20 @@
                         <!-- Campo oculto para almacenar la fecha seleccionada -->
                         <input type="hidden" name="fecha_uso" x-model="selectedDate" />
                         </div>
-                    <div>
-      
+                        <button  
+                        x-show="selectedDate"  
+                        class="btn btn-xs btn-primary"
+                        @click="
+                            htmx.ajax('GET', '{% url 'reserva_create' %}', {
+                                target: '#generic_modal_content',
+                                swap: 'innerHTML',
+                                values: { 'fecha_uso': selectedDate }
+                            })
+                        ">
+                        <i class="fas fa-plus text-xs"></i>
+                        Crear Reserva
+                    </button>
+
                 </div>
                 
                 <!-- Contenido del panel con HTMX -->

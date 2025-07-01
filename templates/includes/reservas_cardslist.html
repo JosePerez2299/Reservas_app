@@ -65,32 +65,37 @@
             <div class="flex gap-2">
 
               {% if reserva.estado == 'pendiente' %}
-              <button
-                href="{% url 'reserva_edit' reserva.id %}"
-                class="btn btn-xs btn-primary flex-1 open-modal-btn" 
-                data-url="{% url 'reserva_edit' reserva.id %}"
-                data-success-callback="reloadRow"
+                <button
+                onclick="generic_modal.showModal()"
+                class="btn btn-primary btn-xs h-8 w-8 p-0 flex-1"
+                hx-get="{% url 'reserva_edit' reserva.id %}"
+                hx-target="#generic_modal_content"
+                hx-swap="innerHTML"
               >
-                <i class="fas fa-edit mr-1"></i>Editar
+              <i class="fas fa-edit text-xs"></i>
+              Editar
               </button>
 
               <button
-              href="{% url 'reserva_delete' reserva.id %}"
-              class="btn btn-xs btn-error flex-1 open-modal-btn" 
-              data-url="{% url 'reserva_delete' reserva.id %}"
-              data-success-callback="reloadRow"
+              onclick="generic_modal.showModal()"
+              class="btn btn-error btn-xs h-8 w-8 p-0 flex-1"
+              hx-get="{% url 'reserva_delete' reserva.id %}"
+              hx-target="#generic_modal_content"
+              hx-swap="innerHTML"
             >
               <i class="fas fa-trash mr-1"></i>Eliminar
             </button>
             {% endif %}
               <button
-                href="{% url 'reserva_view' reserva.id %}"
-                class="btn btn-xs btn-ghost flex-1 open-modal-btn" 
-                data-url="{% url 'reserva_view' reserva.id %}"
-                data-success-callback="reloadRow"
-              >
-                <i class="fas fa-eye mr-1"></i>Ver
-              </button>
+              onclick="generic_modal.showModal()"
+              class="btn btn-ghost btn-xs h-8 w-8 p-0 flex-1"
+              hx-get="{% url 'reserva_view' reserva.id %}"
+              hx-target="#generic_modal_content"
+              hx-swap="innerHTML"
+            >
+            <i class="fas fa-eye text-xs"></i>
+            Ver
+           </button>
 
 
             
