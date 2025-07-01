@@ -163,7 +163,6 @@ def get_stats_moderador(request):
     proximas_reservas = Reserva.objects.filter(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso, estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA], fecha_uso__gte=datetime.now()).order_by('fecha_uso', 'hora_inicio')[:4]
 
 
-    print(month)
     cards = [
         {'title': 'Reservas Aprobadas', 'value': reservas_aprobadas, 'icon': 'reserva', 'color': 'text-success'},
         {'title': 'Reservas Pendientes (por revisar)', 'value': reservas_pendientes, 'icon': 'reserva', 'color': 'text-warning'},

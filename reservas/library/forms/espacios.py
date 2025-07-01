@@ -9,71 +9,10 @@ class EspacioCreateForm(forms.ModelForm):
     class Meta:
         model = Espacio
         fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
-        widgets = {
-            'ubicacion': Select2Widget,
-        }
-
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
-
-          # Helper y layout con Tailwind
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        
-        # IMPORTANTE: Desactivar el renderizado automático del form tag
-        # ya que lo manejas manualmente en el template
-        self.helper.form_tag = False
-
-        self.helper.layout =    Layout(
-            Div(
-                Field('nombre')
-                ),
-            Div(
-                Field('ubicacion'),
-                css_class="mb-4"
-                ),
-            Div(
-                Field('piso'),
-                css_class="mb-4"
-                ),
-            Div(
-                Field('capacidad'),
-                css_class="mb-4"
-                ),
-            Div(
-                Field('tipo'),
-                css_class="mb-4"
-                ),
-            Div(
-                Field('descripcion'),
-                css_class="mb-4"
-                ),
-            Div(
-                Field('disponible'),
-                css_class="mb-4"
-                ),
-            Div(
-                Submit('submit', 'Guardar', css_class='btn btn-primary'),
-            
-                )
-        )
-
         super().__init__(*args, **kwargs)
-
-
-class EspacioUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Espacio
-        fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
-        widgets = {
-            'ubicacion': Select2Widget,
-        }
-
-    def __init__(self, request, *args, **kwargs):
-        self.request = request
-        super().__init__(*args, **kwargs)
-        # Guardamos el estado inicial de disponibilidad
         self.initial_disponible = self.instance.disponible if self.instance.pk else True
 
 
@@ -106,8 +45,8 @@ class EspacioUpdateForm(forms.ModelForm):
                 css_class="mb-4"
                 ),
             Div(
-                Field('descripcion'),
-                css_class="mb-4"
+                Field('descripcion', css_class="h-24 resize-none textarea textarea-bordered w-full"),
+                css_class="mb-4 "
                 ),
             Div(
                 Field('disponible'),
@@ -119,10 +58,10 @@ class EspacioUpdateForm(forms.ModelForm):
                 )
         )
 
-        super().__init__(*args, **kwargs)
 
-        
-    
+
+class EspacioUpdateForm(EspacioCreateForm):
+
     def save(self, commit=True):
         espacio = super().save(commit=False)
             

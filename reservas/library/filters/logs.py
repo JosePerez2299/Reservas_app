@@ -1,7 +1,7 @@
 from auditlog.models import LogEntry
 from django_filters import  FilterSet
 from django import forms
-from django_filters import CharFilter, DateFilter
+from django_filters import CharFilter, DateFilter, ChoiceFilter
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div, Field
 
@@ -19,40 +19,48 @@ class LogFilter(FilterSet):
     timestamp = DateFilter(
         field_name='timestamp',
         lookup_expr='icontains',
-        label='Fecha de uso',
+        label='Fecha',
         widget=forms.DateInput(attrs={
             'class': 'input input-bordered w-full focus:input-primary',
             'type': 'date'
         })
     )
 
+    tipo = ChoiceFilter(
+        field_name='tipo',
+        lookup_expr='iexact',
+        label='Modulo',
+        choices=[
+            ('Usuario', 'Usuario'),
+            ('Espacio', 'Espacio'),
+            ('Reserva', 'Reserva'),
+        ]
+    )
+    action_label = ChoiceFilter(
+        field_name='action_label',     
+        lookup_expr='iexact',
+        label='Tipo de acción',
+        choices=[
+            ('Crear', 'Crear'),
+            ('Actualizar', 'Actualizar'),
+            ('Eliminar', 'Eliminar'),
+        ],
+    )
     class Meta:
         model = LogEntry
-        fields = ['actor', 'timestamp']
+        fields = ['actor', 'tipo', 'action_label', 'timestamp']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # 1. Crear el helper
         self.form.helper = FormHelper()
         self.form.helper.form_method = 'get'
-        self.form.helper.form_class = 'space-y-4 p-4 border rounded-lg'
-        self.form.helper.label_class = 'font-semibold'
-        self.form.helper.field_class = 'w-full'
-
-        # 2. Definir el layout en filas y columnas
+        self.form.helper.form_class = 'form-inline'
         self.form.helper.layout = Layout(
             Div(
-                Field('actor', css_class='w-full'),
-                css_class='w-full',
-            ),
-            Div(
-                Field('timestamp', css_class='calendar w-full'),
-                css_class='w-full',
-            ),
-           
-            Submit('submit', 'Filtrar', css_class='btn btn-primary w-full mt-4')
+                Field('actor'),
+                Field('tipo'),
+                Field('action_label'),
+                Field('timestamp'),
+                Submit('search', 'Buscar', css_class='btn-primary'),
+            )
         )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs

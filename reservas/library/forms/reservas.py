@@ -176,13 +176,12 @@ class ReservaApproveForm(forms.ModelForm):
     
 
     def clean_aprobado_por(self):
-        print(self.request.user)
         return self.request.user
+
     def __init__(self, request, *args, **kwargs):
         self.request = request
         user = self.request.user
         super().__init__(*args, **kwargs)
-        print(user)
         
         self.fields['aprobado_por'].widget = forms.HiddenInput()
         self.fields['aprobado_por'].initial = user.pk
