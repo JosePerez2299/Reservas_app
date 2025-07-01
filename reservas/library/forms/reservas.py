@@ -167,3 +167,53 @@ class ReservaUpdateForm(forms.ModelForm):
                 Submit('submit', 'Guardar', css_class="btn btn-primary w-full"),
             )
         )
+
+
+class ReservaApproveForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ['estado', 'motivo_admin', 'aprobado_por']
+    
+
+    def clean_aprobado_por(self):
+        print(self.request.user)
+        return self.request.user
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
+        user = self.request.user
+        super().__init__(*args, **kwargs)
+        print(user)
+        
+        self.fields['aprobado_por'].widget = forms.HiddenInput()
+        self.fields['aprobado_por'].initial = user.pk
+        self.fields['aprobado_por'].disabled = True
+
+        self.fields['estado'] = forms.ChoiceField(
+            choices=[
+                ('aprobada', 'Aprobada'),
+                ('rechazada', 'Rechazada'),
+            ],
+            widget=forms.RadioSelect,
+            label='Estado'
+        )
+
+        # Helper y layout con Tailwind
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.form_tag = False
+
+        self.helper.layout = Layout(
+            Div(
+                Field('estado', label="Estado de la reserva", css_class="input input-bordered w-full"),
+                css_class="mb-4"
+            ),
+
+            Div(
+                Field('motivo_admin', placeholder="Motivo de la aprobación o rechazo", css_class="h-24 resize-none textarea textarea-bordered w-full"),
+                css_class="mb-6"
+            ),
+
+            Div(
+                Submit('submit', 'Guardar', css_class="btn btn-primary w-full"),
+            )
+        )        

@@ -18,12 +18,13 @@ from reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy, reverse
 from reservas.library.filters.reservas import *
-from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
+from reservas.library.forms.reservas import *
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime
 from django.views import View
 from django.views.generic import TemplateView
+from django.http import Http404
 
 def qs_condiciones(user):
     if user.is_admin:
@@ -260,3 +261,41 @@ class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
         condiciones = qs_condiciones(self.request.user)
         qs = qs.filter(condiciones & Q(estado='pendiente'))
         return qs
+
+class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
+    """
+    Aprobar una reserva existente
+    """
+    model = Reserva
+    form_class = ReservaApproveForm  
+    template_name = 'reservas/reservas_edit.html'
+    success_url = reverse_lazy('reserva')
+    permission_required = 'reservas.change_reserva'
+
+    def success_message(self):
+        return 'Reserva editada correctamente'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('reserva_approve', args=[self.object.pk])
+        ctx['title'] = 'Editar Reserva'
+        ctx['subtitle'] = 'Detalles de la reserva'
+        return ctx
+
+    def get_form_kwargs(self):
+        """
+        Pasa el objeto request al formulario
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def get_queryset(self):
+        if not self.request.user.is_admin and not self.request.user.is_moderador:
+            raise Http404
+        
+        qs = super().get_queryset()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones & Q(estado='pendiente'))
+        return qs
+

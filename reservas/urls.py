@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/reservas/', ReservasMonthlyCount.as_view(), name='reservas_monthly_count'),
 
     path('reservas/fecha/', ReservasByDate.as_view(), name='reservas_by_date'),
+    path('reserva/gestionar/<int:pk>/', ReservaApproveView.as_view(), name='reserva_approve'),
 ]
 
 # Manejador de error 404
