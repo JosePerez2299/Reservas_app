@@ -23,6 +23,14 @@ from django.db.models.functions import Lower, Coalesce
 from reservas.library.filters.usuarios import UsuarioFilter
 from django.conf import settings
 
+def qs_condiciones(user):
+    if user.is_admin:
+        return Q(groups__name__in=[settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO])
+    elif user.is_moderador:
+        return Q(groups__name=settings.GRUPOS.USUARIO)
+    else:
+        return Q()
+
 class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView ):
     """
     Muestra una lista de usuarios con un formulario de filtrado
@@ -70,11 +78,7 @@ class UsuarioListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
             )
         )
 
-        if self.request.user.is_admin:
-            qs = qs.filter(Q(groups__name__in=[settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO]))
-        elif self.request.user.is_moderador:
-            qs = qs.filter(Q(groups__name=settings.GRUPOS.USUARIO))
-        
+        qs = qs.filter(qs_condiciones(self.request.user))
         return qs
 
 
@@ -150,6 +154,9 @@ class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView)
         })  
         return ctx
 
+    def get_queryset(self):
+        return super().get_queryset().filter(qs_condiciones(self.request.user))
+
 
 class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
@@ -179,6 +186,10 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
             return JsonResponse({'error': 'Solo puedes eliminar un usuario con grupo ADMIN'}, status=403)
         else:
             return super().delete(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(qs_condiciones(self.request.user))
+
 class ProfileView(LoginRequiredMixin, DetailView):
     model = Usuario
     template_name = 'reservas/profile.html'
