@@ -1,139 +1,256 @@
-<!-- user_profile.html -->
-<div class="p-6 max-w-md mx-auto" x-data="{ showDetails: false }">
-    <!-- Header del espacio -->
-    <div class="text-center mb-6">
-      <div class="mx-auto h-18 w-18 bg-primary flex items-center justify-center rounded-full">
-        <div class="text-primary-content text-2xl font-bold">
-          {{ object.username|first|upper }}
+{% load utils %}
+<!-- usuario_detail.html -->
+<div class="p-6 max-w-2xl mx-auto bg-base-100 rounded-xl shadow-lg" x-data="{ showDetails: false }">
+
+  <!-- Header simplificado -->
+  <div class="flex justify-between items-center gap-3 mb-4">
+    <div class="flex items-center gap-3"> 
+      <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+        <i class="fas fa-user text-sm"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-bold">Detalle de Usuario</h1>
+        <p class="text-xs text-base-content/60">Usuario #{{ object.pk }}</p>
+      </div>
+    </div>
+
+    <div>
+      {% if object.is_active %}
+        <div class="badge badge-success">Activo</div>
+      {% else %}
+        <div class="badge badge-error">Inactivo</div>
+      {% endif %}
+    </div>
+  </div> 
+
+  <!-- Cards Información básica y Ubicación - más compactas -->
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <!-- Información básica -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-id-card text-primary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Información básica</span>
+      </div>
+      
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 bg-primary text-primary-content rounded-full flex items-center justify-center">
+          <span class="text-xs font-bold">{{ object.username|first|upper }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-sm truncate">{{object.username}}</p>
         </div>
       </div>
       
-      <h2 class="text-2xl font-bold text-base-content">{{ object.username }}</h2>
-      <p class="text-base-content/70">{{ object.email }}</p>
-    </div>
-    <!-- Información básica -->
-    <div class="space-y-4">
-      <!-- Rol/Grupo -->
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Rol</span>
-        <div class="flex gap-1">
-          {% if usuario.is_admin %}
-            <div class="badge badge-error badge-sm">Administrador</div>
-          {% elif usuario.is_moderador %}
-            <div class="badge badge-warning badge-sm">Moderador</div>
-          {% elif usuario.is_usuario %}
-            <div class="badge badge-info badge-sm">Usuario</div>
-          {% else %}
-            <div class="badge badge-ghost badge-sm">Sin rol</div>
-          {% endif %}
-        </div>
-      </div>
-  
-      <!-- Ubicación -->
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Ubicación</span>
-        <span class="text-sm font-semibold">
-          {% if usuario.ubicacion %}
-            {{ usuario.ubicacion.nombre }}
-          {% else %}
-            <span class="text-base-content/50">No asignada</span>
-          {% endif %}
-        </span>
-      </div>
-  
-      <!-- Piso (solo si es moderador o tiene piso asignado) -->
-      {% if usuario.piso is not None %}
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Piso</span>
-        <span class="text-sm font-semibold">Piso {{ usuario.piso }}</span>
+      {% if object.email %}
+      <div class="flex items-center gap-2">
+        <i class="fas fa-envelope text-info text-xs"></i>
+        <span class="text-xs text-base-content/70 truncate">{{object.email}}</span>
       </div>
       {% endif %}
-  
-      <!-- Estado activo -->
-      <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-        <span class="text-sm font-medium text-base-content/70">Estado</span>
-        <div class="flex items-center gap-2">
-          {% if usuario.is_active %}
-            <div class="w-2 h-2 bg-success rounded-full"></div>
-            <span class="text-sm font-semibold text-success">Activo</span>
-          {% else %}
-            <div class="w-2 h-2 bg-error rounded-full"></div>
-            <span class="text-sm font-semibold text-error">Inactivo</span>
-          {% endif %}
-        </div>
+    </div>
+
+    <!-- Ubicación y rol -->
+    <div class="bg-base-200 rounded-lg p-3">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fas fa-map-marker-alt text-secondary text-xs"></i>
+        <span class="font-medium text-xs text-base-content/80">Ubicación y rol</span>
       </div>
-  
-      <!-- Botón para mostrar más detalles -->
-      <button 
-        @click="showDetails = !showDetails"
-        class="btn btn-ghost btn-sm w-full"
-        :class="{ 'btn-active': showDetails }"
-      >
-        <span x-text="showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'"></span>
-        <svg class="w-4 h-4 transform transition-transform" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-  
-      <!-- Detalles adicionales (colapsable) -->
-      <div x-show="showDetails" x-transition class="space-y-3 pt-2">
-        <!-- Fecha de registro -->
-        <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-          <span class="text-sm font-medium text-base-content/70">Registrado</span>
-          <span class="text-sm">{{ usuario.date_joined|date:"d/m/Y" }}</span>
-        </div>
-  
-        <!-- Último acceso -->
-        <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
-          <span class="text-sm font-medium text-base-content/70">Último acceso</span>
-          <span class="text-sm">
-            {% if usuario.last_login %}
-              {{ usuario.last_login|date:"d/m/Y H:i" }}
+      
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-building text-primary text-xs"></i>
+          <span class="font-medium text-sm truncate">
+            {% if object.ubicacion %}
+              {{object.ubicacion.nombre}}
             {% else %}
-              <span class="text-base-content/50">Nunca</span>
+              <span class="text-base-content/50">No asignada</span>
             {% endif %}
           </span>
         </div>
-  
-        <!-- Permisos especiales -->
-        {% if usuario.is_superuser or usuario.is_staff %}
-        <div class="p-3 bg-base-200 rounded-lg">
-          <span class="text-sm font-medium text-base-content/70 block mb-2">Permisos especiales</span>
-          <div class="flex flex-wrap gap-1">
-            {% if usuario.is_superuser %}
-              <div class="badge badge-error badge-xs">Superusuario</div>
+        
+        <div class="flex items-center gap-2">
+          <i class="fas fa-user-tag text-secondary text-xs"></i>
+          <div class="flex gap-1">
+            {% if object.is_admin %}
+              <div class="badge badge-error badge-xs">Administrador</div>
+            {% elif object.is_moderador %}
+              <div class="badge badge-warning badge-xs">Moderador</div>
+            {% elif object.is_usuario %}
+              <div class="badge badge-info badge-xs">Usuario</div>
+            {% else %}
+              <div class="badge badge-ghost badge-xs">Sin rol</div>
             {% endif %}
-            {% if usuario.is_staff %}
-              <div class="badge badge-warning badge-xs">Staff</div>
-            {% endif %}
+          </div>
+        </div>
+        
+        {% if object.piso is not None %}
+        <div class="flex items-center gap-3 text-xs text-base-content/60">
+          <div class="flex items-center gap-1">
+            <i class="fas fa-layer-group text-info"></i>
+            <span>Piso {{object.piso}}</span>
           </div>
         </div>
         {% endif %}
       </div>
     </div>
-  
-    <!-- Estadísticas de reservas (si tienes acceso a ellas) -->
-    {% if usuario.reservas.count > 0 %}
-    <div class="mt-6 p-4 bg-primary/10 rounded-lg">
-      <h3 class="text-sm font-semibold text-primary mb-3">Actividad de Reservas</h3>
-      <div class="flex justify-between">
-        <div class="flex flex-col">
-          <div class="text-lg font-bold text-primary">{{ usuario.reservas.count }}</div>
+  </div>
+
+  <!-- Información de fechas -->
+  <div class="bg-base-200 rounded-xl p-6 mb-8">
+    <h3 class="text-md font-semibold text-base-content/70 mb-4">Información de cuenta</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600">{{ object.date_joined|date:"d" }}</div>
+        <div class="text-sm text-gray-600">{{ object.date_joined|date:"M Y" }}</div>
+        <div class="text-xs text-gray-500 uppercase">Fecha de registro</div>
+      </div>
+      <div class="text-center">
+        {% if object.last_login %}
+          <div class="text-2xl font-bold text-purple-600">{{ object.last_login|date:"d/m" }}</div>
+          <div class="text-sm text-gray-600">{{ object.last_login|date:"H:i" }}</div>
+          <div class="text-xs text-gray-500 uppercase">Último acceso</div>
+        {% else %}
+          <div class="text-2xl font-bold text-gray-400">-</div>
+          <div class="text-sm text-gray-600">Nunca</div>
+          <div class="text-xs text-gray-500 uppercase">Último acceso</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas de reservas -->
+  {% if object.reservas.count > 0 %}
+  <div class="mb-6">
+    <label class="block text-sm font-semibold text-base-content/70 mb-3">Actividad de reservas</label>
+    <div class="bg-base-200 rounded-xl p-4 border-l-4 border-blue-500">
+      <div class="grid grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-lg font-bold text-primary">{{ object.reservas.count }}</div>
           <div class="text-xs text-base-content/70">Total</div>
         </div>
-        <div class="flex flex-col">
+        <div>
           <div class="text-lg font-bold text-success">{{ reservas_aprobadas|default:0 }}</div>
           <div class="text-xs text-base-content/70">Aprobadas</div>
         </div>
-        <div class="flex flex-col">
+        <div>
           <div class="text-lg font-bold text-warning">{{ reservas_pendientes|default:0 }}</div>
           <div class="text-xs text-base-content/70">Pendientes</div>
         </div>
-        <div class="flex flex-col">
+        <div>
           <div class="text-lg font-bold text-error">{{ reservas_rechazadas|default:0 }}</div>
           <div class="text-xs text-base-content/70">Rechazadas</div>
         </div>
       </div>
     </div>
-    {% endif %}
   </div>
+  {% endif %}
+
+  <!-- Botón para mostrar más detalles -->
+  <button 
+    @click="showDetails = !showDetails"
+    class="w-full py-3 px-4 bg-primary/10 hover:bg-primary/20 hover:text-primary-content rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 mb-6"
+  >
+    <span x-text="showDetails ? 'Ocultar detalles adicionales' : 'Mostrar detalles adicionales'" class="font-medium text-base-content"></span>
+    <svg class="w-4 h-4 transform transition-transform text-base-content" :class="{ 'rotate-180': showDetails }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <!-- Detalles adicionales (colapsable) -->
+  <div x-show="showDetails" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95">
+    <div class="bg-primary/5 rounded-xl p-6 space-y-6">
+      
+      <!-- Información detallada del usuario -->
+      <div>
+        <h4 class="text-lg font-semibold text-base-content mb-4">Información Detallada</h4>
+        <div class="bg-base-100 rounded-lg p-4 space-y-3">
+          <!-- Nombre de usuario -->
+          <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+            <span class="text-sm font-medium text-base-content/70">Nombre de usuario</span>
+            <span class="text-sm font-semibold">{{ object.username }}</span>
+          </div>
+
+          <!-- Correo electrónico -->
+          <div class="p-3 bg-base-200 rounded-lg">
+            <span class="text-sm font-medium text-base-content/70 block mb-1">Correo electrónico</span>
+            <span class="text-sm font-semibold break-all">
+              {% if object.email %}
+                {{ object.email }}
+              {% else %}
+                <span class="text-base-content/50">No registrado</span>
+              {% endif %}
+            </span>
+          </div>
+
+          {% if object.first_name or object.last_name %}
+          <!-- Nombre completo -->
+          <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+            <span class="text-sm font-medium text-base-content/70">Nombre completo</span>
+            <span class="text-sm font-semibold">{{ object.first_name }} {{ object.last_name }}</span>
+          </div>
+          {% endif %}
+
+          <!-- Estado de la cuenta -->
+          <div class="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+            <span class="text-sm font-medium text-base-content/70">Estado de la cuenta</span>
+            <div class="flex items-center gap-2">
+              {% if object.is_active %}
+                <div class="w-2 h-2 bg-success rounded-full"></div>
+                <span class="text-sm font-semibold text-success">Activa</span>
+              {% else %}
+                <div class="w-2 h-2 bg-error rounded-full"></div>
+                <span class="text-sm font-semibold text-error">Inactiva</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permisos y privilegios -->
+      {% if object.is_superuser or object.is_staff %}
+      <div>
+        <h4 class="text-lg font-semibold text-base-content mb-4">Permisos y Privilegios</h4>
+        
+        <div class="bg-base-100 rounded-lg p-4">
+          <label class="block text-sm font-medium text-base-content mb-3">Permisos especiales</label>
+          <div class="flex flex-wrap gap-2">
+            {% if object.is_superuser %}
+              <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                <i class="fas fa-crown mr-1"></i>
+                Superusuario
+              </div>
+            {% endif %}
+            {% if object.is_staff %}
+              <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                <i class="fas fa-tools mr-1"></i>
+                Staff
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Información de ubicación detallada -->
+      {% if object.ubicacion %}
+      <div>
+        <h4 class="text-lg font-semibold text-base-content mb-4">Información de Ubicación</h4>
+        <div class="bg-base-100 rounded-lg p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-base-content mb-2">Ubicación asignada</label>
+              <p class="text-base-content font-semibold">{{ object.ubicacion.nombre }}</p>
+            </div>
+            {% if object.piso is not None %}
+            <div>
+              <label class="block text-sm font-medium text-base-content mb-2">Piso asignado</label>
+              <p class="text-base-content font-semibold">Piso {{ object.piso }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

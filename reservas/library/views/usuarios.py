@@ -103,14 +103,13 @@ class UsuarioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         return ctx
     
 
-
-class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):
+class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
     """
     Edita un usuario existente
     """
     model = Usuario
     form_class = UsuarioUpdateForm
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/usuarios_edit.html'
     success_url = reverse_lazy('usuario')
     permission_required = 'reservas.change_usuario'
     html_title = 'Editar Usuario'
@@ -120,16 +119,22 @@ class UsuarioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('usuario_edit', args=[self.object.pk])
+        ctx['title'] = 'Editar Usuario'
+        ctx['subtitle'] = 'Información del usuario'
+        return ctx
+    
 
-
-class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
+class UsuarioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     """
-    Muestra los detalles de un usuario
+    Muestra los detalles de un usuario  
     """
     model = Usuario 
     template_name = 'reservas/usuario_detail.html'
     permission_required = 'reservas.view_usuario'
-    html_title = 'Detalles de Usuario'
     url = 'usuario_view'
 
 
@@ -164,3 +169,11 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
         {'label': 'Grupo', 'value': 'grupo'},
     ]
 
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = Usuario
+    template_name = 'reservas/profile.html'
+    permission_required = 'reservas.view_usuario'
+    url = 'profile'
+
+    def get_object(self):
+        return self.request.user

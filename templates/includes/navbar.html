@@ -73,7 +73,7 @@
 
             <p class="p-1 text-sm text-center text-base-content/70" >{{ user.username|upper }}</p>
             <hr>
-              <li><a><i class="fas fa-user mr-2"></i>Perfil</a></li>
+              <li><a href={% url 'profile' %}><i class="fas fa-user mr-2"></i>Perfil</a></li>
               <li><a href={% url 'log' %}><i class="fas fa-history mr-2"></i>Actividad</a></li>
               <form method="post" action="{% url 'logout' %}">
                   {% csrf_token %}

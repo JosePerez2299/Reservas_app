@@ -10,7 +10,8 @@ from reservas.library.views.logs import *
 
 urlpatterns = [
     path('', LoginView.as_view(template_name='reservas/login.html', redirect_authenticated_user=True), name='login'),
-    path('dashboard/', Dashboard.as_view(), name='dashboard'),
+    path('inicio/', Dashboard.as_view(), name='dashboard'),
+    path('perfil/', ProfileView.as_view(), name='profile'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
 

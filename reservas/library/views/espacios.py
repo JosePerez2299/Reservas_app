@@ -48,30 +48,34 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
     }
     
 
-class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, CreateView):
+class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     """
     Crea un nuevo espacio
     """
     model = Espacio
     form_class = EspacioCreateForm
     permission_required = 'reservas.add_espacio'
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/espacios_create.html'
     success_url = reverse_lazy('espacio')
-    html_title = 'Crear Espacio'
-    url = 'espacio_create'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Crear Espacio'
+        ctx['url'] = reverse_lazy('espacio_create')
+        ctx['subtitle'] = 'Información del espacio'
+        return ctx
 
 
-class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, UpdateView):
+class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
     """
     Edita un espacio existente
     """
     model = Espacio
     permission_required = 'reservas.change_espacio'
     form_class = EspacioUpdateForm
-    template_name = 'reservas/edit_create.html'
+    template_name = 'reservas/espacios_edit.html'
     success_url = reverse_lazy('espacio')
     html_title = 'Editar Espacio'
-    url = 'espacio_edit'
 
     def get_form_kwargs(self):
         """
@@ -80,6 +84,15 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs   
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Editar Espacio'
+        ctx['url'] = reverse_lazy('espacio_edit', args=[self.object.pk])
+        ctx['subtitle'] = 'Información del espacio'
+        return ctx
+
+
 
 
 class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
