@@ -107,7 +107,7 @@ class ReservaCreateForm(forms.ModelForm, ):
 class ReservaUpdateForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = ['fecha_uso', 'hora_inicio',
+        fields = ['usuario', 'fecha_uso', 'hora_inicio',
                   'hora_fin',  'motivo']
         widgets = {
             'fecha_uso': forms.DateInput(
@@ -124,6 +124,18 @@ class ReservaUpdateForm(forms.ModelForm):
         self.request = request
         user = self.request.user
         super().__init__(*args, **kwargs)
+
+        self.fields['usuario'].disabled = True
+        self.fields['usuario'].widget.attrs['readonly'] = True
+        
+        if user.is_moderador:
+            self.fields['usuario'].queryset = Usuario.objects.filter(
+                Q(groups__name=user.GRUPOS.USUARIO) | Q(groups__name=user.GRUPOS.MODERADOR) | Q(id=user.id))
+
+        elif user.is_usuario:
+            self.fields['usuario'].initial = user
+            self.fields['usuario'].disabled = True
+            self.fields['usuario'].help_text = "No puedes cambiar este campo"
 
         # Helper y layout con Tailwind
         self.helper = FormHelper()

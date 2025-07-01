@@ -25,6 +25,20 @@ from datetime import datetime
 from django.views import View
 from django.views.generic import TemplateView
 
+def qs_condiciones(user):
+    if user.is_admin:
+        return Q()
+    elif user.is_moderador:
+        return Q(
+            Q(usuario=user) | 
+            Q(aprobado_por=user) | 
+            (Q(espacio__ubicacion=user.ubicacion)  & 
+            Q(espacio__piso=user.piso))
+        )
+    elif user.is_usuario:
+        return Q(usuario=user)
+    return Q()
+
 class ReservasMonthlyCount(LoginRequiredMixin, PermissionRequiredMixin,View):
     """
     Devuelve un conteo de reservas por día para un rango de fechas,
@@ -47,7 +61,9 @@ class ReservasMonthlyCount(LoginRequiredMixin, PermissionRequiredMixin,View):
         except (ValueError, TypeError):
             return JsonResponse({'error': 'Formato de fecha invalido'}, status=400)
 
+        condiciones = qs_condiciones(self.request.user)
         queryset = Reserva.objects.filter(
+            condiciones,
             fecha_uso__gte=start_date,
             fecha_uso__lte=end_date,
         )
@@ -98,6 +114,12 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
             context['is_htmx'] = True
             
         return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones)
+        return qs
  
     
 class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView):
@@ -135,18 +157,9 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.user.is_admin:
-            return qs
-        elif self.request.user.is_moderador:
-            return qs.filter(
-                Q(usuario=self.request.user) | 
-                Q(aprobado_por=self.request.user) | 
-                (Q(espacio__ubicacion=self.request.user.ubicacion)  & 
-                Q(espacio__piso=self.request.user.piso))
-            )
-        elif self.request.user.is_usuario:
-            return qs.filter(Q(usuario=self.request.user))
-        return qs.none()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones)
+        return qs
     
 
 class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
@@ -189,6 +202,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         ctx['title'] = 'Editar Reserva'
         ctx['subtitle'] = 'Detalles de la reserva'
         return ctx
+
     def get_form_kwargs(self):
         """
         Pasa el objeto request al formulario
@@ -196,6 +210,12 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones & Q(estado='pendiente'))
+        return qs
 
 
 class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DetailView):
@@ -207,6 +227,12 @@ class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     permission_required = 'reservas.view_reserva'
     html_title = 'Detalles de Reserva'
     url = reverse_lazy('reserva_view')
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones)
+        return qs
 
 class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
@@ -229,3 +255,8 @@ class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
         {'label': 'Hora fin', 'value': 'hora_fin'},
     ]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        condiciones = qs_condiciones(self.request.user)
+        qs = qs.filter(condiciones & Q(estado='pendiente'))
+        return qs
