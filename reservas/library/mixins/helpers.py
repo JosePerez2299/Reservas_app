@@ -54,6 +54,7 @@ class AjaxDeleteMixin:
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['model'] = self.model.__name__
+        
         ctx['url'] = reverse_lazy(self.url, args=[self.object.pk])
         ctx['details'] = [{'label': detail['label'], 'value': str(getattr(self.object, detail['value']) )} for detail in self.details]
         return ctx

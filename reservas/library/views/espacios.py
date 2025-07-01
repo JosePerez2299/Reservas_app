@@ -18,6 +18,7 @@ from reservas.library.mixins.helpers import *
 from django.urls import reverse_lazy
 from reservas.library.forms.espacios import *
 from django.db.models.functions import Lower
+from django.db.models import Count, Q   
 
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """
@@ -96,14 +97,31 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
 
 
 class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
-    """
-    Muestra los detalles de un espacio
-    """
     model = Espacio
-    permission_required = 'reservas.view_espacio'
     template_name = 'reservas/espacio_detail.html'
-    html_title = 'Detalles de Espacio'
+    permission_required = 'reservas.view_espacio'
+    context_object_name = 'object'
+    html_title = 'Detalles del Espacio'
     url = 'espacio_view'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        espacio = self.get_object()
+        
+        # Obtener estadísticas de reservas
+        reservas_stats = Reserva.objects.filter(espacio=espacio).aggregate(
+            total=Count('id'),
+            aprobadas=Count('id', filter=Q(estado='aprobada')),
+            pendientes=Count('id', filter=Q(estado='pendiente')),
+            rechazadas=Count('id', filter=Q(estado='rechazada'))
+        )
+        
+        context['total_reservas'] = reservas_stats['total']
+        context['reservas_aprobadas'] = reservas_stats['aprobadas']
+        context['reservas_pendientes'] = reservas_stats['pendientes']
+        context['reservas_rechazadas'] = reservas_stats['rechazadas']
+        
+        return context
 
 class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """

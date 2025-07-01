@@ -161,7 +161,7 @@ COMPRESS_ENABLED = True
 STATIC_ROOT = BASE_DIR / 'static'
 AUTH_USER_MODEL = 'reservas.Usuario'
 APPEND_SLASH = True 
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/inicio/'
 LOGIN_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 

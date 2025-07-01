@@ -148,8 +148,6 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
             return qs.filter(Q(usuario=self.request.user))
         return qs.none()
     
-    
-
 
 class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
     form_class = ReservaCreateForm

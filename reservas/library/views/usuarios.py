@@ -159,7 +159,7 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     template_name = 'reservas/delete.html'
     success_url = reverse_lazy('usuario') 
     permission_required = 'reservas.delete_usuario'
-    url = 'reserva_delete'
+    url = 'usuario_delete'
 
     details = [ 
         {'label': 'Username', 'value': 'username'},
@@ -169,6 +169,16 @@ class UsuarioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
         {'label': 'Grupo', 'value': 'grupo'},
     ]
 
+    def delete(self, request, *args, **kwargs):
+        if self.object.grupo == settings.GRUPOS.ADMIN:
+            return JsonResponse({'error': 'No puedes eliminar un usuario con grupo ADMIN'}, status=403)
+       
+        if self.request.user.is_moderador and self.object.grupo != settings.GRUPOS.USUARIO:
+            return JsonResponse({'error': 'Solo puedes eliminar un usuario con grupo USUARIO'}, status=403)
+        elif self.request.user.is_admin and self.object.grupo != settings.GRUPOS.ADMIN:
+            return JsonResponse({'error': 'Solo puedes eliminar un usuario con grupo ADMIN'}, status=403)
+        else:
+            return super().delete(request, *args, **kwargs)
 class ProfileView(LoginRequiredMixin, DetailView):
     model = Usuario
     template_name = 'reservas/profile.html'

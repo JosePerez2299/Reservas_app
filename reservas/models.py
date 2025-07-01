@@ -105,7 +105,7 @@ class Usuario(AbstractUser):
 
     @property
     def grupo(self):
-        return self.groups.first().name
+        return self.groups.first().name if self.groups.exists() else self.GRUPOS.USUARIO
 
     def get_logs(self):
         qs = LogEntry.objects.all()

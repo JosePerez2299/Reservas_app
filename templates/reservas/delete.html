@@ -42,8 +42,8 @@
       <form 
       id="confirm-delete-form" 
       method="post" 
-      action="{% url 'reserva_delete' object.pk %}"
-      hx-post="{% url 'reserva_delete' object.pk %}"
+      action="{{url}}"
+      hx-post="{{url}}"
       hx-target="#generic_modal_content"   
       hx-trigger="submit"
       hx-swap="none"
