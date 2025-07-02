@@ -10,6 +10,13 @@ class EspacioCreateForm(forms.ModelForm):
         model = Espacio
         fields = ['nombre', 'ubicacion', 'piso', 'capacidad', 'tipo', 'descripcion', 'disponible']
 
+        help_texts = {
+
+            'tipo': 'Tipo de espacio',
+           
+        }
+
+
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
@@ -20,24 +27,25 @@ class EspacioCreateForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         
+        
         # IMPORTANTE: Desactivar el renderizado automático del form tag
         # ya que lo manejas manualmente en el template
         self.helper.form_tag = False
 
         self.helper.layout =    Layout(
             Div(
-                Field('nombre')
+                Field('nombre', placeholder="Nombre del espacio")
                 ),
             Div(
                 Field('ubicacion'),
                 css_class="mb-4"
                 ),
             Div(
-                Field('piso'),
+                Field('piso', placeholder="Piso del espacio"),
                 css_class="mb-4"
                 ),
             Div(
-                Field('capacidad'),
+                Field('capacidad', placeholder="Capacidad del espacio"),
                 css_class="mb-4"
                 ),
             Div(
@@ -45,15 +53,14 @@ class EspacioCreateForm(forms.ModelForm):
                 css_class="mb-4"
                 ),
             Div(
-                Field('descripcion', css_class="h-24 resize-none textarea textarea-bordered w-full"),
+                Field('descripcion', placeholder="Descripción del espacioss", template='components/forms/textarea.html'),
                 css_class="mb-4 "
                 ),
             Div(
-                Field('disponible'),
-                css_class="mb-4"
+                Field('disponible', template='components/forms/checkbox.html'),
                 ),
             Div(
-                Submit('submit', 'Guardar', css_class='btn btn-primary'),
+                Submit('submit', 'Guardar', css_class='btn btn-primary w-full'),
             
                 )
         )
@@ -81,7 +88,7 @@ class EspacioUpdateForm(EspacioCreateForm):
                 reserva.estado = Reserva.Estado.RECHAZADA
                 reserva.aprobado_por = self.request.user
                 reserva.motivo_admin = 'El espacio no se encuentra disponible'
-                reserva.save()  # Esto triggerea las señales y el audit log
+                reserva.save()  
             
         if commit:
             espacio.save()

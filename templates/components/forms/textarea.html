@@ -1,0 +1,9 @@
+{% load widget_tweaks %}
+
+<div class="form-control">
+  <label for="{{ field.id_for_label }}" class="label">
+    <span class="label-text font-semibold">{{ field.label }}</span>
+  </label>
+
+  {{ field|add_class:"textarea resize-none h-24" }}
+</div>

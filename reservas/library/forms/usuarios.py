@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.contrib.auth import password_validation
+from django.utils.text import capfirst
 from django_select2.forms import Select2Widget
 from reservas.models import Usuario
 from django.conf import settings
@@ -11,12 +12,11 @@ from crispy_forms.layout import Layout, Div, Field, Submit, Row
 
 class UsuarioCreateForm(UserCreationForm):
     # Tu formulario de creación original permanece igual
-    groups = forms.ModelChoiceField(
-        queryset=Group.objects.filter(name__in=[ settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO]),
+    groups = forms.ChoiceField(
+        choices=[(settings.GRUPOS.MODERADOR ,capfirst(settings.GRUPOS.MODERADOR)), (settings.GRUPOS.USUARIO,capfirst(settings.GRUPOS.USUARIO))],
         required=False,
         widget=forms.RadioSelect,
         label='Grupo',
-        empty_label="Sin grupo asignado"
     )
 
     class Meta:
@@ -77,7 +77,7 @@ class UsuarioCreateForm(UserCreationForm):
                 css_class="mb-4"
             ),
             Div(
-                Field('groups', css_class="input input-bordered w-full"),
+                Field('groups', template ="components/forms/radioselect.html" ),
                 css_class="mb-4"
             ),
             Div(
@@ -189,7 +189,7 @@ class UsuarioUpdateForm(forms.ModelForm):
                 css_class="mb-4"
             ),
             Div(
-                Field('groups', css_class="input input-bordered w-full"),
+                Field('groups', template ="components/forms/radioselect.html" ),
                 css_class="mb-4"
             ),
             Div(

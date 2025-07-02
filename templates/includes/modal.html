@@ -10,18 +10,9 @@
     <div
       id="generic_modal_content"
       hx-swap="innerHTML"
-      hx-on="showMessage: Swal.fire({
-        icon: 'success',
-        title: '¡Listo!',
-        text: event.detail.value,
-        confirmButtonText: 'OK',
-        allowOutsideClick: false
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.reload();
-        }
-      })"
+      
     >
   </div>
   </div>
 </dialog>
+

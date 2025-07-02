@@ -22,9 +22,7 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
-
+   
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <!-- Select2 css -->
@@ -48,43 +46,24 @@
     </div>
 
     {% include "includes/modal.html" %}
-
- 
+    
+    
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Alpine Plugins -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-
+    
     <!-- Alpine Core -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
     <!-- Htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
-
+    
     <!-- Scripts base -->
     <script src="{% static 'src/js/base.js' %}"></script>
-
-    <!-- Scripts personalizados -->
-    <script> 
-        document.addEventListener('htmx:afterSettle', function(event) {
-            // Asegurarnos de que sea el contenido de nuestro modal
-            if (event.detail.target.id === 'generic_modal_content') {
-              console.log('Modal abierto');
-              // Buscar todos los selects dentro del modal
-              const $modalContent = $(event.detail.target);
-              $modalContent.find('select').each(function() {
-                const $sel = $(this);
-                // Evitar volver a inicializar un select2 ya creado
-                $sel.select2({
-                  dropdownParent: $('#generic_modal'), // selector de tu modal padre
-                  width: '100%'
-                });
-              });
-            }
-          });
-    </script>
+    <script src="{% static 'src/js/modal-listener.js' %}" defer></script>
 
     {% block scripts %}
     {% endblock scripts %}

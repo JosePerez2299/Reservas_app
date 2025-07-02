@@ -1,0 +1,22 @@
+{# templates/components/forms/checkbox.html #}
+{% load i18n %}
+
+<div class="form-control mb-4">
+    
+  <label class="label cursor-pointer block">
+    {# El texto de la etiqueta al lado del checkbox #}
+    <span class="label-text font-semibold">
+    {{ field.label }}
+    </span>
+    {# El input checkbox #}
+    <input
+      type="checkbox"
+      name="{{ field.html_name }}"
+      id="{{ field.id_for_label }}"
+      class=" block checkbox checkbox-primary"
+      {% if field.value %}checked{% endif %}
+      {% if field.field.required %}required{% endif %}
+    />      
+  </label>
+
+</div>
