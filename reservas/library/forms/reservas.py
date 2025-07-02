@@ -203,7 +203,7 @@ class ReservaApproveForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Div(
-                Field('estado', label="Estado de la reserva", css_class="input input-bordered w-full"),
+                Field('estado', label="Estado de la reserva", template='components/forms/radioselect.html'),
                 css_class="mb-4"
             ),
 

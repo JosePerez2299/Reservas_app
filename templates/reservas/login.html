@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 {% load form_style %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block navbar %}
 {# No mostrar la barra de navegación en la página de login #}
@@ -30,22 +31,11 @@
         Inicia sesión para continuar
       </p>
 
-      {% if messages %}
-        <div class="mb-4 space-y-2">
-          {% for message in messages %}
-            <div role="alert" class="alert alert-error text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span>{{ message }}</span>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
       <form method="post" action="{% url 'login' %}" class="space-y-4">
         {% csrf_token %}
         
         <!-- Renderiza los campos del formulario con el filtro personalizado -->
-        {{ form|mystyle }}
+        {{ form|crispy }}
 
         <div class="flex items-center justify-between text-sm">
           <label class="flex items-center cursor-pointer">
