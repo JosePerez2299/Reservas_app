@@ -12,8 +12,6 @@ const isDark = document.documentElement.classList.contains('dark') ||
                document.documentElement.dataset.theme === 'dark';
 
 
-
-
 htmx.on('showMessage', function(event) {
     Swal.fire({
         icon: 'success',

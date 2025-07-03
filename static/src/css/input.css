@@ -2,7 +2,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-
 @source inline('border-l-{warning,info,success,error}');
 
  /* Estilos básicos para FullCalendar */
@@ -65,9 +64,6 @@
 
 
 @layer components {
-    label {
-        @apply font-semibold;
-    }
     /* Campo de texto, email, password, number, etc. */
     .form-input {
       @apply block w-full px-4 py-2 border border-gray-300
@@ -102,3 +98,4 @@
       @apply text-gray-600;
     }
   }
+  
