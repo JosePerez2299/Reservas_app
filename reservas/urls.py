@@ -39,7 +39,7 @@ urlpatterns = [
     path('calendario/', CalendarioReservasView.as_view(), name='calendario'),
     path('api/reservas/', ReservasMonthlyCount.as_view(), name='reservas_monthly_count'),
 
-    path('reservas/fecha/', ReservasByDate.as_view(), name='reservas_by_date'),
+    path('api/reservas/fecha/', ReservasByDate.as_view(), name='reservas_by_date'),
     path('reserva/gestionar/<int:pk>/', ReservaApproveView.as_view(), name='reserva_approve'),
 ]
 

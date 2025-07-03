@@ -1,0 +1,104 @@
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+
+@source inline('border-l-{warning,info,success,error}');
+
+ /* Estilos básicos para FullCalendar */
+ .fc .fc-toolbar-chunk .fc-button-primary {
+    @apply bg-primary text-primary-content;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+   @apply bg-info/20 text-base-content;
+}
+
+.fc .fc-daygrid-day {
+   @apply cursor-pointer;
+}
+
+.fc .fc-daygrid-day.selected-date {
+    @apply bg-info/20 text-base-content;
+    @apply border-2 border-primary;
+}
+
+.fc .fc-event {
+    @apply border-none;
+    @apply rounded-md;
+    @apply text-xs;
+    @apply font-medium;
+    @apply p-1;
+    @apply bg-base-200;
+}   
+
+.fc .fc-event-title {
+    @apply font-medium;
+    @apply text-xs;
+    
+}
+
+
+/* Loading indicator para HTMX */
+.htmx-indicator {
+    @apply hidden;
+}
+.htmx-request .htmx-indicator {
+    @apply inline;
+}
+.htmx-request.htmx-indicator {
+    @apply inline;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+    .fc .fc-toolbar {
+        @apply flex-col;
+        @apply gap-1;
+    }
+    
+    .fc .fc-toolbar-chunk {
+        @apply flex;
+        @apply justify-center;
+    }
+}
+
+
+@layer components {
+    label {
+        @apply font-semibold;
+    }
+    /* Campo de texto, email, password, number, etc. */
+    .form-input {
+      @apply block w-full px-4 py-2 border border-gray-300
+             rounded-md bg-white text-gray-900 placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-indigo-500
+             focus:border-indigo-500 transition;
+    }
+  
+    /* Select estándar */
+    .form-select {
+      @apply block w-full appearance-none px-4 py-2 border border-gray-300
+             rounded-md bg-white text-gray-900 placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-indigo-500
+             focus:border-indigo-500 transition;
+    }
+  
+    /* Textarea */
+    .form-textarea {
+      @apply textarea resize-none h-24 w-full textarea-primary;
+    }
+    
+    
+  
+    /* Checkbox / Radio Wrapper */
+    .form-check {
+      @apply flex items-center space-x-2;
+    }
+    .form-check-input {
+      @apply h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500;
+    }
+    .form-check-label {
+      @apply text-gray-600;
+    }
+  }

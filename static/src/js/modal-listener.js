@@ -4,7 +4,6 @@ const modalContent = document.getElementById('generic_modal_content');
 if (modal) {
   modal.addEventListener('close', event => {
     modalContent.innerHTML = 'Cargando...';
-    console.log('Modal cerrada (desde external .js)', event);
   });
 } else {
   console.warn('No encontré #generic_modal en el DOM');

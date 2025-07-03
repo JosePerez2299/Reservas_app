@@ -16,13 +16,14 @@
       })();
     </script>
 
-    <!-- Tailwind -->
-    <link href="{% static 'src/css/output.css' %}" rel="stylesheet">
-    <!-- DaisyUI -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <!-- Tailwind + DaisyUI  -->
+    <link href="{% static 'src/css/output.css' %}" type="text/css" rel="stylesheet">
+
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-   
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <!-- Select2 css -->
@@ -62,8 +63,8 @@
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     
     <!-- Scripts base -->
-    <script src="{% static 'src/js/base.js' %}"></script>
-    <script src="{% static 'src/js/modal-listener.js' %}" defer></script>
+    <script src="{% static 'src/js/theme-controller.js' %}"></script>
+    <script src="{% static 'src/js/modal-listener.js' %}"></script>
 
     {% block scripts %}
     {% endblock scripts %}

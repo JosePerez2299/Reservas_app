@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'fontawesomefree',
     "crispy_forms",
     "crispy_tailwind",
     'auditlog',
