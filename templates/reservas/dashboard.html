@@ -63,208 +63,51 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 <!-- Recent Reservations -->
 <!-- Recent Reservations -->
-<div class="lg:col-span-2">
-    <div class="card bg-primary/5 border border-base-300 shadow-lg">
-        <div class="card-body p-6">
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <h2 class="card-title text-lg sm:text-xl">
-                    <i class="fas fa-calendar-check text-primary"></i>
-                    Reservas Recientes
-                </h2>
-                <button class="btn btn-primary btn-sm sm:btn-md gap-2">
-                    <i class="fas fa-plus"></i>
-                    <span class="hidden sm:inline">Nueva Reserva</span>
-                    <span class="sm:hidden">Nueva</span>
-                </button>
-            </div>
-            
-            <!-- Lista Compacta de Reservas -->
-            <div class="space-y-3">
-                <!-- Reserva 1 - Aprobada -->
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-success/5 to-success/10 border-l-4 border-success hover:shadow-md transition-all duration-300">
-                    <div class="avatar placeholder">
-                        <div class="bg-success text-success-content rounded-full w-10 h-10">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
+<div class="lg:col-span-2 bg-base-100 rounded-xl shadow-sm border border-base-200 p-8">
+    <h2 class="text-2xl font-bold mb-4"> <i class="fas fa-calendar-check text-primary mr-2"></i> Proximas Reservas</h2>
+    <div class="flex flex-col gap-2">
+        {% for reserva in stats.next_reservations %}
+        <div class=" cursor-pointer card-hover animate-slide-up  open-modal-btn flex justify-between space-x-3 p-3 bg-primary/5 rounded-lg"
+            hx-get="{% url 'reserva_view' reserva.id %}"
+            hx-target="#generic_modal_content"
+            hx-swap="innerHTML"
+        >
+            <div class="flex items-center gap-6">
+                
+                <div class="indicator">
+                    {% if reserva.estado ==     'aprobada' %}
+                    <div class="indicator-item status status-success status-xl"> 
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
-                            <div>
-                                <h3 class="font-semibold text-base text-base-content">Ana García</h3>
-                                <p class="text-xs text-base-content/60">#RSV001</p>
-                            </div>
-                            <div class="badge badge-success badge-sm gap-1">
-                                <i class="fas fa-check text-xs"></i>
-                                Aprobada
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/80 mb-2">
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                                Sala 201 - Piso 2
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-clock text-primary"></i>
-                                13/06/2025 14:00-16:00
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-user-tie text-primary"></i>
-                                Mod: Carlos M.
-                            </span>
-                        </div>
+                    {% elif reserva.estado == 'pendiente' %}
+                    <div class="indicator-item status status-warning status-xl"> 
                     </div>
-                    <div class="btn-group">
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Ver detalles">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                    {% elif reserva.estado == 'rechazada' %}
+                    <div class="indicator-item status status-error status-xl"> 
                     </div>
-                </div>
-
-                <!-- Reserva 2 - Pendiente -->
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-warning/5 to-warning/10 border-l-4 border-warning hover:shadow-md transition-all duration-300">
-                    <div class="avatar placeholder">
-                        <div class="bg-warning text-warning-content rounded-full w-10 h-10">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
+                    {% endif %}
+    
+                    <div class="w-12 h-12 bg-primary/80 text-white rounded-lg flex flex-col items-center justify-center font-bold">
+                        <p class="text-xs">Dia {{ reserva.fecha_uso.day }}</p> 
+                        <p class="text-xs">Mes {{ reserva.fecha_uso.month }}</p>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
-                            <div>
-                                <h3 class="font-semibold text-base text-base-content">Mario López</h3>
-                                <p class="text-xs text-base-content/60">#RSV002</p>
-                            </div>
-                            <div class="badge badge-warning badge-sm gap-1">
-                                <i class="fas fa-clock text-xs"></i>
-                                Pendiente
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/80 mb-2">
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                                Aula 305 - Piso 3
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-clock text-primary"></i>
-                                14/06/2025 09:00-11:00
-                            </span>
-                            <span class="flex items-center gap-1 text-error">
-                                <i class="fas fa-user-slash text-error"></i>
-                                Sin moderador
-                            </span>
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-success btn-xs tooltip" data-tip="Aprobar">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button class="btn btn-error btn-xs tooltip" data-tip="Rechazar">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Ver detalles">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Reserva 3 - Rechazada -->
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-error/5 to-error/10 border-l-4 border-error hover:shadow-md transition-all duration-300">
-                    <div class="avatar placeholder">
-                        <div class="bg-error text-error-content rounded-full w-10 h-10">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
-                            <div>
-                                <h3 class="font-semibold text-base text-base-content">Carmen Ruiz</h3>
-                                <p class="text-xs text-base-content/60">#RSV003</p>
-                            </div>
-                            <div class="badge badge-error badge-sm gap-1">
-                                <i class="fas fa-times text-xs"></i>
-                                Rechazada
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/80 mb-2">
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                                Lab 102 - Piso 1
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-clock text-primary"></i>
-                                12/06/2025 16:00-18:00
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-user-tie text-primary"></i>
-                                Mod: Carlos M.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Ver detalles">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Comentarios">
-                            <i class="fas fa-comment"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Reserva 4 - En Uso -->
-                <div class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-info/5 to-info/10 border-l-4 border-info hover:shadow-md transition-all duration-300">
-                    <div class="avatar placeholder relative">
-                        <div class="bg-info text-info-content rounded-full w-10 h-10">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
-                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse"></div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start mb-1">
-                            <div>
-                                <h3 class="font-semibold text-base text-base-content">Pedro Sánchez</h3>
-                                <p class="text-xs text-base-content/60">#RSV004</p>
-                            </div>
-                            <div class="badge badge-info badge-sm gap-1">
-                                <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                                En Uso
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/80 mb-2">
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                                Auditorio - Piso 0
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-clock text-primary"></i>
-                                15/06/2025 10:00-17:00
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <i class="fas fa-user-tie text-primary"></i>
-                                Mod: Ana R.
-                            </span>
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Ver detalles">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-xs tooltip" data-tip="Editar">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                    </div>
+                  </div>
+                
+                <div class="space-y-1">
+                    <p class="font-semibold  text-base-content">{{ reserva.espacio.nombre }}</p>
+                    <p class="text-xs text-base-content/50"> <i class="fas fa-user mr-1"></i>{{ reserva.usuario.username }}</p>
+                    <p class="text-sm text-base-content/50"> <i class="fas fa-clock mr-1"></i>{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A" }}</p>
                 </div>
             </div>
 
-            <!-- Footer con estadísticas rápidas -->
-            <div class="mt-6 pt-4 border-t border-base-300">
-                <div class="flex justify-between items-center text-sm text-base-content/70">
-                    <span>Mostrando las últimas 4 reservas</span>
-                    <a href="#" class="link link-primary hover:link-hover">Ver todas las reservas →</a>
-                </div>
+            <div class="flex flex-col items-center  space-x-2 ">
+                
+                <span class="text-xs text-base-content/50 ">{{ reserva.estado|capfirst }}</span>
+                 
             </div>
+    
         </div>
+        {% endfor %}
+        
     </div>
 </div>
 
