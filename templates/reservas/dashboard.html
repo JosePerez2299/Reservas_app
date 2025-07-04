@@ -61,56 +61,8 @@
 
     <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-<!-- Recent Reservations -->
-<!-- Recent Reservations -->
-<div class="lg:col-span-2 bg-base-100 rounded-xl shadow-sm border border-base-200 p-8">
-    <h2 class="text-2xl font-bold mb-4"> <i class="fas fa-calendar-check text-primary mr-2"></i> Proximas Reservas</h2>
-    <div class="flex flex-col gap-2">
-        {% for reserva in stats.next_reservations %}
-        <div class=" cursor-pointer card-hover animate-slide-up  open-modal-btn flex justify-between space-x-3 p-3 bg-primary/5 rounded-lg"
-            hx-get="{% url 'reserva_view' reserva.id %}"
-            hx-target="#generic_modal_content"
-            hx-swap="innerHTML"
-        >
-            <div class="flex items-center gap-6">
-                
-                <div class="indicator">
-                    {% if reserva.estado ==     'aprobada' %}
-                    <div class="indicator-item status status-success status-xl"> 
-                    </div>
-                    {% elif reserva.estado == 'pendiente' %}
-                    <div class="indicator-item status status-warning status-xl"> 
-                    </div>
-                    {% elif reserva.estado == 'rechazada' %}
-                    <div class="indicator-item status status-error status-xl"> 
-                    </div>
-                    {% endif %}
-    
-                    <div class="w-12 h-12 bg-primary/80 text-white rounded-lg flex flex-col items-center justify-center font-bold">
-                        <p class="text-xs">Dia {{ reserva.fecha_uso.day }}</p> 
-                        <p class="text-xs">Mes {{ reserva.fecha_uso.month }}</p>
-                    </div>
-                  </div>
-                
-                <div class="space-y-1">
-                    <p class="font-semibold  text-base-content">{{ reserva.espacio.nombre }}</p>
-                    <p class="text-xs text-base-content/50"> <i class="fas fa-user mr-1"></i>{{ reserva.usuario.username }}</p>
-                    <p class="text-sm text-base-content/50"> <i class="fas fa-clock mr-1"></i>{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A" }}</p>
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center  space-x-2 ">
-                
-                <span class="text-xs text-base-content/50 ">{{ reserva.estado|capfirst }}</span>
-                 
-            </div>
-    
-        </div>
-        {% endfor %}
-        
-    </div>
-</div>
-
+        <!-- Recent Reservations -->
+        {% include 'includes/reservas_recientes.html' %}
         <!-- Right Sidebar -->
         <div class="lg:col-span-1 space-y-6">
             <!-- Monthly Progress -->
@@ -142,7 +94,6 @@
             </div>
 
             <!-- Activity Logs -->
-            
             <div class="bg-base-100 rounded-xl shadow-sm border border-base-200">
                 <div class="p-4 sm:p-6">
                     <div class="flex justify-between items-center mb-4">

@@ -273,7 +273,7 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
     """
     model = Reserva
     form_class = ReservaApproveForm  
-    template_name = 'reservas/reservas_edit.html'
+    template_name = 'reservas/reservas_approve.html'
     success_url = reverse_lazy('reserva')
     permission_required = 'reservas.change_reserva'
 
@@ -283,8 +283,8 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['url'] = reverse_lazy('reserva_approve', args=[self.object.pk])
-        ctx['title'] = 'Editar Reserva'
-        ctx['subtitle'] = 'Detalles de la reserva'
+        ctx['title'] = 'Gestionar Reserva'
+        ctx['subtitle'] = 'Aprobar/Rechazar la reserva'
         return ctx
 
     def get_form_kwargs(self):
