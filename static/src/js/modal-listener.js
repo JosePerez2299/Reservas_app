@@ -1,4 +1,3 @@
-const theme = localStorage.getItem('theme');
 const modal = document.getElementById('generic_modal');
 const modalContent = document.getElementById('generic_modal_content');
 if (modal) {
@@ -8,9 +7,6 @@ if (modal) {
 } else {
   console.warn('No encontré #generic_modal en el DOM');
 }
-const isDark = document.documentElement.classList.contains('dark') ||
-               document.documentElement.dataset.theme === 'dark';
-
 
 htmx.on('showMessage', function(event) {
     Swal.fire({
@@ -28,4 +24,18 @@ htmx.on('showMessage', function(event) {
           window.location.reload();
         }
       })
+    });
+
+htmx.on('htmx:afterSwap', function(event) {
+      if (event.detail.target.id === 'generic_modal_content') {
+        $('#generic_modal_content .select2').select2({
+            placeholder: 'Buscar',
+            language: {
+                noResults: function(){
+                  return "No se encontraron resultados";
+                },
+            },
+            dropdownParent: $('#generic_modal')
+        });
+      }
     });

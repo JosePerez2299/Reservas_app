@@ -66,6 +66,7 @@ class ReservaCreateForm(forms.ModelForm ):
         # IMPORTANTE: Desactivar el renderizado automático del form tag
         # ya que lo manejas manualmente en el template
         self.helper.form_tag = False
+        self.helper.input_class = 'form-control'
 
         self.helper.layout = Layout(
             Div(

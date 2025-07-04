@@ -71,6 +71,9 @@ a.active {
 
 
 @layer components {
+    .form-help {
+      @apply text-sm text-base-content/5      0;
+    }
     /* Campo de texto, email, password, number, etc. */
     /* Select estándar */
     .form-select {
@@ -79,12 +82,29 @@ a.active {
              focus:outline-none focus:ring-2 focus:ring-indigo-500
              focus:border-indigo-500 transition;
     }
-  
+    
     /* Textarea */
     .form-textarea {
-      @apply textarea resize-none h-24 w-full textarea-primary;
+      @apply textarea resize-none h-24 w-full focus:textarea-primary;
     }
     
+    .form-label {
+      @apply mb-2;
+      @apply font-medium;
+      @apply text-sm;
+      @apply text-base-content/70;
+    }
+    
+    .form-error {
+      @apply text-error;
+    }
+
+    .form-control {
+      @apply block w-full appearance-none px-4 py-2 border border-gray-300
+             rounded-md bg-white text-gray-900 placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-indigo-500
+             focus:border-indigo-500 transition;
+    }
     
   
     /* Checkbox / Radio Wrapper */

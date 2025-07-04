@@ -63,6 +63,30 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder',
 ]
 
+CRISPY_CLASS_CONVERTERS = {
+    'textinput': 'form-control',
+    'urlinput': 'form-control',
+    'numberinput': 'form-control',
+    'emailinput': 'form-control',
+    'dateinput': 'form-control',
+    'datetimeinput': 'form-control',
+    'timeinput': 'form-control',
+    'textarea': 'form-control',
+    'passwordinput': 'form-control',
+    'hiddeninput': 'form-control',
+    'select': 'form-control',
+    'selectmultiple': 'form-control',
+    'checkboxinput': 'form-control',
+    'radioselect': 'form-control',
+    'checkboxselectmultiple': 'form-control',
+    'fileinput': 'form-control',
+    'clearablefileinput': 'form-control',
+    'multiplehiddeninput': 'form-control',
+    'splitdatetimewidget': 'form-control',
+    'splithiddendatetimewidget': 'form-control',
+    'selectdatewidget': 'form-control',
+}
+
 USE_I18N = True
 
 LANGUAGE_CODE = "es-es"         # o "es" (ambos funcionan)
