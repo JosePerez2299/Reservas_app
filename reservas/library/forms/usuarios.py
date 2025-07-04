@@ -3,11 +3,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group
 from django.contrib.auth import password_validation
 from django.utils.text import capfirst
-from django_select2.forms import Select2Widget
 from reservas.models import Usuario
 from django.conf import settings
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div, Field, Submit, Row
+from crispy_forms.layout import Layout, Div, Field, Submit
 
 
 class UsuarioCreateForm(UserCreationForm):

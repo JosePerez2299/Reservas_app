@@ -2,17 +2,16 @@ from django import forms
 from django.db.models import Q
 from reservas.models import Reserva, Espacio, Usuario
 from datetime import date, timedelta
-from reservas.library.utils.form_widgets import *
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Field, Submit, Row
-from django_select2.forms import Select2Widget
 
-class ReservaCreateForm(forms.ModelForm, ):
+class ReservaCreateForm(forms.ModelForm ):
     class Meta:
         model = Reserva
         fields = ['usuario', 'fecha_uso', 'hora_inicio',
                   'hora_fin', 'espacio', 'motivo', ]
         widgets = {
+            
             'fecha_uso': forms.DateInput(
                 format='%Y-%m-%d',
                 attrs={'type': 'date', 'min': date.today().isoformat(), 'max': (
@@ -20,8 +19,6 @@ class ReservaCreateForm(forms.ModelForm, ):
             ),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
             'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
-            'usuario': Select2Widget,
-            'espacio': Select2Widget,
             'motivo_admin': forms.Textarea(attrs={'rows': 3, 'label': 'Motivo de gestion', 'placeholder': 'Motivo de gestion'}),
             }
 
@@ -72,8 +69,8 @@ class ReservaCreateForm(forms.ModelForm, ):
 
         self.helper.layout = Layout(
             Div(
-                Field('usuario', css_class="input input-bordered p-2"),
-                css_class="mb-4"
+                Field('usuario'),
+                css_class=""
             ),
             Div(
                 Field('espacio', css_class="input input-bordered w-full"),
