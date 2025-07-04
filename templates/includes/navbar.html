@@ -18,7 +18,7 @@
              {% for item in dashboard_access %}
 
              <li>
-             <a href={% url item.url %} class=''{%if current_section == item.url %}active{% endif %}>
+             <a href={% url item.url %} class=''{%if current_section|lower == item.label|lower %}active{% endif %}>
                  {% get_icon item.label|lower %}
              {{ item.label|capfirst }}</a></li>
           {% endfor %}
@@ -39,7 +39,7 @@
         {# Dropdowns por cada modelo con permisos #}
         {% for item in dashboard_access %}
         <li>
-        <a href={% url item.url %} class="{% if current_section == item.url %}active{% endif %}">
+        <a href={% url item.url %} class="{% if current_section|lower == item.label|lower %}active{% endif %}">
             {% get_icon item.label|lower %}
             {{ item.label|capfirst }}
         </a>

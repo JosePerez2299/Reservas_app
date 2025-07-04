@@ -4,6 +4,13 @@
 
 @source inline('border-l-{warning,info,success,error}');
 
+@source inline('progress-{warning,info,success,error}');
+
+
+
+a.active {
+  @apply bg-primary text-primary-content;
+}
  /* Estilos básicos para FullCalendar */
  .fc .fc-toolbar-chunk .fc-button-primary {
     @apply bg-primary text-primary-content;
@@ -65,13 +72,6 @@
 
 @layer components {
     /* Campo de texto, email, password, number, etc. */
-    .form-input {
-      @apply block w-full px-4 py-2 border border-gray-300
-             rounded-md bg-white text-gray-900 placeholder-gray-400
-             focus:outline-none focus:ring-2 focus:ring-indigo-500
-             focus:border-indigo-500 transition;
-    }
-  
     /* Select estándar */
     .form-select {
       @apply block w-full appearance-none px-4 py-2 border border-gray-300
