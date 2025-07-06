@@ -1,3 +1,10 @@
+# Calendario, cambiar botones, ver aprobar editar... 
+# Cambiar la validacion para crear la reserva, eliminar el solapamiento
+# Al aprobar una reserva, se rechaza la de la misma fecha y hora
+# Anadir texto de help para que el usuario sepa que debe hacer
+# Incluir nombre, apellido, cedula en el usuario
+# template del perfil, permite cambiar contraseña
+
 # Casos de Uso
 
 ## Como Administrador:
