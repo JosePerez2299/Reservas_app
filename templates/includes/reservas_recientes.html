@@ -1,6 +1,6 @@
 {% load table_actions %}
 
-<div class="lg:col-span-2 rounded-xl shadow-sm border border-base-200  bg-primary/5     p-8">
+<div class="lg:col-span-2 rounded-xl shadow-sm border border-base-200  bg-primary/5   h-full  p-8">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold mb-4"> <i class="fas fa-calendar-check text-primary mr-2"></i> Próximas Reservas</h2>
         <a href="{% url 'reserva' %}" class="btn btn-primary btn-outline btn-xs hover:btn-primary transition-colors">
@@ -12,7 +12,7 @@
     {% if stats.next_reservations %}
 
         {% for reserva in stats.next_reservations %}
-        <div class="flex justify-between space-x-3 p-3 shadow-lg  bg-base-100 rounded-box  rounded-lg"        >
+        <div class="flex justify-between space-x-3 p-3 shadow-lg  bg-base-100/50 rounded-box  rounded-lg"        >
             <div class="flex items-center gap-6 cursor-pointer rounded-box p-4 hover:bg-info/10 transition-colors duration-300"
             
             hx-get="{% url 'reserva_view' reserva.id %}"

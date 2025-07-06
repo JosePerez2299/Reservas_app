@@ -26,13 +26,7 @@
       </div>
     {% endif %}
     
-    {% for field in form %}
-      {% comment %}
-      Usar atributos separados para fieldset y widget
-      fieldset_class: para las clases del contenedor fieldset
-      class: para las clases del input/widget
-      Agregar clases especiales para campos disabled
-      {% endcomment %}
+    {% for field in form.visible_fields %}
       {% with fieldset_classes=field.field.widget.attrs.fieldset_class|default:"w-full" %}
         {% if field.field.disabled %}
           <fieldset class="{{ fieldset_classes }} opacity-60 bg-base-300/20 rounded-lg border border-base-300/50 p-2">
@@ -57,6 +51,6 @@
         {% endif %}
       {% endwith %}
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="submit" class="w-full btn btn-primary">Guardar</button>
   </form>
 </div>
