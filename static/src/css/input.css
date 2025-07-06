@@ -68,13 +68,19 @@ a.active {
         @apply justify-center;
     }
 }
-    
 
+form input[type="radio"] {
+    @apply radio radio-primary;
+}
+    
+form input[type="checkbox"] {
+    @apply checkbox checkbox-primary;
+}
 
 @layer components {
 
     .form-help {
-      @apply text-xs text-base-content/70;
+      @apply text-xs text-base-content/50 mt-1;
     }
     /* Campo de texto, email, password, number, etc. */
     /* Select estándar */
@@ -99,10 +105,7 @@ a.active {
     }
 
     .form-control {
-      @apply block w-full appearance-none px-4 py-2 border border-base-300
-             rounded-md bg-base-100 text-base-content placeholder-base-content/70
-             focus:outline-none focus:ring-2 
-             focus:border-primary transition;
+      @apply input;
     }
     
   
@@ -118,3 +121,5 @@ a.active {
     }
   }
   
+
+

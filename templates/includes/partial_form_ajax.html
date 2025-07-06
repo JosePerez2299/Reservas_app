@@ -44,6 +44,9 @@
           <fieldset class="{{ fieldset_classes }}">
             <legend class="label-text font-medium text-sm mb-1">{{ field.label }} {% if field.field.required %}<span class="text-error">*</span>{% endif %}</legend>
             {{ field }}
+            {% if field.help_text %}
+              <p class="form-help"> <i class="fas fa-info-circle text-info mr-1"></i> {{ field.help_text }}</p>
+            {% endif %}
             {% for error in field.errors %}
               <p class="text-sm text-error">{{ error }}</p>
             {% endfor %}

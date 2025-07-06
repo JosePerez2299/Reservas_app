@@ -1,5 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h1>Perfil de {{ object.username }}</h1>
 
 <p>Ubicación: {{ object.ubicacion }}</p>
 <p>Piso: {{ object.piso }}</p>
 <p>Grupo: {{ object.grupo }}</p>
+{% endblock %}
