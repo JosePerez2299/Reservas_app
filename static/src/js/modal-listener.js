@@ -26,6 +26,7 @@ htmx.on('showMessage', function(event) {
 
 // Función para limpiar e inicializar Select2
 function initializeSelect2() {
+
   // Destruir todas las instancias existentes en el modal
   $('#generic_modal_content .select2').each(function() {
     if ($(this).hasClass('select2-hidden-accessible')) {

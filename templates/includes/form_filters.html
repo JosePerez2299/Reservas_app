@@ -1,0 +1,53 @@
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}  {# asegúrate de tener django-widget-tweaks instalado #}
+
+  <form
+    class="flex flex-wrap gap-4"
+    method="GET"
+    action="{{ url }}"
+
+  >
+    {% csrf_token %}
+    
+    {% comment %}Mostrar errores no relacionados con campos específicos{% endcomment %}
+    {% if form.non_field_errors %}
+      <div class="w-full">
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-error mb-2">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ error }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% for field in form.visible_fields %}
+      {% with fieldset_classes=field.field.widget.attrs.fieldset_class|default:"w-full" %}
+        {% if field.field.disabled %}
+          <fieldset class="{{ fieldset_classes }} opacity-60 bg-base-300/20 rounded-lg border border-base-300/50 p-2">
+            <legend class="label-text font-medium text-sm mb-1 text-base-content/60">
+              {{ field.label }} 
+              {% if field.field.required %}<span class="text-error">*</span>{% endif %}
+              <span class="text-xs text-base-content/50 ml-1">(deshabilitado)</span>
+            </legend>
+            
+            {% for error in field.errors %}
+              <p class="text-sm text-error">{{ error }}</p>
+            {% endfor %}
+          </fieldset>
+        {% else %}
+          <fieldset class="{{ fieldset_classes }}">
+            <legend class="label-text font-medium text-sm mb-1">{{ field.label }} {% if field.field.required %}<span class="text-error">*</span>{% endif %}</legend>
+            {{ field }}
+            {% if field.help_text %}
+              <p class="form-help"> <i class="fas fa-info-circle text-info mr-1"></i> {{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+              <p class="text-sm text-error">{{ error }}</p>
+            {% endfor %}
+          </fieldset>
+        {% endif %}
+      {% endwith %}
+    {% endfor %}
+    <button type="submit" class="w-full btn btn-primary">Guardar</button>
+  </form>

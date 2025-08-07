@@ -1,28 +1,28 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ReservaSpaces Dashboard</title>
 
     <script>
       // Cargar tema guardado antes de que se renderice la página
-      (function() {
-          const savedTheme = localStorage.getItem('theme');
-          if (savedTheme) {
-              document.documentElement.setAttribute('data-theme', savedTheme);
-          }
-      })();
+      ;(function () {
+        const savedTheme = localStorage.getItem('theme')
+        if (savedTheme) {
+          document.documentElement.setAttribute('data-theme', savedTheme)
+        }
+      })()
     </script>
 
-    <!-- Tailwind + DaisyUI  -->
-    <link href="{% static 'src/css/output.css' %}" type="text/css" rel="stylesheet">
+    <!-- Tailwind + DaisyUI -->
+    <link href="{% static 'src/css/output.css' %}" type="text/css" rel="stylesheet" />
 
     <!-- Font Awesome -->
-    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
-    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
-    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css" />
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -31,43 +31,41 @@
     <!-- Select2 js -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     {% block head %}
-    {% endblock head %}
-    
-</head>
 
-<body class="bg-base-200">
+    {% endblock %}
+  </head>
 
+  <body class="bg-base-200">
     {% if user.is_authenticated %}
-      {% include "includes/navbar.html" %}
+      {% include 'includes/navbar.html' %}
     {% endif %}
 
-    <div class = 'page-transition min-h-screen container mx-auto p-4'>
-        {% block content %}
-        {% endblock content %}
+    <div class="page-transition min-h-screen container mx-auto p-4">
+      {% block content %}
+
+      {% endblock %}
     </div>
 
-    {% include "includes/modal.html" %}
-    
-    
+    {% include 'includes/modal.html' %}
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Alpine Plugins -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
-    
+
     <!-- Alpine Core -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  
+
     <!-- Htmx -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
-    
+
     <!-- Scripts base -->
     <script src="{% static 'src/js/theme-controller.js' %}"></script>
     <script src="{% static 'src/js/modal-listener.js' %}"></script>
 
-    {% block scripts %}}
-
-    {% endblock scripts %}
-</body>
+    {% block scripts %}
+    {% endblock %}
+  </body>
 </html>

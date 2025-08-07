@@ -161,7 +161,7 @@ class Espacio(models.Model):
             validators=[
                 RegexValidator(
                    r"^[a-zA-Z][a-zA-Z0-9 ]*",
-                    message="El nombre del espacio debe comenzar con una letra o número, y solo puede contener letras, números y espacios."
+                    message="El nombre del espacio debe comenzar con una letra, y solo puede contener letras, números y espacios."
                 )
         ]) 
     ubicacion   = models.ForeignKey(Ubicacion, on_delete=models.CASCADE)

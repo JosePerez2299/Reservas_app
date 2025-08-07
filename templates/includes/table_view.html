@@ -189,85 +189,48 @@
         {% puede_eliminar obj as puede_eliminar_obj %}
         {% puede_aprobar obj as puede_aprobar_obj %}
         {% if puede_eliminar_obj or puede_aprobar_obj %}
-{# Dropdown para acciones adicionales #}
-{% puede_eliminar obj as puede_eliminar_obj %}
-{% puede_aprobar obj as puede_aprobar_obj %}
-{% if puede_eliminar_obj or puede_aprobar_obj %}
-<div class="dropdown dropdown-end ml-1" data-adaptive-dropdown>
-    <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-8 w-8 p-0">
-        <i class="fas fa-ellipsis-v text-xs"></i>
-    </div>
-    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[999] w-40 p-2 shadow-lg border border-base-300">
-        
-        {# Eliminar #}
-        {% if puede_eliminar_obj and crud_urls.delete %}
-        <li>
-            <button
-                onclick="generic_modal.showModal()"
-                class="flex items-center gap-2 text-error hover:bg-error/10"
-                hx-get="{% url crud_urls.delete obj.pk %}"
-                hx-target="#generic_modal_content"
-                hx-swap="innerHTML"
-            >
-                <i class="fas fa-trash text-xs"></i>
-                Eliminar
-            </button>
-        </li>
+        <div class="dropdown dropdown-end ml-1" data-adaptive-dropdown>
+            <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-8 w-8 p-0">
+                <i class="fas fa-ellipsis-v text-xs"></i>
+            </div>
+            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[999] w-40 p-2 shadow-lg border border-base-300">
+                
+                {# Eliminar #}
+                {% if puede_eliminar_obj and crud_urls.delete %}
+                <li>
+                    <button
+                        onclick="generic_modal.showModal()"
+                        class="flex items-center gap-2 text-error hover:bg-error/10"
+                        hx-get="{% url crud_urls.delete obj.pk %}"
+                        hx-target="#generic_modal_content"
+                        hx-swap="innerHTML"
+                    >
+                        <i class="fas fa-trash text-xs"></i>
+                        Eliminar
+                    </button>
+                </li>
+                {% endif %}
+
+                {# Aprobar #}
+                {% if puede_aprobar_obj %}
+                <li>
+                    <button
+                        onclick="generic_modal.showModal()"
+                        class="flex items-center justify-start gap-2 text-success hover:bg-success/10"
+                        hx-target="#generic_modal_content"
+                        hx-get="{% url 'reserva_approve' obj.pk %}"
+                        hx-swap="innerHTML"
+                    >
+                            <i class="fas fa-check text-xs"></i>
+                            <i class="fas fa-times text-xs text-error"></i>
+                            Aprobar
+                    </button>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div>
         {% endif %}
-
-        {# Aprobar #}
-        {% if puede_aprobar_obj %}
-        <li>
-            <button
-                onclick="generic_modal.showModal()"
-                class="flex items-center justify-start gap-2 text-success hover:bg-success/10"
-                hx-target="#generic_modal_content"
-                hx-get="{% url 'reserva_approve' obj.pk %}"
-                hx-swap="innerHTML"
-            >
-                    <i class="fas fa-check text-xs"></i>
-                    <i class="fas fa-times text-xs text-error"></i>
-                    Aprobar
-            </button>
-        </li>
-        {% endif %}
-
-    </ul>
-</div>
-{% endif %}
-
-<script>
-// Script para hacer dropdowns adaptativos
-document.addEventListener('DOMContentLoaded', function() {
-const adaptiveDropdowns = document.querySelectorAll('[data-adaptive-dropdown]');
-
-adaptiveDropdowns.forEach(dropdown => {
-const button = dropdown.querySelector('[role="button"]');
-
-button.addEventListener('click', function() {
-// Esperar un frame para que el dropdown se abra
-requestAnimationFrame(() => {
-const rect = dropdown.getBoundingClientRect();
-const viewportHeight = window.innerHeight;
-const dropdownMenu = dropdown.querySelector('.dropdown-content');
-
-if (dropdownMenu) {
-const menuHeight = 200; // Altura aproximada del menú
-
-// Si no hay espacio abajo, posicionar arriba
-if (rect.bottom + menuHeight > viewportHeight) {
-dropdown.classList.add('dropdown-top');
-} else {
-dropdown.classList.remove('dropdown-top');
-}
-}
-});
-});
-});
-});
-</script>
-        {% endif %}
-
     </div>
 </td>
 {% endif %}
@@ -383,9 +346,9 @@ dropdown.classList.remove('dropdown-top');
         <div class="min-h-screen w-80 bg-base-100 border-l border-base-300">
             <div class="p-6">
                 <h2 class="text-lg font-bold text-base-content mb-6">Filtros</h2>
-                <form class="space-y-4">
-                    {% crispy filter.form %}
-                </form>
+                {% with filter.form as form %}
+                {% include 'includes/form_filters.html' %}
+                {% endwith %}
             </div>
         </div>
     </div>
