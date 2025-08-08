@@ -5,6 +5,7 @@ from reservas.templatetags.model_extras import get_attr
 from datetime import datetime
 from datetime import date
 from django.urls import reverse
+from django.conf import settings
 from django.utils.html import format_html
 register = template.Library()
 

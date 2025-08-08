@@ -1,15 +1,18 @@
 from django.apps import AppConfig
 
 
-class ReservasConfig(AppConfig):
+class LogsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'reservas'
+    name = 'apps.logs'
+
     def ready(self):
         import reservas.signals  
         from auditlog.registry import auditlog
         from apps.usuarios.models import Ubicacion  
         from apps.espacios.models import Espacio
         from apps.usuarios.models import Usuario
+        from reservas.models import Reserva
+        auditlog.register(Reserva)
         auditlog.register(Usuario, exclude_fields=['password', 'last_login'])
         auditlog.register(Espacio)
         auditlog.register(Ubicacion)

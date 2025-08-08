@@ -2,11 +2,13 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.contrib.auth.views import LogoutView, LoginView
+from apps.usuarios.views import ProfileView
 from reservas.library.views.usuarios import *
 from reservas.views import *
 from reservas.library.views.espacios import *
 from reservas.library.views.reservas import *
 from reservas.library.views.logs import *
+
 
 urlpatterns = [
     path('', LoginView.as_view(template_name='reservas/login.html', redirect_authenticated_user=True), name='login'),
@@ -18,18 +20,6 @@ urlpatterns = [
     path('log/', LogListView.as_view(), name='log'),
     path('log/<int:pk>/', LogDetailView.as_view(), name='log_detail'),
 
-    path('espacios/', EspacioListView.as_view(), name='espacio'),
-    path('espacios/create/', EspacioCreateView.as_view(), name='espacio_create'),
-    path('espacios/view/<int:pk>/', EspacioDetailView.as_view(), name='espacio_view'),
-    path('espacios/edit/<int:pk>/', EspacioUpdateView.as_view(), name='espacio_edit'),
-    path('espacio/delete/<int:pk>/', EspacioDeleteView.as_view(), name='espacio_delete'),
-
-
-    path('usuarios/', UsuarioListView.as_view(), name='usuario'),
-    path('usuarios/create/', UsuarioCreateView.as_view(), name='usuario_create'),
-    path('usuarios/view/<int:pk>/', UsuarioDetailView.as_view(), name='usuario_view'),
-    path('usuarios/edit/<int:pk>/', UsuarioUpdateView.as_view(), name='usuario_edit'),
-    path('usuarios/delete/<int:pk>/', UsuarioDeleteView.as_view(), name='usuario_delete'),
 
     path('reservas/', ReservaListView.as_view(), name='reserva'),
     path('reservas/create/', ReservaCreateView.as_view(), name='reserva_create'),

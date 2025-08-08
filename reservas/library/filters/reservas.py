@@ -1,5 +1,7 @@
 import django_filters
-from reservas.models import Reserva, Ubicacion, Espacio
+from reservas.models import Reserva
+from apps.usuarios.models import Ubicacion
+from apps.espacios.models import Espacio
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Submit, Div, Field

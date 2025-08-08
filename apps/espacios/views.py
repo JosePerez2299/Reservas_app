@@ -10,15 +10,17 @@ Views para los espacios
 """
 
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from reservas.models import Espacio, Reserva
+
+from .forms import *
+
+from .filters import EspacioFilter
+from .models import Espacio
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
-from apps.espacios.filters import EspacioFilter
 from reservas.library.mixins.helpers import *
 from django.urls import reverse_lazy
 from django.db.models.functions import Lower
 from django.db.models import Count, Q   
-from apps.espacios.forms import EspacioCreateForm, EspacioUpdateForm
 
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """

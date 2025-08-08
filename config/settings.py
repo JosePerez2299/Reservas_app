@@ -39,7 +39,13 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'compressor',
     'django.contrib.humanize',
+
     'reservas',
+    'apps.usuarios',
+    'apps.espacios',
+    'apps.logs',
+
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,7 +90,7 @@ MIDDLEWARE = [
     "auditlog.middleware.AuditlogMiddleware",
 ]
 
-ROOT_URLCONF = 'my_app.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -102,7 +108,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'my_app.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -174,8 +180,8 @@ class GRUPOS:
 
 class MODELOS  :
     LOGENTRY = {'label':'Actividad', 'name':'auditlog.LogEntry', 'url':'log'}
-    USUARIO = {'label':'Usuarios', 'name':'reservas.Usuario', 'url':'usuario'}
-    ESPACIO = {'label':'Espacios', 'name':'reservas.Espacio', 'url':'espacio'}
+    USUARIO = {'label':'Usuarios', 'name':'usuarios.Usuario', 'url':'usuarios'}
+    ESPACIO = {'label':'Espacios', 'name':'espacios.Espacio', 'url':'espacios'}
     RESERVA = {'label':'Reservas', 'name':'reservas.Reserva', 'url':'reserva'}
     dict = {
         'LogEntry': LOGENTRY,

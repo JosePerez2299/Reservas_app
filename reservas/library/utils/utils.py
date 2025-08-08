@@ -30,7 +30,8 @@ def get_all_cols(model):
 
 def get_stats(request):
     try:
-        logs = request.user.get_logs()[:5]
+        logs = []
+        # logs = request.user.get_logs()[:5]
     except:
         logs = []
     if request.user.is_admin:

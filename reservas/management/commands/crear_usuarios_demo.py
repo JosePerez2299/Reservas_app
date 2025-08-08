@@ -2,7 +2,7 @@ import random
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from reservas.models import Ubicacion  # Asegúrate de importar correctamente tu modelo
+from apps.usuarios.models import Ubicacion  # Asegúrate de importar correctamente tu modelo
 
 User = get_user_model()
 

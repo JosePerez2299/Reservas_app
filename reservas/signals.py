@@ -14,7 +14,7 @@ def crear_grupos_y_permisos(sender, **kwargs):
       2. Para cada modelo y cada acción listada en el dict, asigna ese permiso.
     """
     # Nombre de tu app donde están los modelos
-    APP_LABEL = 'reservas'
+    APP_LABEL = 'app.usuarios'
 
     for nombre_grupo, modelos in settings.DASHBOARD_ACCESS.items():
         grupo, _ = Group.objects.get_or_create(name=nombre_grupo)
