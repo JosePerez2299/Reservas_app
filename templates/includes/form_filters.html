@@ -7,7 +7,9 @@
     action="{{ url }}"
 
   >
-    {% csrf_token %}
+
+  <h2 class="text-lg font-semibold mt-2 w-full">Filtros</h2>
+
     
     {% comment %}Mostrar errores no relacionados con campos específicos{% endcomment %}
     {% if form.non_field_errors %}

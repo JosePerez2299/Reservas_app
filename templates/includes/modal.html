@@ -3,7 +3,7 @@
           htmx:afterSwap: if (event.detail.target.id === 'generic_modal_content') this.showModal();
           htmx:beforeSwap: if (event.detail.target.id === 'generic_modal_content' && event.detail.xhr.status === 204) { this.close(); event.detail.shouldSwap = false; };
         ">
-  <div class="modal-box relative p-2 mt-2 rounded-box">
+  <div class="modal-box relative p-2 mt-2 min-w-fit  rounded-box">
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
     </form>
