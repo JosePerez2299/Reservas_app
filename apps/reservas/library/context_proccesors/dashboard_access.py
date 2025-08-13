@@ -5,6 +5,8 @@ def dashboard_access(request):
     # Obtener la ruta actual
     current_path = request.path_info
     current_section = current_path.strip('/').split('/')[0] if current_path != '/' else 'dashboard'
+    if current_path == '/reservas/calendario/':
+        current_section = 'calendario'
     if (request.user.is_superuser):
         grupo = settings.GRUPOS.ADMINISTRADOR
     else:
@@ -15,11 +17,9 @@ def dashboard_access(request):
     
     # Permisos por modelo para este grupo
     modelos = settings.DASHBOARD_ACCESS.get(grupo, [])
-
     navlinks = [{"label": "Inicio", "url": "dashboard"},{"label": "Calendario", "url": "calendario"}]
     navlinks.extend([modelo['model'] for modelo in modelos if modelo['model']['name'] != 'auditlog.LogEntry'])
 
-    print(navlinks)
     return {
         "group": grupo,
         "current_section": current_section,  # Sección actual para resaltar en el menú

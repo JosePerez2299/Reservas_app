@@ -1,7 +1,7 @@
 # templatetags/table_actions.py
 from django import template
 from django.conf import settings
-from reservas.models import Reserva, Usuario, Espacio
+from apps.reservas.models import Reserva, Usuario, Espacio
 
 register = template.Library()
 

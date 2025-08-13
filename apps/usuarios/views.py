@@ -11,11 +11,14 @@ Views para los usuarios
 """
 
 from django_filters.views import FilterView
+from django.views.generic import TemplateView
+
+from apps.reservas.library.utils.utils import get_stats
 from .forms import UsuarioCreateForm, UsuarioUpdateForm
-from reservas.library.mixins.helpers import *
+from apps.reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
-from django.urls import reverse_lazy
-from reservas.models import Usuario
+from django.urls import reverse, reverse_lazy
+from apps.reservas.models import Usuario
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -23,6 +26,20 @@ from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from .filters import UsuarioFilter
 from django.conf import settings
+
+def custom_404_view(request, exception=None):
+    """Custom 404 handler that redirects to login page."""
+    return redirect(reverse('login'))
+
+class Dashboard(LoginRequiredMixin, TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        stats = get_stats(self.request)
+        context['stats'] = stats
+        return context
+    
+    template_name = 'reservas/dashboard.html'
 
 def qs_condiciones(user):
     if user.is_admin:

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'compressor',
     'django.contrib.humanize',
 
-    'reservas',
+    'apps.reservas',
     'apps.usuarios',
     'apps.espacios',
     'apps.logs',
@@ -102,7 +102,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'reservas.library.context_proccesors.dashboard_access.dashboard_access',
+                'apps.reservas.library.context_proccesors.dashboard_access.dashboard_access',
             ],
         },
     },

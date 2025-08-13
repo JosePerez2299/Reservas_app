@@ -1,6 +1,8 @@
 from django import forms
 from django.db.models import Q
-from reservas.models import Reserva, Espacio, Usuario
+from apps.reservas.models import Reserva
+from apps.espacios.models import Espacio
+from apps.usuarios.models import Usuario
 from datetime import date, timedelta
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Div, Field, Submit, Row

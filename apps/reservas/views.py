@@ -11,14 +11,14 @@ Views para las reservas
 import json
 from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
-from reservas.models import Reserva
+from .models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
-from reservas.library.mixins.helpers import *
+from apps.reservas.library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy, reverse
-from reservas.library.filters.reservas import *
-from reservas.library.forms.reservas import *
+from apps.reservas.library.filters.reservas import *
+from apps.reservas.library.forms.reservas import *
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime

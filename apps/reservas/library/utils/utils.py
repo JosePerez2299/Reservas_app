@@ -1,6 +1,8 @@
-from reservas.models import *
+from apps.reservas.models import *
 from datetime import datetime
 from math import floor
+
+from library.utils.get_logs import get_logs
     
 def get_user_groups(user):
     """
@@ -30,8 +32,7 @@ def get_all_cols(model):
 
 def get_stats(request):
     try:
-        logs = []
-        # logs = request.user.get_logs()[:5]
+        logs = get_logs(request.user)[:5]
     except:
         logs = []
     if request.user.is_admin:
