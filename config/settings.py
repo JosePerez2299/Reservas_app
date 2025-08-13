@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.usuarios',
     'apps.espacios',
     'apps.logs',
+    'apps.core',
 
 
     'django.contrib.admin',

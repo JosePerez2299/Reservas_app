@@ -151,89 +151,89 @@
                                     </td>
 
                                     {% endfor %}
-{% if actions %}
-<td class="">
-    <div class="p-2 flex items-center justify-center">
-        
-        {# Botones principales siempre visibles #}
-        <div class="flex gap-1">
-            {# Ver detalles #}
-            {% if crud_urls.view %}
-            <div class="tooltip" data-tip="Ver detalles">
-                <button
-                    onclick="generic_modal.showModal()"
-                    class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                    hx-get="{% url crud_urls.view obj.pk %}"
-                    hx-target="#generic_modal_content"
-                    hx-swap="innerHTML"
-                ><i class="fas fa-eye text-xs"></i></button>
-            </div>
-            {% endif %}
+                            {% if actions %}
+                            <td class="">
+                                <div class="p-2 flex items-center justify-center">
+                                    
+                                    {# Botones principales siempre visibles #}
+                                    <div class="flex gap-1">
+                                        {# Ver detalles #}
+                                        {% if crud_urls.view %}
+                                        <div class="tooltip" data-tip="Ver detalles">
+                                            <button
+                                                onclick="generic_modal.showModal()"
+                                                class="btn btn-ghost btn-sm h-8 w-8 p-0"
+                                                hx-get="{% url crud_urls.view obj.pk %}"
+                                                hx-target="#generic_modal_content"
+                                                hx-swap="innerHTML"
+                                            ><i class="fas fa-eye text-xs"></i></button>
+                                        </div>
+                                        {% endif %}
 
-            {# Editar #}
-            {% puede_editar obj as puede_editar_obj %}
-            {% if puede_editar_obj and crud_urls.edit %}
-            <div class="tooltip" data-tip="Editar">
-                <button
-                    onclick="generic_modal.showModal()"
-                    class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                    hx-get="{% url crud_urls.edit obj.pk %}"
-                    hx-target="#generic_modal_content"
-                    hx-swap="innerHTML"
-                ><i class="fas fa-edit text-xs"></i></button>
-            </div>
-            {% endif %}
-        </div>
+                                        {# Editar #}
+                                        {% puede_editar obj as puede_editar_obj %}
+                                        {% if puede_editar_obj and crud_urls.edit %}
+                                        <div class="tooltip" data-tip="Editar">
+                                            <button
+                                                onclick="generic_modal.showModal()"
+                                                class="btn btn-ghost btn-sm h-8 w-8 p-0"
+                                                hx-get="{% url crud_urls.edit obj.pk %}"
+                                                hx-target="#generic_modal_content"
+                                                hx-swap="innerHTML"
+                                            ><i class="fas fa-edit text-xs"></i></button>
+                                        </div>
+                                        {% endif %}
+                                    </div>
 
-        {# Dropdown para acciones adicionales #}
-        {% puede_eliminar obj as puede_eliminar_obj %}
-        {% puede_aprobar obj as puede_aprobar_obj %}
-        {% if puede_eliminar_obj or puede_aprobar_obj %}
-        <div class="dropdown dropdown-end ml-1" data-adaptive-dropdown>
-            <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-8 w-8 p-0">
-                <i class="fas fa-ellipsis-v text-xs"></i>
-            </div>
-            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[999] w-40 p-2 shadow-lg border border-base-300">
-                
-                {# Eliminar #}
-                {% if puede_eliminar_obj and crud_urls.delete %}
-                <li>
-                    <button
-                        onclick="generic_modal.showModal()"
-                        class="flex items-center gap-2 text-error hover:bg-error/10"
-                        hx-get="{% url crud_urls.delete obj.pk %}"
-                        hx-target="#generic_modal_content"
-                        hx-swap="innerHTML"
-                    >
-                        <i class="fas fa-trash text-xs"></i>
-                        Eliminar
-                    </button>
-                </li>
-                {% endif %}
+                                    {# Dropdown para acciones adicionales #}
+                                    {% puede_eliminar obj as puede_eliminar_obj %}
+                                    {% puede_aprobar obj as puede_aprobar_obj %}
+                                    {% if puede_eliminar_obj or puede_aprobar_obj %}
+                                    <div class="dropdown dropdown-end ml-1" data-adaptive-dropdown>
+                                        <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-8 w-8 p-0">
+                                            <i class="fas fa-ellipsis-v text-xs"></i>
+                                        </div>
+                                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[999] w-40 p-2 shadow-lg border border-base-300">
+                                            
+                                            {# Eliminar #}
+                                            {% if puede_eliminar_obj and crud_urls.delete %}
+                                            <li>
+                                                <button
+                                                    onclick="generic_modal.showModal()"
+                                                    class="flex items-center gap-2 text-error hover:bg-error/10"
+                                                    hx-get="{% url crud_urls.delete obj.pk %}"
+                                                    hx-target="#generic_modal_content"
+                                                    hx-swap="innerHTML"
+                                                >
+                                                    <i class="fas fa-trash text-xs"></i>
+                                                    Eliminar
+                                                </button>
+                                            </li>
+                                            {% endif %}
 
-                {# Aprobar #}
-                {% if puede_aprobar_obj %}
-                <li>
-                    <button
-                        onclick="generic_modal.showModal()"
-                        class="flex items-center justify-start gap-2 text-success hover:bg-success/10"
-                        hx-target="#generic_modal_content"
-                        hx-get="{% url 'reserva_approve' obj.pk %}"
-                        hx-swap="innerHTML"
-                    >
-                            <i class="fas fa-check text-xs"></i>
-                            <i class="fas fa-times text-xs text-error"></i>
-                            Aprobar
-                    </button>
-                </li>
-                {% endif %}
+                                            {# Aprobar #}
+                                            {% if puede_aprobar_obj %}
+                                            <li>
+                                                <button
+                                                    onclick="generic_modal.showModal()"
+                                                    class="flex items-center justify-start gap-2 text-success hover:bg-success/10"
+                                                    hx-target="#generic_modal_content"
+                                                    hx-get="{% url 'reserva_approve' obj.pk %}"
+                                                    hx-swap="innerHTML"
+                                                >
+                                                        <i class="fas fa-check text-xs"></i>
+                                                        <i class="fas fa-times text-xs text-error"></i>
+                                                        Aprobar
+                                                </button>
+                                            </li>
+                                            {% endif %}
 
-            </ul>
-        </div>
-        {% endif %}
-    </div>
-</td>
-{% endif %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            {% endif %}
 
                                 </tr>
                                 {% empty %}

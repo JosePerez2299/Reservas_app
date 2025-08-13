@@ -3,8 +3,9 @@ from datetime import timedelta, date, time
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
-from reservas.models import Reserva, Usuario, Espacio
+from apps.reservas.models import Reserva
+from apps.espacios.models import Espacio
+from apps.usuarios.models import Usuario
 
 class Command(BaseCommand):
     help = 'Crea un número especificado de reservas PENDIENTES por cada ubicación con espacios disponibles.'

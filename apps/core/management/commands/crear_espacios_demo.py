@@ -1,6 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
-from reservas.models import Espacio, Ubicacion, Usuario
+from apps.espacios.models import Espacio
+from apps.usuarios.models import Ubicacion, Usuario
 
 class Command(BaseCommand):
     help = 'Crea 1000 espacios de prueba para poblar la base de datos.'

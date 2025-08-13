@@ -2,14 +2,11 @@
 {% load widget_tweaks %}  {# asegúrate de tener django-widget-tweaks instalado #}
 
   <form
-    class="flex flex-wrap gap-4"
+    class="flex flex-wrap gap-4 mt-4"
     method="GET"
     action="{{ url }}"
 
   >
-
-  <h2 class="text-lg font-semibold mt-2 w-full">Filtros</h2>
-
     
     {% comment %}Mostrar errores no relacionados con campos específicos{% endcomment %}
     {% if form.non_field_errors %}
