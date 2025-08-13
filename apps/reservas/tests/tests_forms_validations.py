@@ -1,7 +1,7 @@
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import Group
 from reservas.models import Usuario, Ubicacion, Espacio, Reserva
-from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
+from reservas..forms.reservas import ReservaCreateForm, ReservaUpdateForm
 
 from datetime import timedelta, time, date
 

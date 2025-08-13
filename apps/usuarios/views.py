@@ -13,10 +13,9 @@ Views para los usuarios
 from django_filters.views import FilterView
 from django.views.generic import TemplateView
 
-from apps.reservas.library.utils.utils import get_stats
+from library.utils.utils import get_stats
 from .forms import UsuarioCreateForm, UsuarioUpdateForm
-from apps.reservas.library.mixins.helpers import *
-from django.db.models.functions import Lower
+from library.mixins.helpers import *
 from django.urls import reverse, reverse_lazy
 from apps.reservas.models import Usuario
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView

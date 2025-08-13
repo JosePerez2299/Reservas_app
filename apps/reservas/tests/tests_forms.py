@@ -2,9 +2,9 @@ from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import Group
 from reservas.models import Usuario, Ubicacion, Espacio, Reserva
 from django.urls import reverse
-from reservas.library.forms.usuarios import UsuarioCreateForm, UsuarioUpdateForm
-from reservas.library.forms.espacios import EspacioCreateForm, EspacioUpdateForm
-from reservas.library.forms.reservas import ReservaCreateForm, ReservaUpdateForm
+from reservas..forms.usuarios import UsuarioCreateForm, UsuarioUpdateForm
+from reservas..forms.espacios import EspacioCreateForm, EspacioUpdateForm
+from reservas..forms.reservas import ReservaCreateForm, ReservaUpdateForm
 from django.utils import timezone
 import random
 from datetime import timedelta, time, date

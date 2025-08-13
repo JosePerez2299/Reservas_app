@@ -1,14 +1,13 @@
 from auditlog.models import LogEntry
-from apps.reservas.library.mixins.helpers import *
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.conf import settings
 from django.db.models import Case, When, Value, CharField
 from django.contrib.contenttypes.models import ContentType
 from apps.reservas.models import *
-from library.utils.get_logs import get_logs
+from library.utils.utils import get_logs
 from .filters import LogFilter
-from apps.reservas.library.mixins.helpers import ListCrudMixin, SmartOrderingMixin
+from library.mixins.helpers import ListCrudMixin, SmartOrderingMixin
 from django_filters.views import FilterView
 
 class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  SmartOrderingMixin, FilterView ):

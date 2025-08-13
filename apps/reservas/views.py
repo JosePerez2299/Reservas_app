@@ -14,11 +14,11 @@ from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from .models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
-from apps.reservas.library.mixins.helpers import *
+from library.mixins.helpers import *
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy, reverse
-from apps.reservas.library.filters.reservas import *
-from apps.reservas.library.forms.reservas import *
+from .filters import *
+from .forms import *
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from datetime import datetime

@@ -15,7 +15,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
-from reservas.library.forms.espacios import EspacioCreateForm
+from reservas..forms.espacios import EspacioCreateForm
 from reservas.models import Ubicacion, Espacio, Reserva, Usuario
 
 User = get_user_model()
