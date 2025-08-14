@@ -1,6 +1,7 @@
 import random
 from datetime import timedelta, date, time
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from apps.reservas.models import Reserva
