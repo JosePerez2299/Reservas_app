@@ -77,7 +77,8 @@ class Reserva(models.Model):
         # 2) solapamiento de franjas horarias
         qs = Reserva.objects.filter(
             espacio_id=self.espacio_id,
-            fecha_uso=self.fecha_uso
+            fecha_uso=self.fecha_uso,
+            estado=self.Estado.APROBADA
         ).exclude(pk=self.pk).filter(
             Q(hora_inicio__lt=self.hora_fin) &
             Q(hora_fin__gt=self.hora_inicio)

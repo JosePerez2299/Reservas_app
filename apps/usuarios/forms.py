@@ -18,10 +18,35 @@ class UsuarioCreateForm(UserCreationForm):
         empty_label="Sin grupo asignado",
     )
 
+    password1 = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput (attrs={'class': 'form-control w-full'}),
+        min_length=8,
+        max_length=20,
+        required=True,
+    )
+    password2 = forms.CharField(
+        label='Confirmar contraseña',
+        widget=forms.PasswordInput(attrs={'class': 'form-control w-full'}),
+        required=True,
+        min_length=8,
+        max_length=20,
+        help_text='Ingresa la misma contraseña para verificación.'
+    )
+
     class Meta:
         model = Usuario
-        fields = ['username', 'email', 'password1',
-                  'password2', 'ubicacion', 'piso', 'groups']
+        fields = ['username', 'password1', 'password2', 'email', 'ubicacion', 'piso', 'groups']
+        
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control w-full', 'placeholder': 'Nombre de usuario'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control w-full', 'placeholder': 'Correo electrónico'}),
+            'ubicacion': forms.Select(attrs={'class': 'form-control w-full', 'placeholder': 'Ubicación'}),
+            'piso': forms.NumberInput(attrs={'class': 'form-control w-full', 'placeholder': 'Piso'}),
+            'groups': forms.RadioSelect(attrs={'class': 'form-check-input'})
+        }
+        
+
         help_texts = {
             'username': 'Requerido. 20 caracteres o menos. Debe comenzar con letra.',
         }

@@ -60,7 +60,7 @@ class Usuario(AbstractUser):
         validators=[validate_username],
         help_text='Nombre de usuario único. 3-20 caracteres. Debe comenzar con letra.',
         error_messages={
-            'unique': "Ya existe un usuario con este nombre.",
+            'unique': "Ya existe un Usuario con este nombre.",
         },  
     )
     
