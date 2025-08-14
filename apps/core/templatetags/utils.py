@@ -91,8 +91,8 @@ def get_td_html(context, obj, field):
         email = getattr(obj.usuario, 'email', '')
         return format_html(
             '<div class="flex items-center gap-3">'
-                '<div class="avatar placeholder">'
-                    '<div class="bg-secondary text-secondary-content rounded-full w-8">'
+                '<div class="">'
+                    '<div class="h-8 w-8 p-1 flex justify-center items-center bg-secondary text-secondary-content rounded-full">'
                         '<span class="text-xs">{}</span>'
                     '</div>'
                 '</div>'
@@ -207,8 +207,8 @@ def get_td_html(context, obj, field):
             email = getattr(obj, 'email', '')
             return format_html(
                 '<div class="flex items-center gap-3">'
-                    '<div class="avatar placeholder">'
-                        '<div class="bg-secondary text-secondary-content rounded-full w-8">'
+                    '<div class="">'
+                        '<div class="h-8 flex items-center justify-center bg-secondary text-secondary-content rounded-full w-8">'
                             '<span class="text-xs">{}</span>'
                         '</div>'
                     '</div>'

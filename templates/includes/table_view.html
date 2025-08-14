@@ -104,10 +104,7 @@
                         <table class="table table-md text-sm">
                             <thead class="bg-base-200/70">
                                 <tr class="border-b border-base-300">
-                                    <th class="w-12">
-                                        <input type="checkbox" class="checkbox checkbox-sm" onchange="toggleSelectAll(this)">
-                                    </th>
-                                    
+                                   
                                     {% for field, label in cols.items %}
                                     <th class="hover:bg-base-300/50 font-semibold text-base-content/80 text-sm">
                                         <div class="flex items-center justify-between gap-2 px-2">
@@ -139,9 +136,7 @@
                             <tbody id="tableBody">
                                 {% for obj in object_list %}
                                 <tr class="border-b border-base-200 hover:bg-base-50">
-                                    <td>
-                                        <input type="checkbox" class="row-checkbox checkbox checkbox-sm" onchange="toggleSelect(this)">
-                                    </td>
+                                  
                                     
                                     {% for col in cols %}
                                     <td class="py-4">
@@ -256,17 +251,8 @@
 
                 <!-- Pagination -->
                 <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 p-4 mt-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm text-base-content/70">Mostrar</span>
-                            <select class="select select-bordered select-sm w-20 h-8">
-                                <option>10</option>
-                                <option>25</option>
-                                <option>50</option>
-                                <option>100</option>
-                            </select>
-                            <span class="text-sm text-base-content/70">por página</span>
-                        </div>
+                    <div class="flex  justify-center items-center gap-4">
+ 
                         
                         <div class="join">
                             {% if page_obj %}
@@ -341,7 +327,7 @@
     </div>
     
     <!-- Sidebar -->
-    <div class="drawer-side">
+    <div class="drawer-side z-50">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <div class="min-h-screen w-80 bg-base-100 border-l border-base-300">
             <div class="p-6">

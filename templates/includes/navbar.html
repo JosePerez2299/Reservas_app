@@ -2,7 +2,7 @@
 {% load static %}
 
 <!-- Navbar moderno con glassmorphism y animaciones -->
-<div class="navbar bg-base-100/95 backdrop-blur-md shadow-lg border-b border-base-300/50 sticky top-0 ">
+<div class="navbar bg-base-100/95 backdrop-blur-md shadow-lg border-b border-base-300/50 sticky top-0 z-50 ">
   <div class="navbar-start">
     <!-- Mobile menu button con animación -->
     <div class="dropdown lg:hidden">
@@ -189,13 +189,8 @@
   animation: fadeInUp 0.5s ease-out;
 }
 
-.menu li {
-  animation: slideIn 0.3s ease-out;
-}
 
-.menu li:nth-child(2) { animation-delay: 0.1s; }
-.menu li:nth-child(3) { animation-delay: 0.2s; }
-.menu li:nth-child(4) { animation-delay: 0.3s; }
+
 
 /* Hover effects */
 .navbar a:hover {
