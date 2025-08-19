@@ -2,8 +2,6 @@ from auditlog.models import LogEntry
 from django_filters import  FilterSet
 from django import forms
 from django_filters import CharFilter, DateFilter, ChoiceFilter
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Div, Field
 
 class LogFilter(FilterSet):
     actor = CharFilter(
@@ -50,17 +48,4 @@ class LogFilter(FilterSet):
         model = LogEntry
         fields = ['actor', 'tipo', 'action_label', 'timestamp']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.form.helper = FormHelper()
-        self.form.helper.form_method = 'get'
-        self.form.helper.form_class = 'form-inline'
-        self.form.helper.layout = Layout(
-            Div(
-                Field('actor'),
-                Field('tipo'),
-                Field('action_label'),
-                Field('timestamp'),
-                Submit('search', 'Buscar', css_class='btn-primary'),
-            )
-        )
+    

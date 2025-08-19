@@ -4,6 +4,4 @@ django-widget-tweaks
 django-compressor
 pandas
 django-auditlog
-django-crispy-forms
-crispy-tailwind
 fontawesomefree

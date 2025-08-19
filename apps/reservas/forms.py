@@ -4,8 +4,6 @@ from apps.reservas.models import Reserva
 from apps.espacios.models import Espacio
 from apps.usuarios.models import Usuario
 from datetime import date, timedelta
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Div, Field, Submit, Row
 
 class ReservaCreateForm(forms.ModelForm ):
     class Meta:
@@ -62,7 +60,9 @@ class ReservaCreateForm(forms.ModelForm ):
 
         # Si es usuario, mostrar selector de su usuario
         elif user.is_usuario:
+            self.fields['usuario'].widget = forms.HiddenInput()
             self.fields['usuario'].initial = user
+
             self.fields['usuario'].disabled = True
             self.fields['usuario'].help_text = "No puedes cambiar este campo"
 
