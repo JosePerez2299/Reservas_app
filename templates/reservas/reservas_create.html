@@ -1,1 +1,1106 @@
-{% extends 'reservas/form_base.html' %}
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto p-4 max-w-5xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
+            <i class="fas fa-calendar-alt text-2xl text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Reserva de Espacios</h1>
+        <p class="text-gray-600">Sistema integral de gestión de reservas</p>
+    </div>
+
+    <!-- Progreso Visual -->
+    <div class="mb-8">
+        <div class="flex items-center justify-center space-x-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold" id="step-1">1</div>
+                <span class="ml-3 text-sm font-medium text-blue-600" id="step-1-text">Tipo de Espacio</span>
+            </div>
+            <div class="w-16 h-px bg-gray-300" id="progress-line-1"></div>
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-bold" id="step-2">2</div>
+                <span class="ml-3 text-sm font-medium text-gray-500" id="step-2-text">Detalles</span>
+            </div>
+            <div class="w-16 h-px bg-gray-300" id="progress-line-2"></div>
+            <div class="flex items-center">
+                <div class="w-10 h-10 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center text-sm font-bold" id="step-3">3</div>
+                <span class="ml-3 text-sm font-medium text-gray-500" id="step-3-text">Confirmación</span>
+            </div>
+        </div>
+    </div>
+
+    <form class="space-y-6" id="main-form">
+        <!-- PASO 1: Selección de Tipo de Espacio -->
+        <div class="step-content" id="step-content-1">
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">
+                    <i class="fas fa-map-marker-alt mr-3 text-blue-500"></i>
+                    ¿Qué tipo de espacio necesitas?
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="spaceType" value="fisico" class="sr-only" onchange="selectSpaceType(this)">
+                        <div class="space-type-card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-gray-200 rounded-xl p-8 transition-all duration-300 group-hover:shadow-lg">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-building text-white text-3xl"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-800 mb-3">Espacio Físico</h3>
+                                <p class="text-gray-600 mb-6">Salas, auditorios y espacios presenciales para reuniones y eventos</p>
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center radio-visual mx-auto">
+                                    <div class="w-3 h-3 bg-transparent rounded-full radio-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                    
+                    <label class="cursor-pointer group">
+                        <input type="radio" name="spaceType" value="virtual" class="sr-only" onchange="selectSpaceType(this)">
+                        <div class="space-type-card bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-gray-200 rounded-xl p-8 transition-all duration-300 group-hover:shadow-lg">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-video text-white text-3xl"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-800 mb-3">Espacio Virtual</h3>
+                                <p class="text-gray-600 mb-6">Zoom, Teams y plataformas digitales para conferencias online</p>
+                                <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center radio-visual mx-auto">
+                                    <div class="w-3 h-3 bg-transparent rounded-full radio-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button type="button" id="next-step-1" class="btn btn-primary btn-lg px-8 opacity-50 cursor-not-allowed" disabled onclick="goToStep(2)">
+                        Continuar
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: Detalles del Formulario -->
+        <div class="step-content hidden" id="step-content-2">
+            <!-- Formulario Físico -->
+            <div id="physical-form" class="hidden">
+                <!-- Información Básica -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-green-500"></i>
+                        Información de la Actividad
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-tag mr-2 text-blue-500"></i>
+                                Nombre de la Actividad *
+                            </label>
+                            <input type="text" id="activity-name" placeholder="Ej: Reunión de equipo, Conferencia..." 
+                                   class="input input-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar mr-2 text-blue-500"></i>
+                                Fecha de la Actividad *
+                            </label>
+                            <input type="date" id="activity-date" class="input input-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-building mr-2 text-blue-500"></i>
+                                Sede *
+                            </label>
+                            <select class="select select-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    onchange="updateRooms()" id="sede-select">
+                                <option disabled selected>Seleccione una sede</option>
+                                <option value="principal">Sede Principal</option>
+                                <option value="norte">Sede Norte</option>
+                                <option value="sur">Sede Sur</option>
+                                <option value="oriente">Sede Oriente</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-door-open mr-2 text-blue-500"></i>
+                                Sala *
+                            </label>
+                            <select class="select select-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                    id="room-select" disabled>
+                                <option disabled selected>Primero seleccione una sede</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-clock mr-2 text-blue-500"></i>
+                                Hora de Inicio *
+                            </label>
+                            <input type="time" id="start-time" class="input input-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-clock mr-2 text-blue-500"></i>
+                                Hora de Finalización *
+                            </label>
+                            <input type="time" id="end-time" class="input input-bordered w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requerimientos Comunicacionales -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-bullhorn mr-3 text-orange-500"></i>
+                        Requerimientos Comunicacionales
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-question-circle text-orange-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Ciclo de preguntas y respuestas</span>
+                                        <p class="text-sm text-gray-600">Sesión interactiva con la audiencia</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="qa-checkbox" class="toggle toggle-primary" onchange="toggleObservations('qa-obs', this)">
+                                </label>
+                            </div>
+                            <div id="qa-obs" class="mt-4 hidden">
+                                <textarea id="qa-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-orange-500" 
+                                          placeholder="Especifique detalles sobre la sesión de Q&A..." rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-newspaper text-blue-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Prensa interna</span>
+                                        <p class="text-sm text-gray-600">Cobertura y comunicación interna</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="press-checkbox" class="toggle toggle-primary" onchange="toggleObservations('press-obs', this)">
+                                </label>
+                            </div>
+                            <div id="press-obs" class="mt-4 hidden">
+                                <textarea id="press-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-blue-500" 
+                                          placeholder="Especifique el tipo de cobertura de prensa..." rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-camera text-green-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Fotografía y video</span>
+                                        <p class="text-sm text-gray-600">Cobertura audiovisual del evento</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="photo-checkbox" class="toggle toggle-primary" onchange="toggleObservations('photo-obs', this)">
+                                </label>
+                            </div>
+                            <div id="photo-obs" class="mt-4 hidden">
+                                <textarea id="photo-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-green-500" 
+                                          placeholder="Especifique el tipo de cobertura audiovisual..." rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-tv text-red-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Televisión</span>
+                                        <p class="text-sm text-gray-600">Pantallas y equipos de visualización</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="tv-checkbox" class="toggle toggle-primary" onchange="toggleObservations('tv-obs', this)">
+                                </label>
+                            </div>
+                            <div id="tv-obs" class="mt-4 hidden">
+                                <textarea id="tv-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-red-500" 
+                                          placeholder="Especifique requerimientos de TV y pantallas..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requerimientos de Producción -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-cogs mr-3 text-indigo-500"></i>
+                        Requerimientos de Producción
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-volume-up text-indigo-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Sistema de sonido</span>
+                                        <p class="text-sm text-gray-600">Micrófonos, amplificación y audio</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="sound-checkbox" class="toggle toggle-secondary" onchange="toggleObservations('sound-obs', this)">
+                                </label>
+                            </div>
+                            <div id="sound-obs" class="mt-4 hidden">
+                                <textarea id="sound-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-indigo-500" 
+                                          placeholder="Especifique tipo de sonido, micrófonos, amplificación..." rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-desktop text-teal-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Pantallas y proyección</span>
+                                        <p class="text-sm text-gray-600">Proyectores, pantallas y displays</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="screen-checkbox" class="toggle toggle-secondary" onchange="toggleObservations('screen-obs', this)">
+                                </label>
+                            </div>
+                            <div id="screen-obs" class="mt-4 hidden">
+                                <textarea id="screen-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-teal-500" 
+                                          placeholder="Especifique cantidad, tamaño de pantallas, proyectores..." rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario Virtual -->
+            <div id="virtual-form" class="hidden">
+                <!-- Información Básica Virtual -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-purple-500"></i>
+                        Información de la Actividad Virtual
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-tag mr-2 text-purple-500"></i>
+                                Nombre de la Actividad *
+                            </label>
+                            <input type="text" id="virtual-activity-name" placeholder="Ej: Webinar, Reunión virtual..." 
+                                   class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar mr-2 text-purple-500"></i>
+                                Fecha de la Actividad *
+                            </label>
+                            <input type="date" id="virtual-activity-date" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-play-circle mr-2 text-purple-500"></i>
+                                Hora de Inicio *
+                            </label>
+                            <input type="time" id="virtual-start-time" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-stopwatch mr-2 text-purple-500"></i>
+                                Duración (minutos) *
+                            </label>
+                            <input type="number" id="virtual-duration" placeholder="90" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" min="15" step="15" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-users mr-2 text-purple-500"></i>
+                                Número de Usuarios *
+                            </label>
+                            <input type="number" id="virtual-users" placeholder="20" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" min="1" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-user-tie mr-2 text-purple-500"></i>
+                                Responsable/Anfitrión *
+                            </label>
+                            <input type="text" id="virtual-host" placeholder="Nombre del responsable" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-map-pin mr-2 text-purple-500"></i>
+                            Espacio Físico de Transmisión
+                        </label>
+                        <input type="text" id="virtual-location" placeholder="Ubicación desde donde se realizará la transmisión" class="input input-bordered w-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                    </div>
+                </div>
+
+                <!-- Requerimientos Virtuales -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-laptop mr-3 text-purple-500"></i>
+                        Requerimientos Virtuales
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-purple-50 rounded-xl p-4 hover:bg-purple-100 transition-colors duration-200 border border-purple-100">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-user-shield text-purple-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Acompañamiento y monitoreo</span>
+                                        <p class="text-sm text-gray-600">Soporte técnico durante la transmisión</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="monitoring-checkbox" class="toggle toggle-accent" onchange="toggleObservations('monitoring-obs', this)">
+                                </label>
+                            </div>
+                            <div id="monitoring-obs" class="mt-4 hidden">
+                                <textarea id="monitoring-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-purple-500" 
+                                          placeholder="Especifique tipo de acompañamiento requerido..." rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-pink-50 rounded-xl p-4 hover:bg-pink-100 transition-colors duration-200 border border-pink-100">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-presentation-screen text-pink-500"></i>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-gray-800">Compartir presentación</span>
+                                        <p class="text-sm text-gray-600">Uso de pantalla compartida y slides</p>
+                                    </div>
+                                </div>
+                                <label class="cursor-pointer">
+                                    <input type="checkbox" id="presentation-checkbox" class="toggle toggle-accent" onchange="toggleObservations('presentation-obs', this)">
+                                </label>
+                            </div>
+                            <div id="presentation-obs" class="mt-4 hidden">
+                                <textarea id="presentation-notes" class="textarea textarea-bordered w-full bg-white focus:ring-2 focus:ring-pink-500" 
+                                          placeholder="Especifique detalles de la presentación..." rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones Navegación Paso 2 -->
+            <div class="flex justify-between">
+                <button type="button" class="btn btn-outline btn-lg px-8" onclick="goToStep(1)">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Atrás
+                </button>
+                <button type="button" id="next-step-2" class="btn btn-primary btn-lg px-8" onclick="goToStep(3)">
+                    Continuar
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- PASO 3: Resumen y Confirmación -->
+        <div class="step-content hidden" id="step-content-3">
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-8 text-center">
+                    <i class="fas fa-clipboard-check mr-3 text-green-500"></i>
+                    Confirma los datos de tu reserva
+                </h2>
+                
+                <div id="summary-content" class="space-y-6">
+                    <!-- El contenido se generará dinámicamente -->
+                </div>
+                
+                <!-- Botones Navegación Paso 3 -->
+                <div class="flex justify-between pt-8">
+                    <button type="button" class="btn btn-outline btn-lg px-8" onclick="goToStep(2)">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Modificar
+                    </button>
+                    <div class="space-x-4">
+                        <button type="button" class="btn btn-outline btn-lg px-8">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Borrador
+                        </button>
+                        <button type="submit" class="btn btn-success btn-lg px-8 bg-gradient-to-r from-green-500 to-emerald-600 border-0">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Enviar Solicitud
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-box relative max-w-md mx-auto">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-3xl text-green-500"></i>
+                </div>
+                <h3 class="font-bold text-xl text-gray-800 mb-2">¡Solicitud Enviada!</h3>
+                <p class="text-gray-600 mb-6">Su solicitud de reserva ha sido procesada correctamente. Recibirá una confirmación por correo electrónico.</p>
+                <button class="btn btn-primary btn-wide" onclick="closeModal()">
+                    <i class="fas fa-thumbs-up mr-2"></i>
+                    Perfecto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let selectedSpaceType = null;
+    
+    // Configuración de salas por sede
+    const roomsBySede = {
+        principal: [
+            'Auditorio Principal (200 personas)',
+            'Sala de Juntas Ejecutiva (12 personas)',
+            'Sala de Conferencias A (50 personas)',
+            'Sala de Conferencias B (30 personas)',
+            'Sala de Reuniones 1 (8 personas)',
+            'Sala de Reuniones 2 (6 personas)'
+        ],
+        norte: [
+            'Sala Norte Principal (80 personas)',
+            'Sala de Juntas Norte (10 personas)',
+            'Sala de Capacitación (25 personas)',
+            'Sala de Reuniones Norte (6 personas)'
+        ],
+        sur: [
+            'Auditorio Sur (150 personas)',
+            'Sala de Juntas Sur (14 personas)',
+            'Sala de Formación (40 personas)',
+            'Sala Polivalente (60 personas)'
+        ],
+        oriente: [
+            'Sala Oriente Principal (90 personas)',
+            'Sala de Reuniones Oriente A (8 personas)',
+            'Sala de Reuniones Oriente B (12 personas)',
+            'Sala de Videoconferencias (20 personas)'
+        ]
+    };
+
+    function selectSpaceType(radio) {
+        selectedSpaceType = radio.value;
+        
+        // Reset visual state
+        document.querySelectorAll('.space-type-card').forEach(card => {
+            card.classList.remove('selected', 'border-blue-500', 'border-purple-500', 'shadow-lg');
+            const radioDot = card.querySelector('.radio-dot');
+            const radioVisual = card.querySelector('.radio-visual');
+            
+            if (radioDot) {
+                radioDot.style.backgroundColor = 'transparent';
+            }
+            if (radioVisual) {
+                radioVisual.classList.remove('border-blue-500', 'border-purple-500');
+                radioVisual.classList.add('border-gray-300');
+            }
+        });
+
+        // Apply selected state
+        const selectedCard = radio.closest('.space-type-card');
+        if (selectedCard) {
+            selectedCard.classList.add('selected', 'shadow-lg');
+            const radioDot = selectedCard.querySelector('.radio-dot');
+            const radioVisual = selectedCard.querySelector('.radio-visual');
+            
+            if (selectedSpaceType === 'fisico') {
+                selectedCard.classList.add('border-blue-500');
+                if (radioDot) radioDot.style.backgroundColor = '#3b82f6';
+                if (radioVisual) {
+                    radioVisual.classList.remove('border-gray-300');
+                    radioVisual.classList.add('border-blue-500');
+                }
+            } else {
+                selectedCard.classList.add('border-purple-500');
+                if (radioDot) radioDot.style.backgroundColor = '#8b5cf6';
+                if (radioVisual) {
+                    radioVisual.classList.remove('border-gray-300');
+                    radioVisual.classList.add('border-purple-500');
+                }
+            }
+        }
+
+        // Enable next button
+        const nextBtn = document.getElementById('next-step-1');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            nextBtn.classList.add('hover:scale-105', 'transform', 'transition-all', 'duration-200');
+        }
+    }
+
+    function goToStep(step) {
+        // Validación antes de avanzar
+        if (step > currentStep) {
+            if (step === 2 && !selectedSpaceType) {
+                alert('Por favor seleccione un tipo de espacio');
+                return;
+            }
+            if (step === 3 && !validateCurrentForm()) {
+                return;
+            }
+        }
+
+        // Ocultar paso actual
+        const currentContent = document.getElementById(`step-content-${currentStep}`);
+        if (currentContent) {
+            currentContent.classList.add('hidden');
+        }
+
+        // Mostrar nuevo paso
+        const newContent = document.getElementById(`step-content-${step}`);
+        if (newContent) {
+            newContent.classList.remove('hidden');
+            
+            // Si vamos al paso 2, mostrar el formulario correspondiente
+            if (step === 2) {
+                if (selectedSpaceType === 'fisico') {
+                    document.getElementById('physical-form').classList.remove('hidden');
+                    document.getElementById('virtual-form').classList.add('hidden');
+                } else {
+                    document.getElementById('virtual-form').classList.remove('hidden');
+                    document.getElementById('physical-form').classList.add('hidden');
+                }
+            }
+            
+            // Si vamos al paso 3, generar el resumen
+            if (step === 3) {
+                generateSummary();
+            }
+        }
+
+        currentStep = step;
+        updateProgressIndicator();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateProgressIndicator() {
+        for (let i = 1; i <= 3; i++) {
+            const stepElement = document.getElementById(`step-${i}`);
+            const stepText = document.getElementById(`step-${i}-text`);
+            const progressLine = document.getElementById(`progress-line-${i}`);
+            
+            if (stepElement && stepText) {
+                if (i < currentStep) {
+                    // Paso completado
+                    stepElement.classList.remove('bg-gray-300', 'text-gray-600', 'bg-blue-500');
+                    stepElement.classList.add('bg-green-500', 'text-white');
+                    stepElement.innerHTML = '<i class="fas fa-check text-xs"></i>';
+                    stepText.classList.remove('text-gray-500');
+                    stepText.classList.add('text-green-600', 'font-medium');
+                    if (progressLine) {
+                        progressLine.classList.remove('bg-gray-300');
+                        progressLine.classList.add('bg-green-500');
+                    }
+                } else if (i === currentStep) {
+                    // Paso actual
+                    stepElement.classList.remove('bg-gray-300', 'text-gray-600', 'bg-green-500');
+                    stepElement.classList.add('bg-blue-500', 'text-white');
+                    stepElement.innerHTML = i;
+                    stepText.classList.remove('text-gray-500', 'text-green-600');
+                    stepText.classList.add('text-blue-600', 'font-semibold');
+                    if (progressLine) {
+                        progressLine.classList.remove('bg-green-500');
+                        progressLine.classList.add('bg-gray-300');
+                    }
+                } else {
+                    // Paso futuro
+                    stepElement.classList.remove('bg-blue-500', 'text-white', 'bg-green-500');
+                    stepElement.classList.add('bg-gray-300', 'text-gray-600');
+                    stepElement.innerHTML = i;
+                    stepText.classList.remove('text-blue-600', 'font-semibold', 'text-green-600', 'font-medium');
+                    stepText.classList.add('text-gray-500');
+                    if (progressLine) {
+                        progressLine.classList.remove('bg-green-500');
+                        progressLine.classList.add('bg-gray-300');
+                    }
+                }
+            }
+        }
+    }
+
+    function validateCurrentForm() {
+        let requiredFields = [];
+        
+        if (selectedSpaceType === 'fisico') {
+            requiredFields = [
+                'activity-name',
+                'activity-date',
+                'sede-select',
+                'room-select',
+                'start-time',
+                'end-time'
+            ];
+        } else {
+            requiredFields = [
+                'virtual-activity-name',
+                'virtual-activity-date',
+                'virtual-start-time',
+                'virtual-duration',
+                'virtual-users',
+                'virtual-host'
+            ];
+        }
+        
+        let isValid = true;
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                if (field.value.trim() === '' || (field.type === 'select-one' && field.selectedIndex === 0)) {
+                    field.classList.add('input-error');
+                    isValid = false;
+                } else {
+                    field.classList.remove('input-error');
+                }
+            }
+        });
+        
+        if (!isValid) {
+            alert('Por favor complete todos los campos obligatorios');
+            const firstError = document.querySelector('.input-error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+        
+        return isValid;
+    }
+
+    function generateSummary() {
+        const summaryContent = document.getElementById('summary-content');
+        if (!summaryContent) return;
+        
+        let html = '';
+        
+        // Información básica
+        html += `<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">`;
+        html += `<h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">`;
+        html += `<i class="fas fa-info-circle mr-2 text-blue-500"></i>Información General</h3>`;
+        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+        
+        if (selectedSpaceType === 'fisico') {
+            const activityName = document.getElementById('activity-name').value;
+            const activityDate = document.getElementById('activity-date').value;
+            const sede = document.getElementById('sede-select').value;
+            const room = document.getElementById('room-select').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            
+            html += `<div><strong>Tipo:</strong> <span class="text-blue-600">Espacio Físico</span></div>`;
+            html += `<div><strong>Actividad:</strong> ${activityName}</div>`;
+            html += `<div><strong>Fecha:</strong> ${new Date(activityDate).toLocaleDateString('es-ES')}</div>`;
+            html += `<div><strong>Sede:</strong> ${sede}</div>`;
+            html += `<div><strong>Sala:</strong> ${room}</div>`;
+            html += `<div><strong>Horario:</strong> ${startTime} - ${endTime}</div>`;
+        } else {
+            const activityName = document.getElementById('virtual-activity-name').value;
+            const activityDate = document.getElementById('virtual-activity-date').value;
+            const startTime = document.getElementById('virtual-start-time').value;
+            const duration = document.getElementById('virtual-duration').value;
+            const users = document.getElementById('virtual-users').value;
+            const host = document.getElementById('virtual-host').value;
+            const location = document.getElementById('virtual-location').value;
+            
+            html += `<div><strong>Tipo:</strong> <span class="text-purple-600">Espacio Virtual</span></div>`;
+            html += `<div><strong>Actividad:</strong> ${activityName}</div>`;
+            html += `<div><strong>Fecha:</strong> ${new Date(activityDate).toLocaleDateString('es-ES')}</div>`;
+            html += `<div><strong>Hora inicio:</strong> ${startTime}</div>`;
+            html += `<div><strong>Duración:</strong> ${duration} minutos</div>`;
+            html += `<div><strong>Usuarios:</strong> ${users}</div>`;
+            html += `<div><strong>Responsable:</strong> ${host}</div>`;
+            if (location) html += `<div><strong>Ubicación transmisión:</strong> ${location}</div>`;
+        }
+        
+        html += `</div></div>`;
+        
+        // Requerimientos seleccionados
+        const requirements = getSelectedRequirements();
+        if (requirements.length > 0) {
+            html += `<div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">`;
+            html += `<h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">`;
+            html += `<i class="fas fa-check-circle mr-2 text-green-500"></i>Requerimientos Seleccionados</h3>`;
+            html += `<div class="space-y-3">`;
+            
+            requirements.forEach(req => {
+                html += `<div class="flex items-start space-x-3">`;
+                html += `<i class="${req.icon} text-${req.color}-500 mt-1"></i>`;
+                html += `<div>`;
+                html += `<div class="font-medium">${req.name}</div>`;
+                if (req.notes) html += `<div class="text-sm text-gray-600 mt-1">${req.notes}</div>`;
+                html += `</div></div>`;
+            });
+            
+            html += `</div></div>`;
+        }
+        
+        summaryContent.innerHTML = html;
+    }
+
+    function getSelectedRequirements() {
+        const requirements = [];
+        
+        if (selectedSpaceType === 'fisico') {
+            // Requerimientos comunicacionales
+            if (document.getElementById('qa-checkbox').checked) {
+                requirements.push({
+                    name: 'Ciclo de preguntas y respuestas',
+                    notes: document.getElementById('qa-notes').value,
+                    icon: 'fas fa-question-circle',
+                    color: 'orange'
+                });
+            }
+            if (document.getElementById('press-checkbox').checked) {
+                requirements.push({
+                    name: 'Prensa interna',
+                    notes: document.getElementById('press-notes').value,
+                    icon: 'fas fa-newspaper',
+                    color: 'blue'
+                });
+            }
+            if (document.getElementById('photo-checkbox').checked) {
+                requirements.push({
+                    name: 'Fotografía y video',
+                    notes: document.getElementById('photo-notes').value,
+                    icon: 'fas fa-camera',
+                    color: 'green'
+                });
+            }
+            if (document.getElementById('tv-checkbox').checked) {
+                requirements.push({
+                    name: 'Televisión',
+                    notes: document.getElementById('tv-notes').value,
+                    icon: 'fas fa-tv',
+                    color: 'red'
+                });
+            }
+            
+            // Requerimientos de producción
+            if (document.getElementById('sound-checkbox').checked) {
+                requirements.push({
+                    name: 'Sistema de sonido',
+                    notes: document.getElementById('sound-notes').value,
+                    icon: 'fas fa-volume-up',
+                    color: 'indigo'
+                });
+            }
+            if (document.getElementById('screen-checkbox').checked) {
+                requirements.push({
+                    name: 'Pantallas y proyección',
+                    notes: document.getElementById('screen-notes').value,
+                    icon: 'fas fa-desktop',
+                    color: 'teal'
+                });
+            }
+        } else {
+            // Requerimientos virtuales
+            if (document.getElementById('monitoring-checkbox').checked) {
+                requirements.push({
+                    name: 'Acompañamiento y monitoreo',
+                    notes: document.getElementById('monitoring-notes').value,
+                    icon: 'fas fa-user-shield',
+                    color: 'purple'
+                });
+            }
+            if (document.getElementById('presentation-checkbox').checked) {
+                requirements.push({
+                    name: 'Compartir presentación',
+                    notes: document.getElementById('presentation-notes').value,
+                    icon: 'fas fa-presentation-screen',
+                    color: 'pink'
+                });
+            }
+        }
+        
+        return requirements;
+    }
+
+    function updateRooms() {
+        const sedeSelect = document.getElementById('sede-select');
+        const roomSelect = document.getElementById('room-select');
+        
+        if (!sedeSelect || !roomSelect) return;
+        
+        const selectedSede = sedeSelect.value;
+        roomSelect.innerHTML = '<option disabled selected>Seleccione una sala</option>';
+        
+        if (selectedSede && roomsBySede[selectedSede]) {
+            roomSelect.disabled = false;
+            roomsBySede[selectedSede].forEach(room => {
+                const option = document.createElement('option');
+                option.value = room;
+                option.textContent = room;
+                roomSelect.appendChild(option);
+            });
+        } else {
+            roomSelect.disabled = true;
+        }
+    }
+
+    function toggleObservations(obsId, checkbox) {
+        const obsDiv = document.getElementById(obsId);
+        if (!obsDiv) return;
+        
+        if (checkbox.checked) {
+            obsDiv.classList.remove('hidden');
+            obsDiv.classList.add('animate-slideDown');
+            setTimeout(() => {
+                obsDiv.classList.remove('animate-slideDown');
+            }, 300);
+        } else {
+            obsDiv.classList.add('animate-slideUp');
+            setTimeout(() => {
+                obsDiv.classList.add('hidden');
+                obsDiv.classList.remove('animate-slideUp');
+            }, 300);
+        }
+    }
+
+    function openModal() {
+        const modal = document.getElementById('confirmation-modal');
+        if (modal) {
+            modal.classList.add('modal-open');
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('confirmation-modal');
+        const form = document.getElementById('main-form');
+        
+        if (modal) {
+            modal.classList.remove('modal-open');
+        }
+        
+        if (form) {
+            form.reset();
+            currentStep = 1;
+            selectedSpaceType = null;
+            
+            // Reset UI
+            document.querySelectorAll('.step-content').forEach(step => step.classList.add('hidden'));
+            document.getElementById('step-content-1').classList.remove('hidden');
+            updateProgressIndicator();
+            
+            // Reset space type selection
+            const nextBtn = document.getElementById('next-step-1');
+            if (nextBtn) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                nextBtn.classList.remove('hover:scale-105', 'transform', 'transition-all', 'duration-200');
+            }
+        }
+    }
+
+    // Manejo del envío del formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('main-form');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateCurrentForm()) {
+                    return;
+                }
+                
+                // Simular envío con loading
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enviando...';
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        openModal();
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Inicializar UI
+        updateProgressIndicator();
+        
+        // Animación de entrada
+        document.querySelectorAll('.bg-white').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 150);
+        });
+    });
+</script>
+
+<style>
+    /* Animaciones */
+    .animate-slideDown {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .animate-slideUp {
+        animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        0% { 
+            opacity: 0; 
+            transform: translateY(-20px);
+            max-height: 0;
+        }
+        100% { 
+            opacity: 1; 
+            transform: translateY(0);
+            max-height: 200px;
+        }
+    }
+    
+    @keyframes slideUp {
+        0% { 
+            opacity: 1; 
+            transform: translateY(0);
+            max-height: 200px;
+        }
+        100% { 
+            opacity: 0; 
+            transform: translateY(-20px);
+            max-height: 0;
+        }
+    }
+    
+    /* Estados de validación */
+    .input-error {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        background-color: #fef2f2;
+    }
+    
+    /* Hover effects */
+    .space-type-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .space-type-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .space-type-card.selected {
+        transform: translateY(-4px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Toggle animations */
+    .toggle:checked {
+        animation: toggleBounce 0.3s ease;
+    }
+    
+    @keyframes toggleBounce {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Focus states */
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+        transform: scale(1.01);
+        transition: all 0.2s ease;
+    }
+    
+    /* Radio button visual */
+    .radio-visual {
+        transition: all 0.3s ease;
+    }
+    
+    .radio-dot {
+        transition: all 0.3s ease;
+        border-radius: 50%;
+    }
+    
+    /* Progress indicator animations */
+    #step-1, #step-2, #step-3 {
+        transition: all 0.3s ease;
+    }
+    
+    #progress-line-1, #progress-line-2 {
+        transition: all 0.3s ease;
+    }
+    
+    /* Botón submit especial */
+    .btn-success:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+        }
+        
+        .space-type-card {
+            padding: 1.5rem;
+        }
+        
+        .grid {
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock content %}

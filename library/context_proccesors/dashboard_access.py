@@ -1,27 +1,74 @@
-from django.conf import settings
+
+
+from config.model_perms import DASHBOARD_ACCESS, MODELOS, GRUPOS
 
 
 def dashboard_access(request):
     # Obtener la ruta actual
     current_path = request.path_info
-    current_section = current_path.strip('/').split('/')[0] if current_path != '/' else 'dashboard'
-    if current_path == '/reservas/calendario/':
-        current_section = 'calendario'
-    if (request.user.is_superuser):
-        grupo = settings.GRUPOS.ADMINISTRADOR
-    else:
-    # Obtener nombre de grupo
-        grupos = request.user.groups.values_list("name", flat=True)
-        grupo = request.user.groups.first().name if request.user.groups.exists() else settings.GRUPOS.USUARIO
-        # Si es superusuario, mostrar todos los modelos
-    
-    # Permisos por modelo para este grupo
-    modelos = settings.DASHBOARD_ACCESS.get(grupo, [])
-    navlinks = [{"label": "Inicio", "url": "dashboard"},{"label": "Calendario", "url": "calendario"}]
-    navlinks.extend([modelo['model'] for modelo in modelos if modelo['model']['name'] != 'auditlog.LogEntry'])
+    current_path = current_path.split('/')[1]
+    dashboard_access = DashboardAccess(request.user)   
 
     return {
-        "group": grupo,
-        "current_section": current_section,  # Sección actual para resaltar en el menú
-        "dashboard_access": navlinks
+        "group": dashboard_access.get_group(),
+        "dashboard_access": dashboard_access.get_links(),
+        "current_section": current_path,    
     }
+
+
+class DashboardAccess:
+    
+    class LinksTitle:
+        INICIO = { 'type': 'link', 'label': 'Inicio', 'url': 'dashboard', }
+        RESERVA = {'type': 'menu', 'label': 'Reservas', 'url': 'reserva', 'childrens': [
+                        {'type': 'link', 'label': 'Crear', 'url': 'reserva_create'},
+                        {'type': 'link', 'label': 'Listado', 'url': 'reserva'},
+                        {'type': 'link', 'label': 'Calendario', 'url': 'calendario'},
+                    ]}
+        USUARIOS = {'type': 'link', 'label': 'Usuarios', 'url': 'usuarios'}
+        ESPACIOS = {'type': 'link', 'label': 'Espacios', 'url': 'espacios'}
+
+    links_for_group = {
+            GRUPOS.ADMINISTRADOR: [
+                LinksTitle.INICIO,
+                LinksTitle.RESERVA,
+                LinksTitle.USUARIOS,
+                LinksTitle.ESPACIOS,    
+            ],
+            GRUPOS.MODERADOR: [
+                LinksTitle.INICIO,
+                LinksTitle.RESERVA,
+                LinksTitle.USUARIOS,
+            ],
+            GRUPOS.USUARIO: [
+                LinksTitle.INICIO,
+                LinksTitle.RESERVA,
+            ],
+        }
+ 
+    def __init__(self, user):
+        self.user = user
+        self.links = self.get_links_by_group(self.get_group())        
+
+    def get_links(self):
+        """
+        Obtiene los links del menu
+        """
+        return self.links
+
+    def get_group(self):
+        """
+        Obtiene el nombre del grupo del usuario
+        """
+        return self.user.groups.first().name if self.user.groups.exists() else GRUPOS.USUARIO
+    
+
+    def get_links_by_group(self, group):
+        """
+        Obtiene los links del menu segun el grupo del usuario
+        """
+        links = self.links_for_group[group]
+        return links
+
+
+

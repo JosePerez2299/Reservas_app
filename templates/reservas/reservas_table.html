@@ -1,46 +1,48 @@
-{% extends "includes/table_view.html" %}
+{% extends 'includes/table_view.html' %}
 {% load utils %}
 
 {% block header %}
-<div class="flex items-center gap-3 mb-2">
-    <div class="text-2xl text-primary">
-        {% get_icon model.label|lower %}
+  <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="text-2xl text-primary">
+            {% get_icon model.label|lower %}
+          </div>
+          <h1 class="text-3xl font-bold text-base-content">Gestión de Reservas</h1>
+        </div>
+        <p class="text-sm text-base-content/60 max-w-2xl">Administra y gestiona las reservas de espacios. Aquí podrás crear nuevas reservas, aprobar solicitudes pendientes y ver el historial de reservas.</p>
+      </div>
+
+    
+        <div class="flex items-center gap-3">
+          <a href="{% url crud_urls.create %}" class="btn btn-primary">
+            <i class="fas fa-plus text-xs"></i>
+            Crear {{ model.label|capfirst|slice:':-1' }}
+          </a>
+        </div>
     </div>
-    <h1 class="text-3xl font-bold text-base-content">Gestión de Reservas</h1>
-</div>
-<p class="text-sm text-base-content/60 max-w-2xl">
-    Administra y gestiona las reservas de espacios. Aquí podrás crear nuevas reservas, 
-    aprobar solicitudes pendientes y ver el historial de reservas.
-</p>
+  </div>
 {% endblock %}
 
 {% block table_actions %}
   {% if not request.user.is_usuario %}
     <div class="join">
-      <a
-        href="{% url 'reserva' %}?usuario={{ request.user.username }}"
-        class="join-item btn btn-sm btn-ghost border border-base-300 gap-2"
-      >
+      <a href="{% url 'reserva' %}?usuario={{ request.user.username }}" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
         <i class="fas fa-user text-xs"></i>
         <span>Mis reservas</span>
       </a>
-    {% if request.user.is_moderador %}
-      <a
-      href="{% url 'reserva' %}?estado=pendiente&piso={{ request.user.piso }}&ubicacion={{ request.user.ubicacion.id }}"
-      class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
-    >
-      <i class="fas fa-check text-xs"></i>
-      <span>Por aprobar</span>
-    </a>
-    {% elif request.user.is_admin %}
-      <a
-      href="{% url 'reserva' %}?estado=pendiente"
-      class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2"
-    >
-      <i class="fas fa-check text-xs"></i>
-      <span>Por aprobar</span>
-    </a>
-    {% endif %}
+      {% if request.user.is_moderador %}
+        <a href="{% url 'reserva' %}?estado=pendiente&piso={{ request.user.piso }}&ubicacion={{ request.user.ubicacion.id }}" class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2">
+          <i class="fas fa-check text-xs"></i>
+          <span>Por aprobar</span>
+        </a>
+      {% elif request.user.is_admin %}
+        <a href="{% url 'reserva' %}?estado=pendiente" class="join-item btn btn-sm btn-outline btn-warning border border-base-300 gap-2">
+          <i class="fas fa-check text-xs"></i>
+          <span>Por aprobar</span>
+        </a>
+      {% endif %}
     </div>
   {% endif %}
 {% endblock %}
