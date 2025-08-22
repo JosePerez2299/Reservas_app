@@ -3423,6 +3423,12 @@
   .bg-success {
     background-color: var(--color-success);
   }
+  .bg-success\/5 {
+    background-color: var(--color-success);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-success) 5%, transparent);
+    }
+  }
   .bg-success\/20 {
     background-color: var(--color-success);
     @supports (color: color-mix(in lab, red, red)) {
@@ -4220,6 +4226,9 @@
   .radio-primary {
     --input-color: var(--color-primary);
   }
+  .radio-secondary {
+    --input-color: var(--color-secondary);
+  }
   .select-error {
     &, &:focus, &:focus-within {
       --input-color: var(--color-error);
@@ -4489,6 +4498,16 @@
       }
     }
   }
+  .hover\:border-success\/50 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-success);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(in oklab, var(--color-success) 50%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-base-200 {
     &:hover {
       @media (hover: hover) {
@@ -4750,11 +4769,24 @@
       border-color: var(--color-primary);
     }
   }
+  .has-\[\:checked\]\:border-success {
+    &:has(*:is(:checked)) {
+      border-color: var(--color-success);
+    }
+  }
   .has-\[\:checked\]\:bg-primary\/5 {
     &:has(*:is(:checked)) {
       background-color: var(--color-primary);
       @supports (color: color-mix(in lab, red, red)) {
         background-color: color-mix(in oklab, var(--color-primary) 5%, transparent);
+      }
+    }
+  }
+  .has-\[\:checked\]\:bg-success\/5 {
+    &:has(*:is(:checked)) {
+      background-color: var(--color-success);
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-success) 5%, transparent);
       }
     }
   }
