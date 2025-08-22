@@ -1,6 +1,105 @@
-<form class='w-2xl min-h-50vh' hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
-    {% csrf_token %}
-    <label><input type="radio" name="tipo" value="fisico" required> Físico</label><br>
-    <label><input type="radio" name="tipo" value="virtual" required> Virtual</label><br>
-    <button class='btn' type="submit">Siguiente</button>
-</form>
+
+ <div data-step="1">
+        <!-- Formulario -->
+        <form class="space-y-8"  hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
+            {% csrf_token %}
+            <!-- Opciones de tipo de reserva -->
+            <div class="grid gap-4 md:gap-6">
+                
+                <!-- Opción Físico -->
+                <div class="card bg-base-200 border-2 border-base-300 hover:border-primary/50 
+                           hover:shadow-lg transition-all duration-300 cursor-pointer
+                           has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <label class="card-body p-6 cursor-pointer">
+                        <div class="flex items-center space-x-4">
+                            <!-- Radio button nativo de DaisyUI -->
+                            <div class="flex-shrink-0">
+                                <input type="radio" name="tipo" value="fisico" 
+                                       class="radio radio-primary radio-lg" required>
+                            </div>
+                            
+                            <!-- Icono -->
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Contenido -->
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-semibold text-base-content mb-2">Reserva Físico</h3>
+                                <p class="text-base-content/60">Reserva de espacio físico en nuestras instalaciones</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Opción Virtual -->
+                <div class="card bg-base-200 border-2 border-base-300 hover:border-primary/50 
+                           hover:shadow-lg transition-all duration-300 cursor-pointer
+                           has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <label class="card-body p-6 cursor-pointer">
+                        <div class="flex items-center space-x-4">
+                            <!-- Radio button nativo de DaisyUI -->
+                            <div class="flex-shrink-0">
+                                <input type="radio" name="tipo" value="virtual" 
+                                       class="radio radio-primary radio-lg" required>
+                            </div>
+                            
+                            <!-- Icono -->
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Contenido -->
+                            <div class="flex-grow">
+                                <h3 class="text-xl font-semibold text-base-content mb-2">Reserva Virtual</h3>
+                                <p class="text-base-content/60">Reserva de sesión virtual online</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Botón de continuar -->
+            <div class="flex justify-end ">
+                <button type="submit" class="btn btn-primary group">
+                    Siguiente
+                    <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Agregar interactividad adicional si es necesaria
+        document.querySelectorAll('input[name="tipo"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Remover clases activas de todas las cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('border-primary', 'bg-primary/5');
+                    card.classList.add('border-base-300');
+                });
+                
+                // Agregar clases activas a la card seleccionada
+                const selectedCard = this.closest('.card');
+                selectedCard.classList.remove('border-base-300');
+                selectedCard.classList.add('border-primary', 'bg-primary/5');
+            });
+        });
+    </script>
+</div>
+
+

@@ -1,31 +1,34 @@
-{% if tipo == "fisico" %}
-<form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
-    {% csrf_token %}
-    <label>Dirección:
-        <input type="text" name="direccion" value="{{ data.direccion|default:'' }}">
-    </label><br>
-    <label>Capacidad:
-        <input type="number" name="capacidad" value="{{ data.capacidad|default:'' }}">
-    </label><br>
-    <input type="hidden" name="tipo" value="{{ tipo }}">
-    <button type="submit">Siguiente</button>
-</form>
-{% elif tipo == "virtual" %}
-<form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
-    {% csrf_token %}
+<div  data-step="2">
 
-    <label>Plataforma:
-        <input type="text" name="plataforma" value="{{ data.plataforma|default:'' }}">
-    </label><br>
-    <label>Enlace:
-        <input type="url" name="enlace" value="{{ data.enlace|default:'' }}">
-    </label><br>
-    <input type="hidden" name="tipo" value="{{ tipo }}">
-    <button type="submit">Siguiente</button>
-</form>
-{% endif %}
+    {% if tipo == "fisico" %}
+    <form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
+        {% csrf_token %}
+        <label>Dirección:
+            <input type="text" name="direccion" value="{{ data.direccion|default:'' }}">
+        </label><br>
+        <label>Capacidad:
+            <input type="number" name="capacidad" value="{{ data.capacidad|default:'' }}">
+        </label><br>
+        <input type="hidden" name="tipo" value="{{ tipo }}">
+        <button type="submit">Siguiente</button>
+    </form>
+    {% elif tipo == "virtual" %}
+    <form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
+        {% csrf_token %}
 
-<!-- botón volver -->
-<form hx-get="{% url 'wizard_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
-    <button type="submit">Volver</button>
-</form>
+        <label>Plataforma:
+            <input type="text" name="plataforma" value="{{ data.plataforma|default:'' }}">
+        </label><br>
+        <label>Enlace:
+            <input type="url" name="enlace" value="{{ data.enlace|default:'' }}">
+        </label><br>
+        <input type="hidden" name="tipo" value="{{ tipo }}">
+        <button type="submit">Siguiente</button>
+    </form>
+    {% endif %}
+
+    <!-- botón volver -->
+    <form hx-get="{% url 'wizard_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
+        <button type="submit">Volver</button>
+    </form>
+</div>

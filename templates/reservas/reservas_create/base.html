@@ -1,5 +1,89 @@
+<div class='p-7' >
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 shadow-lg">
+            <i class="fas fa-calendar-alt text-2xl text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Reserva de Espacios</h1>
+        <p class="text-gray-600">Sistema integral de gestión de reservas</p>
+    </div>
 
+    <!-- Progreso Visual -->
+    <div id="progress" class="mb-8">
+        <div class="flex items-center justify-center space-x-4">
+            <!-- Paso 1 -->
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-300 text-gray-600" id="step-1">1</div>
+                <span class="ml-3 text-sm font-medium text-gray-500" id="step-1-text">Tipo de Espacio</span>
+            </div>
+            <div class="w-16 h-px bg-gray-300" id="progress-line-1"></div>
+            <!-- Paso 2 -->
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-300 text-gray-600" id="step-2">2</div>
+                <span class="ml-3 text-sm font-medium text-gray-500" id="step-2-text">Detalles</span>
+            </div>
+            <div class="w-16 h-px bg-gray-300" id="progress-line-2"></div>
+            <!-- Paso 3 -->
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-300 text-gray-600" id="step-3">3</div>
+                <span class="ml-3 text-sm font-medium text-gray-500" id="step-3-text">Confirmación</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor dinámico -->
     <div id="wizard-container"
          hx-get="{% url 'wizard_step1' %}"
          hx-trigger="load">
     </div>
+</div>
+
+<!-- Script progreso -->
+<script>
+document.body.addEventListener("htmx:afterSwap", function(evt) {
+    if (evt.target.id === "wizard-container") {
+        const stepDiv = evt.target.querySelector("[data-step]");
+        if (stepDiv) {
+            updateProgress(parseInt(stepDiv.dataset.step));
+        }
+    }
+});
+
+function updateProgress(step) {
+    // reset círculos y textos
+    ["1","2","3"].forEach(n => {
+        document.getElementById("step-"+n).className =
+            "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-gray-300 text-gray-600";
+        document.getElementById("step-"+n+"-text").className =
+            "ml-3 text-sm font-medium text-gray-500";
+    });
+    // reset líneas
+    ["1","2"].forEach(n => {
+        document.getElementById("progress-line-"+n).className = "w-16 h-px bg-gray-300";
+    });
+
+    // marcar pasos previos como completados
+    for (let i=1; i<step; i++) {
+        setDone(i);
+        if (document.getElementById("progress-line-"+i)) {
+            document.getElementById("progress-line-"+i).className = "w-16 h-px bg-green-500";
+        }
+    }
+    // marcar activo
+    setActive(step);
+}
+
+function setActive(n) {
+    document.getElementById("step-"+n).className =
+        "w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold";
+    document.getElementById("step-"+n+"-text").className =
+        "ml-3 text-sm font-medium text-blue-600";
+}
+
+function setDone(n) {
+    document.getElementById("step-"+n).className =
+        "w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold";
+    document.getElementById("step-"+n+"-text").className =
+        "ml-3 text-sm font-medium text-green-600";
+}
+</script>
