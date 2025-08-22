@@ -26,6 +26,27 @@ from django.views import View
 from django.views.generic import TemplateView
 from django.http import Http404
 
+from django.shortcuts import render
+
+def wizard(request):
+    # Carga inicial con el primer paso
+    return render(request, "reservas/reservas_create/base.html")
+
+def wizard_step1(request):
+    return render(request, "reservas/reservas_create/step1.html")
+
+def wizard_step2(request):
+    data = request.POST.dict()
+    tipo = data.get("tipo")
+    return render(request, "reservas/reservas_create/step2.html", {"tipo": tipo, "data": data})
+
+def wizard_step3(request):
+    # simula vista previa con los datos posteados
+    data = request.POST.dict()
+    return render(request, "reservas/reservas_create/step3.html", {"data": data})
+
+
+
 def qs_condiciones(user):
     if user.is_admin:
         return Q()

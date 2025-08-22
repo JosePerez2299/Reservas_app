@@ -1,0 +1,6 @@
+<form class='w-2xl min-h-50vh' hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
+    {% csrf_token %}
+    <label><input type="radio" name="tipo" value="fisico" required> Físico</label><br>
+    <label><input type="radio" name="tipo" value="virtual" required> Virtual</label><br>
+    <button class='btn' type="submit">Siguiente</button>
+</form>

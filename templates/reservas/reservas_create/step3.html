@@ -1,0 +1,19 @@
+<h3>Vista previa</h3>
+<ul>
+    {% for k,v in data.items %}
+        <li>{{ k }}: {{ v }}</li>
+    {% endfor %}
+</ul>
+
+<!-- botón volver al step2 conservando tipo -->
+<form hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
+    {% for k,v in data.items %}
+        <input type="hidden" name="{{ k }}" value="{{ v }}">
+    {% endfor %}
+    <button type="submit">Volver</button>
+</form>
+
+<!-- reiniciar al paso 1 sin refrescar -->
+<form hx-get="{% url 'wizard_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
+    <button type="submit">Reiniciar</button>
+</form>
