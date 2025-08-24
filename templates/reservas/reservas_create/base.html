@@ -35,17 +35,69 @@
     <div id="wizard-container"
          hx-get="{% url 'wizard_step1' %}"
          hx-trigger="load">
+        <!-- Spinner inicial -->
+        <div class="flex flex-col items-center justify-center py-12 space-y-4">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+            <p class="text-base-content/70">Cargando formulario...</p>
+        </div>
     </div>
 </div>
 
-<!-- Script progreso -->
+<!-- Script progreso y spinner -->
 <script>
+// Función para mostrar el spinner en el wizard
+function showWizardSpinner() {
+    const wizardContainer = document.getElementById('wizard-container');
+    wizardContainer.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-12 space-y-4">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+            <p class="text-base-content/70">Cargando...</p>
+        </div>
+    `;
+}
+
+// Evento antes de hacer la petición HTMX - mostrar spinner
+document.body.addEventListener("htmx:beforeRequest", function(evt) {
+    if (evt.target.id === "wizard-container" || evt.target.closest("#wizard-container")) {
+        showWizardSpinner();
+    }
+});
+
+// Evento después del intercambio - actualizar progreso
 document.body.addEventListener("htmx:afterSwap", function(evt) {
     if (evt.target.id === "wizard-container") {
         const stepDiv = evt.target.querySelector("[data-step]");
         if (stepDiv) {
             updateProgress(parseInt(stepDiv.dataset.step));
         }
+    }
+});
+
+// Manejar errores de carga en el wizard
+document.body.addEventListener("htmx:responseError", function(evt) {
+    if (evt.target.id === "wizard-container") {
+        const wizardContainer = document.getElementById('wizard-container');
+        wizardContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                <div class="text-error text-6xl">⚠️</div>
+                <p class="text-error font-semibold">Error al cargar el contenido</p>
+                <button class="btn btn-sm btn-outline" onclick="location.reload()">Reintentar</button>
+            </div>
+        `;
+    }
+});
+
+// Manejar problemas de conexión en el wizard
+document.body.addEventListener("htmx:sendError", function(evt) {
+    if (evt.target.id === "wizard-container") {
+        const wizardContainer = document.getElementById('wizard-container');
+        wizardContainer.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                <div class="text-warning text-6xl">🌐</div>
+                <p class="text-warning font-semibold">Sin conexión a internet</p>
+                <button class="btn btn-sm btn-outline" onclick="location.reload()">Reintentar</button>
+            </div>
+        `;
     }
 });
 
