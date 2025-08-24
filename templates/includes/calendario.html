@@ -114,19 +114,9 @@
                         <!-- Campo oculto para almacenar la fecha seleccionada -->
                         <input type="hidden" name="fecha_uso" x-model="selectedDate" />
                         </div>
-                        <button  
-                        x-show="selectedDate"  
-                        class="btn btn-xs btn-primary"
-                        @click="
-                            htmx.ajax('GET', '{% url 'reserva_create' %}', {
-                                target: '#generic_modal_content',
-                                swap: 'innerHTML',
-                                values: { 'fecha_uso': selectedDate }
-                            })
-                        ">
-                        <i class="fas fa-plus text-xs"></i>
-                        Crear Reserva
-                    </button>
+                        <button onclick="openModal('{% url 'reserva_create' %}')">
+                        Abrir Modal
+</button>
 
                 </div>
                 

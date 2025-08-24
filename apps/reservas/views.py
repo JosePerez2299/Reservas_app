@@ -27,8 +27,9 @@ from django.views.generic import TemplateView
 from django.http import Http404
 
 from django.shortcuts import render
-
+import time 
 def wizard(request):
+    time.sleep(5)  # Simula un retardo para ver el spinner
     # Carga inicial con el primer paso
     return render(request, "reservas/reservas_create/base.html")
 
@@ -36,6 +37,7 @@ def wizard_step1(request):
     return render(request, "reservas/reservas_create/step1.html")
 
 def wizard_step2(request):
+    time.sleep(5)  # Simula un retardo para ver el spinner
     data = request.POST.dict()
     tipo = data.get("tipo")
     return render(request, "reservas/reservas_create/step2.html", {"tipo": tipo, "data": data})

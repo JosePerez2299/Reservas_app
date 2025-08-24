@@ -148,12 +148,11 @@
                                         {% if puede_editar_obj and crud_urls.edit %}
                                         <div class="tooltip" data-tip="Editar">
                                             <button
-                                                onclick="generic_modal.showModal()"
+                                                onclick="openModal('{% url crud_urls.edit obj.pk %}')"
                                                 class="btn btn-ghost btn-sm h-8 w-8 p-0"
-                                                hx-get="{% url crud_urls.edit obj.pk %}"
-                                                hx-target="#generic_modal_content"
-                                                hx-swap="innerHTML"
-                                            ><i class="fas fa-edit text-xs"></i></button>
+                                            >
+                                            <i class="fas fa-edit text-xs"></i>
+                                        </button>
                                         </div>
                                         {% endif %}
                                     </div>
