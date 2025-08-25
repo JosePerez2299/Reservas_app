@@ -25,29 +25,50 @@ from datetime import datetime
 from django.views import View
 from django.views.generic import TemplateView
 from django.http import Http404
-
 from django.shortcuts import render
 import time 
-def wizard(request):
-    time.sleep(5)  # Simula un retardo para ver el spinner
-    # Carga inicial con el primer paso
-    return render(request, "reservas/reservas_create/base.html")
 
-def wizard_step1(request):
-    return render(request, "reservas/reservas_create/step1.html")
+class ReservaCreateWizardView(LoginRequiredMixin, TemplateView):
+    """
+    Vista inicial del wizard para crear reservas
+    """
+    template_name = "reservas/reservas_create/base.html"
+    
 
-def wizard_step2(request):
-    time.sleep(5)  # Simula un retardo para ver el spinner
-    data = request.POST.dict()
-    tipo = data.get("tipo")
-    return render(request, "reservas/reservas_create/step2.html", {"tipo": tipo, "data": data})
+class ReservaCreateStep1View(LoginRequiredMixin, TemplateView):
+    """
+    Primer paso del wizard para crear reservas - Selección de tipo
+    """
+    template_name = "reservas/reservas_create/step1.html"
 
-def wizard_step3(request):
-    # simula vista previa con los datos posteados
-    data = request.POST.dict()
-    return render(request, "reservas/reservas_create/step3.html", {"data": data})
+class ReservaCreateStep2View(LoginRequiredMixin, View):
+    """
+    Segundo paso del wizard para crear reservas - Configuración de detalles
+    """
+    template_name = "reservas/reservas_create/step2.html"
+    
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+    
+    def post(self, request, *args, **kwargs):
+        data = request.POST.dict()
+        tipo = data.get("tipo")
+        return render(request, self.template_name, {"tipo": tipo, "data": data})
 
 
+class ReservaCreateStep3View(LoginRequiredMixin, View):
+    """
+    Tercer paso del wizard para crear reservas - Vista previa y confirmación
+    """
+    template_name = "reservas/reservas_create/step3.html"
+    
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+    
+    def post(self, request, *args, **kwargs):
+        # simula vista previa con los datos posteados
+        data = request.POST.dict()
+        return render(request, self.template_name, {"data": data})
 
 def qs_condiciones(user):
     if user.is_admin:

@@ -1,7 +1,7 @@
 
  <div data-step="1">
         <!-- Formulario -->
-        <form class="space-y-8"  hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
+        <form class="space-y-8"  hx-post="{% url 'reserva_create_step2' %}" hx-target="#wizard-container">
             {% csrf_token %}
             <!-- Opciones de tipo de reserva -->
             <div class="grid gap-4 md:gap-6">

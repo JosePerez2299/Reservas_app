@@ -21,7 +21,6 @@ class DashboardAccess:
     class LinksTitle:
         INICIO = { 'type': 'link', 'label': 'Inicio', 'url': 'dashboard', }
         RESERVA = {'type': 'menu', 'label': 'Reservas', 'url': 'reserva', 'childrens': [
-                        {'type': 'link', 'label': 'Crear', 'url': 'reserva_create'},
                         {'type': 'link', 'label': 'Listado', 'url': 'reserva'},
                         {'type': 'link', 'label': 'Calendario', 'url': 'calendario'},
                     ]}

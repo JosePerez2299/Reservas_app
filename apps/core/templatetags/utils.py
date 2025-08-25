@@ -13,6 +13,7 @@ register = template.Library()
 def get_icon(icon_name):
 
     dict_icons = {
+        'listado': 'fas fa-list-alt',
         'calendario': 'fas fa-calendar-alt',
         'reserva': 'fas fa-calendar-alt',
         'reservas': 'fas fa-calendar-alt',

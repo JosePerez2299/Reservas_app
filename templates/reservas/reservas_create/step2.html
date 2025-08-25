@@ -1,7 +1,7 @@
 <div  data-step="2">
 
     {% if tipo == "fisico" %}
-    <form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
+    <form hx-post="{% url 'reserva_create_step3' %}" hx-target="#wizard-container">
         {% csrf_token %}
         <label>Dirección:
             <input type="text" name="direccion" value="{{ data.direccion|default:'' }}">
@@ -13,7 +13,7 @@
         <button type="submit">Siguiente</button>
     </form>
     {% elif tipo == "virtual" %}
-    <form hx-post="{% url 'wizard_step3' %}" hx-target="#wizard-container">
+    <form hx-post="{% url 'reserva_create_step3' %}" hx-target="#wizard-container">
         {% csrf_token %}
 
         <label>Plataforma:
@@ -28,7 +28,7 @@
     {% endif %}
 
     <!-- botón volver -->
-    <form hx-get="{% url 'wizard_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
+    <form hx-get="{% url 'reserva_create_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
         <button type="submit">Volver</button>
     </form>
 </div>

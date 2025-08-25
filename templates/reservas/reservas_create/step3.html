@@ -7,7 +7,7 @@
     </ul>
 
     <!-- botón volver al step2 conservando tipo -->
-    <form hx-post="{% url 'wizard_step2' %}" hx-target="#wizard-container">
+    <form hx-post="{% url 'reserva_create_step2' %}" hx-target="#wizard-container">
         {% for k,v in data.items %}
             <input type="hidden" name="{{ k }}" value="{{ v }}">
         {% endfor %}
@@ -15,7 +15,7 @@
     </form>
 
     <!-- reiniciar al paso 1 sin refrescar -->
-    <form hx-get="{% url 'wizard_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
+        <form hx-get="{% url 'reserva_create_step1' %}" hx-target="#wizard-container" style="margin-top:10px;">
         <button type="submit">Reiniciar</button>
     </form>
 <div/>
