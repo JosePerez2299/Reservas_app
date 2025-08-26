@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from apps.usuarios.models import Ubicacion
 
 
@@ -16,16 +17,13 @@ class PlataformaDigital(models.Model):
         return f"{self.nombre}"
 
 
+
+
 class Espacio(models.Model):
 
-    class TipoUbicacion(models.TextChoices):
+    class Tipo(models.TextChoices):
         FISICO = 'fisico', 'Físico'
         DIGITAL = 'digital', 'Digital'
-
-    class Tipo(models.TextChoices):
-        SALON = 'salon', 'Salón'
-        LABORATORIO = 'laboratorio', 'Laboratorio'
-        AUDITORIO = 'auditorio', 'Auditorio'
 
     nombre = models.CharField(max_length=20, unique=True, blank=False,
                               validators=[
@@ -35,14 +33,13 @@ class Espacio(models.Model):
                                   )
                               ])
 
-
     capacidad_maxima = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000), MinValueValidator(1)],
-        help_text="Capacidad máxima (≤ 1000)"
+        validators=[MaxValueValidator(5000), MinValueValidator(1)],
+        help_text="Capacidad máxima (≤ 5000)"
     )
 
-    tipo_ubicacion = models.CharField(
-        max_length=20, choices=TipoUbicacion.choices)
+    tipo = models.CharField(
+        max_length=20, choices=Tipo.choices)
   
     disponible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now=True)
@@ -51,32 +48,24 @@ class Espacio(models.Model):
         "Descripción", null=True, blank=True
     )
 
+    activo = models.BooleanField(default=True)
+
     class Meta:
         verbose_name = "Espacio"
         verbose_name_plural = "Espacios"
-        ordering = ['tipo_ubicacion',  'nombre']
+        ordering = ['tipo',  'nombre']
         indexes = [
-            models.Index(fields=['tipo_ubicacion'])
+            models.Index(fields=['tipo'])
         ]
         constraints = [
             models.CheckConstraint(
-                check=Q(capacidad_maxima__lte=1000),
-                name='check_capacidad_max_1000'
-            ),
-            models.CheckConstraint(
-                check=Q(tipo_ubicacion='digital') & Q(tipo__isnull=True),
-                name='check_tipo_digital_no_nulo',
-                violation_error_message="El tipo de espacio debe ser nulo si el espacio es digital."
-            ),
-            models.CheckConstraint(
-                check=Q(tipo_ubicacion='fisico') & Q(tipo__isnull=False),
-                name='check_tipo_fisico_no_nulo',
-                violation_error_message="El tipo de espacio debe ser no nulo si el espacio es físico."
+                check=Q(capacidad_maxima__lte=5000),
+                name='check_capacidad_max_5000'
             ),
         ]
 
     def ubicacion(self):
-        if self.tipo_ubicacion == 'fisico':
+        if self.tipo == 'fisico':
             return self.detalles_fisicos.first().ubicacion.nombre
         return self.detalles_digitales.first().plataforma.nombre
 
@@ -100,20 +89,46 @@ class DetalleEspacioDigital(models.Model):
                 name='uniq_espacio_digital',
                 violation_error_message="Ya existe un detalle de espacio digital para este espacio."
             )
-
         ]
 
+    def clean(self):
+        super().clean()
+        
+        # Validar que el espacio sea de tipo digital
+        if self.espacio and self.espacio.tipo != 'digital':
+            raise ValidationError({
+                'espacio': f'El espacio "{self.espacio.nombre}" debe ser de tipo digital para tener detalles digitales.'
+            })
+        
+        # Validar que no existan detalles físicos para el mismo espacio
+        if self.espacio and hasattr(self.espacio, 'detalles_fisicos') and self.espacio.detalles_fisicos.exists():
+            raise ValidationError({
+                'espacio': f'El espacio "{self.espacio.nombre}" ya tiene detalles físicos. No puede tener ambos tipos de detalles.'
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.capacidad_maxima}"
+        return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.espacio.capacidad_maxima}"
 
 
 class DetalleEspacioFisico(models.Model):
+    class Tipo(models.TextChoices):
+        SALON = 'salon', 'Salón'
+        LABORATORIO = 'laboratorio', 'Laboratorio'
+        AUDITORIO = 'auditorio', 'Auditorio'
+
     espacio = models.ForeignKey(
         Espacio, on_delete=models.CASCADE, related_name='detalles_fisicos')
     piso = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
         help_text="Piso en que se encuentra el espacio (≤ 40)"
     )
+    tipo = models.CharField(
+        max_length=20, choices=Tipo.choices)
+    
     ubicacion = models.ForeignKey(
         Ubicacion, on_delete=models.CASCADE, related_name='espacios_fisicos')
 
@@ -125,9 +140,29 @@ class DetalleEspacioFisico(models.Model):
                 fields=['espacio'],
                 name='uniq_espacio_fisico',
                 violation_error_message="Ya existe un detalle de espacio físico para este espacio."
-            ),
+            )
         ]
 
+    def clean(self):
+        super().clean()
+        
+        # Validar que el espacio sea de tipo físico
+        if self.espacio and self.espacio.tipo != 'fisico':
+            raise ValidationError({
+                'espacio': f'El espacio "{self.espacio.nombre}" debe ser de tipo físico para tener detalles físicos.'
+            })
+        
+        # Validar que no existan detalles digitales para el mismo espacio
+        if self.espacio and hasattr(self.espacio, 'detalles_digitales') and self.espacio.detalles_digitales.exists():
+            raise ValidationError({
+                'espacio': f'El espacio "{self.espacio.nombre}" ya tiene detalles digitales. No puede tener ambos tipos de detalles.'
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.capacidad_maxima}"
+        return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.espacio.capacidad_maxima}"
+
+

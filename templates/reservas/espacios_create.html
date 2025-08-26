@@ -14,32 +14,51 @@
         </div>
     </div>
 
-    <form method="post" action="{% url 'espacio_create' %}" class="flex flex-col gap-4">
+    <form
+    class="flex flex-wrap gap-4"
+    method="POST"
+    hx-post="{{ url }}"
+    hx-target="#generic_modal_content"
+    hx-swap="innerHTML"
+  >
         {% csrf_token %}
-        
-        <div class="flex flex-col gap-2">
-            <label for="{{ form.nombre.id_for_label }}" class="label">{{ form.nombre.label }}</label>
-            {{ form.nombre }}
-        </div>
-        <!-- Campos básicos -->
-        <div class="flex flex-col gap-2">
-            <label class="label">{{ form.tipo_ubicacion.label }}</label>
-            <div class="flex gap-4">
-                {{ form.tipo_ubicacion }}
+        <div class="flex flex-col gap-2 border border-base-300 shadow-xl  bg-amber-200">
+            <div class="text-red-500">
+            {{ form.errors }}
             </div>
+            
+            <div class="flex flex-col gap-2 ">
+                <label for="{{ form.nombre.id_for_label }}" class="label">{{ form.nombre.label }}</label>
+                {{ form.nombre }}
+            </div>
+            <!-- Campos básicos -->
+            <div class="flex flex-col gap-2">
+                <label class="label">{{ form.tipo.label }}</label>
+                <div class="flex gap-4">
+                    {{ form.tipo }}
+                </div>
+            </div>
+
         </div>
         
         <!-- Campos específicos para espacios físicos -->
-        <div id="fields-fisico" class="hidden space-y-2">
+        <div id="fields-fisico" class="hidden space-y-2 border border-base-300 shadow-xl">
             <h2 class="text-lg font-bold">Espacio Físico</h2>
             <div class="flex flex-col gap-2">
-                <label for="{{ form.ubicacion.id_for_label }}" class="label">{{ form.ubicacion.label }}</label>
+                <label for="{{ form.ubicacion.id_for_label }}" class="label">
+                    {{ form.ubicacion.label }} <span class="text-error">*</span>
+                </label>
                 {{ form.ubicacion }}
             </div>
 
             <div class="flex flex-col gap-2">
-                <label for="{{ form.tipo.id_for_label }}" class="label">{{ form.tipo.label }}</label>
-                {{ form.tipo }}
+                <label for="{{ form.espacio_tipo.id_for_label }}" class="label">{{ form.espacio_tipo.label }}</label>
+                {{ form.espacio_tipo }}
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.piso.id_for_label }}" class="label">{{ form.piso.label }}</label>
+                {{ form.piso }}
             </div>
         </div>
         
@@ -55,25 +74,25 @@
         
         
         
-        <div class="flex flex-col gap-2">
-            <label for="{{ form.piso.id_for_label }}" class="label">{{ form.piso.label }}</label>
-            {{ form.piso }}
+        <!-- Campos comunes -->
+        <div class="flex flex-col gap-2 border border-base-300 shadow-xl">
+            <div class="flex flex-col gap-2">   
+                <label for="{{ form.capacidad_maxima.id_for_label }}" class="label">{{ form.capacidad_maxima.label }}</label>
+                {{ form.capacidad_maxima }}
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.descripcion.id_for_label }}" class="label">{{ form.descripcion.label }}</label>
+                {{ form.descripcion }}
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.disponible.id_for_label }}" class="label">{{ form.disponible.label }}</label>
+                {{ form.disponible }}
+            </div>
         </div>
         
-        <div class="flex flex-col gap-2">
-            <label for="{{ form.capacidad_maxima.id_for_label }}" class="label">{{ form.capacidad_maxima.label }}</label>
-            {{ form.capacidad_maxima }}
-        </div>
         
-        <div class="flex flex-col gap-2">
-            <label for="{{ form.descripcion.id_for_label }}" class="label">{{ form.descripcion.label }}</label>
-            {{ form.descripcion }}
-        </div>
-        
-        <div class="flex flex-col gap-2">
-            <label for="{{ form.disponible.id_for_label }}" class="label">{{ form.disponible.label }}</label>
-            {{ form.disponible }}
-        </div>
         
 
         <button class="btn btn-primary" type="submit">Guardar</button>
@@ -88,7 +107,7 @@
 (function() {
     
     // Buscar los radio buttons dentro del contenido que se acaba de cargar
-    const tipoUbicacionRadios = document.querySelectorAll('input[name="tipo_ubicacion"]');
+    const tipoUbicacionRadios = document.querySelectorAll('input[name="tipo"]');
     
     if (tipoUbicacionRadios.length > 0) {
         
@@ -110,7 +129,7 @@
         // Función para manejar el cambio
         function handleTipoChange() {
             // Encontrar el radio button seleccionado
-            const tipoSeleccionado = document.querySelector('input[name="tipo_ubicacion"]:checked');
+            const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked');
             const tipo = tipoSeleccionado ? tipoSeleccionado.value : null;
             
             const fieldsFisico = document.getElementById('fields-fisico');
