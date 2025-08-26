@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models import Q, F
 from apps.espacios.models import Espacio
 from apps.usuarios.models import Usuario
+from apps.usuarios.models import Ubicacion
 
 
 # ——— 4. Reserva ————————————————————————————————————————————————
@@ -21,7 +22,7 @@ class Reserva(models.Model):
     )
     fecha_uso = models.DateField()
     hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
+    hora_fin = models.TimeField()   
     estado = models.CharField(
         max_length=10, choices=Estado.choices, default=Estado.PENDIENTE
     )
@@ -34,6 +35,17 @@ class Reserva(models.Model):
     aprobado_por = models.ForeignKey(
         Usuario, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='reservas_aprobadas'
+    )
+
+    numero_participantes = models.IntegerField(
+        "Número de participantes", null=False, blank=False, default=1
+    )
+
+    fecha_creacion = models.DateTimeField(
+        "Fecha de creación", auto_now_add=True
+    )
+    fecha_cambio_estado = models.DateTimeField(
+        "Fecha de cambio de estado", null=True, blank=True
     )
 
     class Meta:
@@ -61,6 +73,10 @@ class Reserva(models.Model):
 
     def __str__(self):
         return f"US:{self.usuario.username} | ESP:{self.espacio.nombre}"
+
+
+    def tipo_reserva(self):
+        return self.espacio.tipo
 
     def clean(self):
         super().clean()
@@ -105,3 +121,60 @@ class Reserva(models.Model):
                 raise ValidationError(
                     "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
                 )
+
+
+class DetalleReservaDigital(models.Model):
+    # To do: Validar que reserva.espacio.tipo == 'digital'
+    # To do: Reserva unique constraint
+    reserva = models.ForeignKey(
+        Reserva, on_delete=models.CASCADE, related_name='detalles'
+    )
+
+    anfitrion_usuario = models.CharField(max_length=100, null=True, blank=True)
+
+    ubicacion_transmision = models.ForeignKey(
+        Ubicacion, on_delete=models.CASCADE, related_name='reservas_digitales', null=True, blank=True
+    )
+
+    # Espacio donde se realizara la transmisión
+    espacio_transmision = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Detalle Reserva Digital"
+        verbose_name_plural = "Detalles de Reservas Digitales"
+        ordering = ['-reserva__fecha_uso', 'reserva__hora_inicio']
+        indexes = [
+            models.Index(fields=['reserva']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['reserva'],
+                name='uniq_reserva_digital',
+                violation_error_message="Ya existe un detalle de reserva digital para esta reserva."
+            ),
+        ]
+
+    def __str__(self):
+        return f"Reserva: {self.reserva.id} | Anfitrion: {self.anfitrion_usuario}"
+
+
+
+class RequerimientoReserva(models.Model):
+
+    class Tipo(models.TextChoices):
+        PRODUCCION = 'produccion', 'Producción'
+        COMUNICACIONAL = 'comunicacional', 'Comunicacional'
+        OTRO = 'otro', 'Otro'
+
+    reserva = models.ForeignKey(
+        Reserva, on_delete=models.CASCADE, related_name='requerimientos'
+    )
+
+    nombre = models.CharField(max_length=100)
+    observacion = models.TextField(null=True, blank=True)
+    tipo = models.CharField(max_length=100, choices=Tipo.choices)
+
+    class Meta:
+        verbose_name = "Requerimiento de Reserva"
+        verbose_name_plural = "Requerimientos de Reservas"
+        ordering = ['-reserva__fecha_uso', 'reserva__hora_inicio']
