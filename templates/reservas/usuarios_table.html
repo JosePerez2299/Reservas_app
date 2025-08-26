@@ -2,14 +2,28 @@
 {% load utils %}
 
 {% block header %}
-<div class="flex items-center gap-3 mb-2">
-    <div class="text-2xl text-primary">
-        {% get_icon model.label|lower %}
+  <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="text-2xl text-primary">
+            {% get_icon model.label|lower %}
+          </div>
+          <h1 class="text-3xl font-bold text-base-content">Gestión de Usuarios</h1>
+        </div>
+        <p class="text-sm text-base-content/60 max-w-2xl">Administra y gestiona los usuarios de la aplicación. Aquí podrás crear nuevos usuarios, editar usuarios existentes y ver el historial de usuarios.</p>
+      </div>
+
+    
+        <div class="flex items-center gap-3">
+            <button
+                onclick="openModal('{% url crud_urls.create %}')"
+                class="btn btn-primary"
+            >
+                <i class="fas fa-plus text-xs"></i>
+                Crear {{ model.label|capfirst|slice:':-1' }}
+            </button>
+        </div>
     </div>
-    <h1 class="text-3xl font-bold text-base-content">Gestión de Usuarios</h1>
-</div>
-<p class="text-sm text-base-content/60 max-w-2xl">
-    Administra y gestiona los usuarios de la aplicación. Aquí podrás crear nuevos usuarios, 
-    editar usuarios existentes y ver el historial de usuarios.
-</p>
+  </div>
 {% endblock %}

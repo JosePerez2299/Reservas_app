@@ -19,39 +19,42 @@ class PlataformaDigital(models.Model):
 class Espacio(models.Model):
 
     class TipoUbicacion(models.TextChoices):
-        FISICO      = 'fisico', 'Físico'
-        DIGITAL     = 'digital', 'Digital'
+        FISICO = 'fisico', 'Físico'
+        DIGITAL = 'digital', 'Digital'
 
-    class Tipo(models.TextChoices): 
-        SALON     = 'salon', 'Salón'
+    class Tipo(models.TextChoices):
+        SALON = 'salon', 'Salón'
         LABORATORIO = 'laboratorio', 'Laboratorio'
-        AUDITORIO   = 'auditorio', 'Auditorio'
+        AUDITORIO = 'auditorio', 'Auditorio'
 
-    nombre      = models.CharField(max_length=20, unique=True, blank=False,
-            validators=[
-                RegexValidator(
-                   r"^[a-zA-Z][a-zA-Z0-9 ]*",
-                    message="El nombre del espacio debe comenzar con una letra, y solo puede contener letras, números y espacios."
-                )
-        ]) 
+    nombre = models.CharField(max_length=20, unique=True, blank=False,
+                              validators=[
+                                  RegexValidator(
+                                      r"^[a-zA-Z][a-zA-Z0-9 ]*",
+                                      message="El nombre del espacio debe comenzar con una letra, y solo puede contener letras, números y espacios."
+                                  )
+                              ])
 
-    piso        = models.PositiveSmallIntegerField(
+    piso = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
         help_text="Piso en que se encuentra el espacio (≤ 40)"
     )
-    capacidad_maxima  = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000),MinValueValidator(1)],
+    capacidad_maxima = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(1000), MinValueValidator(1)],
         help_text="Capacidad máxima (≤ 1000)"
     )
 
-    tipo_ubicacion = models.CharField(max_length=20, choices=TipoUbicacion.choices)
-    tipo        = models.CharField(max_length=20, choices=Tipo.choices, null=True, blank=True)
-    disponible  = models.BooleanField(default=True)
-    created_at  = models.DateTimeField(auto_now=True)
+    tipo_ubicacion = models.CharField(
+        max_length=20, choices=TipoUbicacion.choices)
+    tipo = models.CharField(
+        max_length=20, choices=Tipo.choices, null=True, blank=True)
+    disponible = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     descripcion = models.TextField(
         "Descripción", null=True, blank=True
     )
+
     class Meta:
         verbose_name = "Espacio"
         verbose_name_plural = "Espacios"
@@ -80,19 +83,21 @@ class Espacio(models.Model):
         if self.tipo_ubicacion == 'fisico':
             return self.detalles_fisicos.first().ubicacion.nombre
         return self.detalles_digitales.first().plataforma.nombre
-    def __str__(self):
-        return f"{self.nombre}" 
 
+    def __str__(self):
+        return f"{self.nombre}"
 
 
 class DetalleEspacioDigital(models.Model):
-    espacio = models.ForeignKey(Espacio, on_delete=models.CASCADE, related_name='detalles_digitales')
+    espacio = models.ForeignKey(
+        Espacio, on_delete=models.CASCADE, related_name='detalles_digitales')
     capacidad_maxima = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000),MinValueValidator(1)],
+        validators=[MaxValueValidator(1000), MinValueValidator(1)],
         help_text="Capacidad máxima (≤ 1000)"
     )
 
-    plataforma = models.ForeignKey(PlataformaDigital, on_delete=models.CASCADE, related_name='detalles')
+    plataforma = models.ForeignKey(
+        PlataformaDigital, on_delete=models.CASCADE, related_name='detalles')
 
     class Meta:
         verbose_name = "Detalle Espacio Digital"
@@ -102,12 +107,8 @@ class DetalleEspacioDigital(models.Model):
                 fields=['espacio'],
                 name='uniq_espacio_digital',
                 violation_error_message="Ya existe un detalle de espacio digital para este espacio."
-            ),
-            models.CheckConstraint(
-                check=Q(espacio__tipo_ubicacion='digital'),
-                name='check_tipo_ubicacion_digital',
-                violation_error_message="El espacio debe ser digital para tener un detalle de espacio digital."
-            ),
+            )
+
         ]
 
     def __str__(self):
@@ -115,12 +116,15 @@ class DetalleEspacioDigital(models.Model):
 
 
 class DetalleEspacioFisico(models.Model):
-    espacio = models.ForeignKey(Espacio, on_delete=models.CASCADE, related_name='detalles_fisicos')
+    espacio = models.ForeignKey(
+        Espacio, on_delete=models.CASCADE, related_name='detalles_fisicos')
     capacidad_maxima = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000),MinValueValidator(1)],
+        validators=[MaxValueValidator(1000), MinValueValidator(1)],
         help_text="Capacidad máxima (≤ 1000)"
     )
-    ubicacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE, related_name='espacios_fisicos')
+    ubicacion = models.ForeignKey(
+        Ubicacion, on_delete=models.CASCADE, related_name='espacios_fisicos')
+
     class Meta:
         verbose_name = "Detalle Espacio Físico"
         verbose_name_plural = "Detalles de Espacios Físicos"
@@ -129,11 +133,6 @@ class DetalleEspacioFisico(models.Model):
                 fields=['espacio'],
                 name='uniq_espacio_fisico',
                 violation_error_message="Ya existe un detalle de espacio físico para este espacio."
-            ),
-            models.CheckConstraint(
-                check=Q(espacio__tipo_ubicacion='fisico'),
-                name='check_tipo_ubicacion_fisico',
-                violation_error_message="El espacio debe ser físico para tener un detalle de espacio físico."
             ),
         ]
 
