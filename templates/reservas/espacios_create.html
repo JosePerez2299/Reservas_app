@@ -1,101 +1,322 @@
-<div class="h-full flex w-3xl flex-col p-7">
+<div class="h-full flex w-2xl flex-col p-7">
 
-    <!-- Header con progreso a la derecha - ARRIBA -->
+    <!-- Header -->
     <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
-        <!-- Título a la izquierda -->
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
-                <i class="fas fa-edit text-sm"></i>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
             </div>
             <div>
                 <h1 class="text-lg font-bold">Crear Espacio</h1>
-                <p class="text-xs text-base-content/60">Sistema integral de gestión</p>
+                <p class="text-xs text-base-content/60">Configura un nuevo espacio para reservas</p>
             </div>
         </div>
     </div>
+    
+    <!-- Divisor -->
+    <div class="divider mt-0"></div>
 
     <form
-    class="flex flex-wrap gap-4"
-    method="POST"
-    hx-post="{{ url }}"
-    hx-target="#generic_modal_content"
-    hx-swap="innerHTML"
-  >
+        class="space-y-6 flex-1 overflow-auto"
+        method="POST"
+        hx-post="{{ url }}"
+        hx-target="#generic_modal_content"
+        hx-swap="innerHTML"
+    >
         {% csrf_token %}
-        <div class="flex flex-col gap-2 border border-base-300 shadow-xl  bg-amber-200">
-            <div class="text-red-500">
-            {{ form.errors }}
-            </div>
-            
-            <div class="flex flex-col gap-2 ">
-                <label for="{{ form.nombre.id_for_label }}" class="label">{{ form.nombre.label }}</label>
-                {{ form.nombre }}
-            </div>
-            <!-- Campos básicos -->
-            <div class="flex flex-col gap-2">
-                <label class="label">{{ form.tipo.label }}</label>
-                <div class="flex gap-4">
-                    {{ form.tipo }}
+        
+        <!-- Errores del formulario -->
+        {% if form.errors %}
+            <div class="alert alert-error mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <h4 class="font-semibold">Se encontraron errores en el formulario</h4>
+                    <div class="text-sm mt-1">Por favor, revisa los campos marcados.</div>
                 </div>
             </div>
+        {% endif %}
 
-        </div>
-        
-        <!-- Campos específicos para espacios físicos -->
-        <div id="fields-fisico" class="hidden space-y-2 border border-base-300 shadow-xl">
-            <h2 class="text-lg font-bold">Espacio Físico</h2>
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.ubicacion.id_for_label }}" class="label">
-                    {{ form.ubicacion.label }} <span class="text-error">*</span>
-                </label>
-                {{ form.ubicacion }}
-            </div>
+        <!-- Información Básica -->
+        <div class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Información Básica</h3>
+                        <p class="text-sm text-base-content/60">Identifica y clasifica el espacio</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Campo Nombre -->
+                    <div class="form-control">
+                        <label for="{{ form.nombre.id_for_label }}" class="label">
+                            <span class="label-text font-medium">{{ form.nombre.label }}</span>
+                            <span class="label-text-alt text-error">* Requerido</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                            </div>
+                            {{ form.nombre }}
+                        </div>
+                    </div>
 
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.espacio_tipo.id_for_label }}" class="label">{{ form.espacio_tipo.label }}</label>
-                {{ form.espacio_tipo }}
-            </div>
-
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.piso.id_for_label }}" class="label">{{ form.piso.label }}</label>
-                {{ form.piso }}
-            </div>
-        </div>
-        
-        <!-- Campos específicos para espacios digitales -->
-        <div id="fields-digital" class="hidden space-y-2">
-            <h2 class="text-lg font-bold">Espacio Digital</h2>
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.plataforma.id_for_label }}" class="label">{{ form.plataforma.label }}</label>
-                {{ form.plataforma }}
-            </div>
-   
-        </div>
-        
-        
-        
-        <!-- Campos comunes -->
-        <div class="flex flex-col gap-2 border border-base-300 shadow-xl">
-            <div class="flex flex-col gap-2">   
-                <label for="{{ form.capacidad_maxima.id_for_label }}" class="label">{{ form.capacidad_maxima.label }}</label>
-                {{ form.capacidad_maxima }}
-            </div>
-
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.descripcion.id_for_label }}" class="label">{{ form.descripcion.label }}</label>
-                {{ form.descripcion }}
-            </div>
-
-            <div class="flex flex-col gap-2">
-                <label for="{{ form.disponible.id_for_label }}" class="label">{{ form.disponible.label }}</label>
-                {{ form.disponible }}
+                    <!-- Campo Tipo -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">{{ form.tipo.label }}</span>
+                            <span class="label-text-alt text-error">* Requerido</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-3">
+                            {{ form.tipo }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        
-        
 
-        <button class="btn btn-primary" type="submit">Guardar</button>
+        <!-- Configuración -->
+        <div class="card bg-base-200 border border-base-300 hover:border-accent/30 transition-all duration-300">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Configuración</h3>
+                        <p class="text-sm text-base-content/60">Capacidad y disponibilidad</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <!-- Campo Capacidad -->
+                    <div class="form-control">
+                        <label for="{{ form.capacidad_maxima.id_for_label }}" class="label">
+                            <span class="label-text font-medium">{{ form.capacidad_maxima.label }}</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            {{ form.capacidad_maxima }}
+                        </div>
+                    </div>
+
+                    <!-- Campo Disponible -->
+                    <div class="form-control">
+                        <label for="{{ form.disponible.id_for_label }}" class="label">
+                            <span class="label-text font-medium">{{ form.disponible.label }}</span>
+                        </label>
+                        <div class="flex items-center gap-3 p-3 bg-base-100 rounded-lg border border-base-300">
+                            <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z"/>
+                            </svg>
+                            {{ form.disponible }}
+                            <span class="text-sm text-base-content/60">Disponible para reservas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detalles Espacio Físico -->
+        <div id="fields-fisico" class="hidden section-transition">
+            <div class="card bg-base-200 border border-base-300 hover:border-success/30 transition-all duration-300">
+                <div class="card-body p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Espacio Físico</h3>
+                            <p class="text-sm text-base-content/60">Ubicación y características</p>
+                        </div>
+                        <div class="badge badge-success badge-outline ml-auto">Presencial</div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Campo Ubicación -->
+                        <div class="form-control">
+                            <label for="{{ form.ubicacion.id_for_label }}" class="label">
+                                <span class="label-text font-medium">{{ form.ubicacion.label }}</span>
+                                <span class="label-text-alt text-error">* Requerido</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </div>
+                                {{ form.ubicacion }}
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <!-- Campo Tipo de Espacio -->
+                            <div class="form-control">
+                                <label for="{{ form.espacio_tipo.id_for_label }}" class="label">
+                                    <span class="label-text font-medium">{{ form.espacio_tipo.label }}</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"/>
+                                        </svg>
+                                    </div>
+                                    {{ form.espacio_tipo }}
+                                </div>
+                            </div>
+
+                            <!-- Campo Piso -->
+                            <div class="form-control">
+                                <label for="{{ form.piso.id_for_label }}" class="label">
+                                    <span class="label-text font-medium">{{ form.piso.label }}</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                        </svg>
+                                    </div>
+                                    {{ form.piso }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detalles Espacio Digital -->
+        <div id="fields-digital" class="hidden section-transition">
+            <div class="card bg-base-200 border border-base-300 hover:border-info/30 transition-all duration-300">
+                <div class="card-body p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-info/10 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Espacio Digital</h3>
+                            <p class="text-sm text-base-content/60">Plataforma virtual</p>
+                        </div>
+                        <div class="badge badge-info badge-outline ml-auto">Virtual</div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Campo Plataforma -->
+                        <div class="form-control">
+                            <label for="{{ form.plataforma.id_for_label }}" class="label">
+                                <span class="label-text font-medium">{{ form.plataforma.label }}</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"/>
+                                    </svg>
+                                </div>
+                                {{ form.plataforma }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información Adicional -->
+        <div class="card bg-base-200 border border-base-300 hover:border-neutral/30 transition-all duration-300">
+            <div class="card-body p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 bg-neutral/10 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-neutral" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 6h16M4 12h16M4 18h7"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Descripción</h3>
+                        <p class="text-sm text-base-content/60">Información adicional del espacio</p>
+                    </div>
+                </div>
+                
+                <!-- Campo Descripción -->
+                <div class="form-control">
+                    <label for="{{ form.descripcion.id_for_label }}" class="label">
+                        <span class="label-text font-medium">{{ form.descripcion.label }}</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute top-3 left-3 pointer-events-none">
+                            <svg class="w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        {{ form.descripcion }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex justify-end gap-3 pt-4">
+            <button 
+                type="button" 
+                class="btn btn-ghost group" 
+                onclick="htmx.closest(this, '.modal').remove()"
+            >
+                <svg class="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+                </svg>
+                Cancelar
+            </button>
+            <button 
+                class="btn btn-primary group" 
+                type="submit"
+            >
+                Crear Espacio
+                <svg class="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M5 13l4 4L19 7"/>
+                </svg>
+                <span class="htmx-indicator loading loading-spinner loading-sm ml-2"></span>
+            </button>
+        </div>
     </form>
 
 
@@ -145,11 +366,15 @@
                 clearContainerValues(fieldsDigital);
             }
             
-            // Mostrar solo el contenedor apropiado
+            // Mostrar solo el contenedor apropiado con transición
             if (tipo === 'fisico') {
-                if (fieldsFisico) fieldsFisico.classList.remove('hidden');
+                if (fieldsFisico) {
+                    fieldsFisico.classList.remove('hidden');
+                }
             } else if (tipo === 'digital') {
-                if (fieldsDigital) fieldsDigital.classList.remove('hidden');
+                if (fieldsDigital) {
+                    fieldsDigital.classList.remove('hidden');
+                }
             }
         }
         

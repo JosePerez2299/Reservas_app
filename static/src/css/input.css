@@ -82,15 +82,60 @@ form input[type="checkbox"] {
     .form-help {
       @apply text-xs text-base-content/50 mt-1;
     }
+    
+    /* Estilos para formularios - Consistente con base.html y step1.html */
+    .form-control input:not([type="radio"]):not([type="checkbox"]),
+    .form-control select,
+    .form-control textarea {
+      @apply w-full py-3 border border-base-300 rounded-lg;
+      @apply bg-base-100 text-base-content;
+      @apply transition-all duration-300;
+      @apply focus:border-primary focus:ring-1 focus:ring-primary/10;
+      @apply hover:border-primary/30;
+    }
+    
+    /* Padding para campos sin iconos */
+    .form-control input:not([type="radio"]):not([type="checkbox"]):not(.has-icon),
+    .form-control select:not(.has-icon) {
+      @apply px-4;
+    }
+    
+    /* Padding para campos CON iconos a la izquierda */
+    .form-control .relative input:not([type="radio"]):not([type="checkbox"]),
+    .form-control .relative select {
+      @apply pl-10 pr-4;
+    }
+    
+    /* Padding especial para textarea con icono */
+    .form-control .relative textarea {
+      @apply pl-10 pr-4 pt-4;
+    }
+    
+    /* Cards con estilo similar a step1.html */
+    .card {
+      @apply transition-all duration-300;
+    }
+    
+    .card:hover {
+      @apply shadow-lg;
+    }
+    
+    .form-control input:focus:not([type="radio"]):not([type="checkbox"]),
+    .form-control select:focus,
+    .form-control textarea:focus {
+      @apply shadow-lg shadow-primary/10;
+      @apply outline-none;
+    }
+    
     /* Campo de texto, email, password, number, etc. */
     /* Select estándar */
     .form-select {
-      @apply select   ;
+      @apply select;
     }
 
     /* Textarea */
     .form-textarea {
-      @apply textarea resize-none h-24 w-full ;
+      @apply textarea resize-none h-24 w-full;
     }
     
     .form-label {
@@ -103,11 +148,97 @@ form input[type="checkbox"] {
     .form-error {
       @apply text-error;
     }
-
-    .form-control {
-      @apply input;
+    
+    /* Mejoras para radio buttons */
+    .form-control input[type="radio"] {
+      @apply radio radio-primary mr-2;
+      @apply transition-all duration-200;
     }
     
+    .form-control input[type="radio"]:hover {
+      @apply scale-110;
+    }
+    
+    /* Mejoras para checkboxes */
+    .form-control input[type="checkbox"] {
+      @apply checkbox checkbox-primary mr-2;
+      @apply transition-all duration-200;
+    }
+    
+    .form-control input[type="checkbox"]:hover {
+      @apply scale-110;
+    }
+    
+    /* Labels para radio y checkbox */
+    .form-control label:has(input[type="radio"]),
+    .form-control label:has(input[type="checkbox"]) {
+      @apply flex items-center cursor-pointer;
+      @apply p-2 rounded-lg transition-colors duration-200;
+      @apply hover:bg-base-200;
+    }
+    
+    /* Animaciones para secciones */
+    .section-transition {
+      @apply transition-all duration-300 ease-in-out;
+    }
+    
+    .section-transition.hidden {
+      @apply opacity-0 transform -translate-y-2;
+    }
+    
+    .section-transition:not(.hidden) {
+      @apply opacity-100 transform translate-y-0;
+    }
+    
+    /* Mejoras para los iconos en inputs - IZQUIERDA */
+    .form-control .relative .absolute {
+      @apply transition-colors duration-200;
+    }
+    
+    /* Cuando el campo tiene focus, el icono cambia de color */
+    .form-control:focus-within .absolute i {
+      @apply text-primary;
+    }
+    
+    /* Radio buttons con estilo similar a step1.html */
+    .form-control input[type="radio"] + label {
+      @apply card bg-base-200 border-2 border-base-300 cursor-pointer;
+      @apply transition-all duration-300;
+      @apply hover:border-primary/50 hover:shadow-lg hover:bg-primary/5;
+    }
+    
+    .form-control input[type="radio"]:checked + label {
+      @apply border-primary bg-primary/5 shadow-md;
+    }
+    
+    .form-control input[type="radio"] + label .card-body {
+      @apply p-4;
+    }
+    
+    /* Estilo específico para los radio en grid */
+    .grid input[type="radio"] + label {
+      @apply flex items-center gap-3 p-3;
+      @apply text-sm font-medium;
+    }
+    
+    /* Mejor aspecto para los pasos numerados */
+    .step-number {
+      @apply w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm;
+      @apply transition-all duration-200;
+    }
+    
+    /* Animaciones para secciones con mejor transición */
+    .section-transition {
+      @apply transition-all duration-500 ease-in-out;
+    }
+    
+    .section-transition.hidden {
+      @apply opacity-0 transform scale-95 -translate-y-4;
+    }
+    
+    .section-transition:not(.hidden) {
+      @apply opacity-100 transform scale-100 translate-y-0;
+    }
   
     /* Checkbox / Radio Wrapper */
     .form-check {
