@@ -35,10 +35,7 @@ class Espacio(models.Model):
                                   )
                               ])
 
-    piso = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(40)],
-        help_text="Piso en que se encuentra el espacio (≤ 40)"
-    )
+
     capacidad_maxima = models.PositiveSmallIntegerField(
         validators=[MaxValueValidator(1000), MinValueValidator(1)],
         help_text="Capacidad máxima (≤ 1000)"
@@ -46,8 +43,7 @@ class Espacio(models.Model):
 
     tipo_ubicacion = models.CharField(
         max_length=20, choices=TipoUbicacion.choices)
-    tipo = models.CharField(
-        max_length=20, choices=Tipo.choices, null=True, blank=True)
+  
     disponible = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now=True)
 
@@ -58,9 +54,9 @@ class Espacio(models.Model):
     class Meta:
         verbose_name = "Espacio"
         verbose_name_plural = "Espacios"
-        ordering = ['tipo_ubicacion', 'piso', 'nombre']
+        ordering = ['tipo_ubicacion',  'nombre']
         indexes = [
-            models.Index(fields=['tipo_ubicacion', 'piso']),
+            models.Index(fields=['tipo_ubicacion'])
         ]
         constraints = [
             models.CheckConstraint(
@@ -91,10 +87,6 @@ class Espacio(models.Model):
 class DetalleEspacioDigital(models.Model):
     espacio = models.ForeignKey(
         Espacio, on_delete=models.CASCADE, related_name='detalles_digitales')
-    capacidad_maxima = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000), MinValueValidator(1)],
-        help_text="Capacidad máxima (≤ 1000)"
-    )
 
     plataforma = models.ForeignKey(
         PlataformaDigital, on_delete=models.CASCADE, related_name='detalles')
@@ -118,9 +110,9 @@ class DetalleEspacioDigital(models.Model):
 class DetalleEspacioFisico(models.Model):
     espacio = models.ForeignKey(
         Espacio, on_delete=models.CASCADE, related_name='detalles_fisicos')
-    capacidad_maxima = models.PositiveSmallIntegerField(
-        validators=[MaxValueValidator(1000), MinValueValidator(1)],
-        help_text="Capacidad máxima (≤ 1000)"
+    piso = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(40)],
+        help_text="Piso en que se encuentra el espacio (≤ 40)"
     )
     ubicacion = models.ForeignKey(
         Ubicacion, on_delete=models.CASCADE, related_name='espacios_fisicos')
@@ -135,6 +127,7 @@ class DetalleEspacioFisico(models.Model):
                 violation_error_message="Ya existe un detalle de espacio físico para este espacio."
             ),
         ]
+
 
     def __str__(self):
         return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.capacidad_maxima}"

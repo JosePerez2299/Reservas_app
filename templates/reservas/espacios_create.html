@@ -1,1 +1,149 @@
-{% extends "reservas/form_base.html" %}
+<div class="h-full flex w-3xl flex-col p-7">
+
+    <!-- Header con progreso a la derecha - ARRIBA -->
+    <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
+        <!-- Título a la izquierda -->
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+                <i class="fas fa-edit text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold">Crear Espacio</h1>
+                <p class="text-xs text-base-content/60">Sistema integral de gestión</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'espacio_create' %}" class="flex flex-col gap-4">
+        {% csrf_token %}
+        
+        <div class="flex flex-col gap-2">
+            <label for="{{ form.nombre.id_for_label }}" class="label">{{ form.nombre.label }}</label>
+            {{ form.nombre }}
+        </div>
+        <!-- Campos básicos -->
+        <div class="flex flex-col gap-2">
+            <label class="label">{{ form.tipo_ubicacion.label }}</label>
+            <div class="flex gap-4">
+                {{ form.tipo_ubicacion }}
+            </div>
+        </div>
+        
+        <!-- Campos específicos para espacios físicos -->
+        <div id="fields-fisico" class="hidden space-y-2">
+            <h2 class="text-lg font-bold">Espacio Físico</h2>
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.ubicacion.id_for_label }}" class="label">{{ form.ubicacion.label }}</label>
+                {{ form.ubicacion }}
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.tipo.id_for_label }}" class="label">{{ form.tipo.label }}</label>
+                {{ form.tipo }}
+            </div>
+        </div>
+        
+        <!-- Campos específicos para espacios digitales -->
+        <div id="fields-digital" class="hidden space-y-2">
+            <h2 class="text-lg font-bold">Espacio Digital</h2>
+            <div class="flex flex-col gap-2">
+                <label for="{{ form.plataforma.id_for_label }}" class="label">{{ form.plataforma.label }}</label>
+                {{ form.plataforma }}
+            </div>
+   
+        </div>
+        
+        
+        
+        <div class="flex flex-col gap-2">
+            <label for="{{ form.piso.id_for_label }}" class="label">{{ form.piso.label }}</label>
+            {{ form.piso }}
+        </div>
+        
+        <div class="flex flex-col gap-2">
+            <label for="{{ form.capacidad_maxima.id_for_label }}" class="label">{{ form.capacidad_maxima.label }}</label>
+            {{ form.capacidad_maxima }}
+        </div>
+        
+        <div class="flex flex-col gap-2">
+            <label for="{{ form.descripcion.id_for_label }}" class="label">{{ form.descripcion.label }}</label>
+            {{ form.descripcion }}
+        </div>
+        
+        <div class="flex flex-col gap-2">
+            <label for="{{ form.disponible.id_for_label }}" class="label">{{ form.disponible.label }}</label>
+            {{ form.disponible }}
+        </div>
+        
+
+        <button class="btn btn-primary" type="submit">Guardar</button>
+    </form>
+
+
+
+</div>
+
+<script>
+
+(function() {
+    
+    // Buscar los radio buttons dentro del contenido que se acaba de cargar
+    const tipoUbicacionRadios = document.querySelectorAll('input[name="tipo_ubicacion"]');
+    
+    if (tipoUbicacionRadios.length > 0) {
+        
+        // Función para limpiar los valores de un contenedor
+        function clearContainerValues(container) {
+            if (container) {
+                // Limpiar todos los inputs, selects y textareas dentro del contenedor
+                const inputs = container.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        input.checked = false;
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+        }
+        
+        // Función para manejar el cambio
+        function handleTipoChange() {
+            // Encontrar el radio button seleccionado
+            const tipoSeleccionado = document.querySelector('input[name="tipo_ubicacion"]:checked');
+            const tipo = tipoSeleccionado ? tipoSeleccionado.value : null;
+            
+            const fieldsFisico = document.getElementById('fields-fisico');
+            const fieldsDigital = document.getElementById('fields-digital');
+            
+            // Ocultar y limpiar ambos contenedores primero
+            if (fieldsFisico) {
+                fieldsFisico.classList.add('hidden');
+                clearContainerValues(fieldsFisico);
+            }
+            if (fieldsDigital) {
+                fieldsDigital.classList.add('hidden');
+                clearContainerValues(fieldsDigital);
+            }
+            
+            // Mostrar solo el contenedor apropiado
+            if (tipo === 'fisico') {
+                if (fieldsFisico) fieldsFisico.classList.remove('hidden');
+            } else if (tipo === 'digital') {
+                if (fieldsDigital) fieldsDigital.classList.remove('hidden');
+            }
+        }
+        
+        // Agregar event listener a todos los radio buttons
+        tipoUbicacionRadios.forEach(radio => {
+            radio.addEventListener('change', handleTipoChange);
+        });
+        
+        // Ejecutar una vez al cargar para establecer estado inicial
+        handleTipoChange();
+        
+    } else {
+        console.warn('⚠️ No se encontraron los radio buttons de tipo_ubicacion');
+    }
+})();
+</script>

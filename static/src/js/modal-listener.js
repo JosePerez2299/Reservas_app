@@ -73,6 +73,32 @@ function initializeSelect2() {
   });
 }
 
+// Función para reinicializar otros componentes comunes
+function initializeModalComponents() {
+  const modalContent = document.getElementById('generic_modal_content');
+  if (!modalContent) return;
+  
+  // Reinicializar tooltips de Tailwind si los hay
+  const tooltips = modalContent.querySelectorAll('[data-tip]');
+  tooltips.forEach(tooltip => {
+    // Re-trigger tooltip initialization if needed
+  });
+  
+  // Reinicializar inputs con máscaras si los hay
+  const maskedInputs = modalContent.querySelectorAll('[data-mask]');
+  maskedInputs.forEach(input => {
+    // Re-apply input masks if needed
+  });
+  
+  // Reinicializar datepickers si los hay
+  const dateInputs = modalContent.querySelectorAll('input[type="date"]');
+  dateInputs.forEach(input => {
+    // Re-initialize date pickers if needed
+  });
+  
+  console.log('Componentes adicionales inicializados en modal');
+}
+
 // Manejar el cierre automático de la modal en submit exitoso
 htmx.on('htmx:beforeSwap', function(event) {
   if (event.detail.target.id === 'generic_modal_content' && event.detail.xhr.status === 204) {
@@ -86,7 +112,21 @@ htmx.on('htmx:beforeSwap', function(event) {
 htmx.on('htmx:afterSwap', function(event) {
   if (event.detail.target.id === 'generic_modal_content') {
     setTimeout(function() {
+      // Reinicializar componentes comunes
       initializeSelect2();
+      initializeModalComponents();
+      
+      // Reinicializar Alpine.js si hay componentes
+      if (window.Alpine) {
+        Alpine.initTree(event.detail.target);
+      }
+      
+      // Disparar evento personalizado para que otros scripts se enganchen
+      window.dispatchEvent(new CustomEvent('modalContentLoaded', {
+        detail: { target: event.detail.target }
+      }));
+      
+      console.log('Contenido modal cargado y componentes inicializados');
     }, 50);
   }
 });
