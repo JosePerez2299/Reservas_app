@@ -64,7 +64,9 @@ class EspacioCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         ctx = super().get_context_data(**kwargs)
         ctx['title'] = 'Crear Espacio'
         ctx['url'] = reverse_lazy('espacio_create')
-        ctx['subtitle'] = 'Información del espacio'
+        ctx['subtitle'] = 'Configura un nuevo espacio para reservas'
+        ctx['header_icon'] = 'plus'
+        ctx['submit_text'] = 'Crear Espacio'
         return ctx
 
 

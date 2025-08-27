@@ -16,7 +16,12 @@ class EspacioCreateForm(forms.ModelForm):
         label='Tipo de Espacio',
         initial=Espacio.Tipo.FISICO
     )
-    disponible = forms.BooleanField(required=True, initial=True, label='Disponible')
+    disponible = forms.BooleanField(
+        required=False, 
+        initial=True, 
+        label='Disponible',
+        widget=forms.CheckboxInput(attrs={'class': 'toggle toggle-primary'})
+    )
     descripcion = forms.CharField(widget=forms.Textarea, label='Descripción', required=True)
     capacidad_maxima = forms.IntegerField(min_value=1, max_value=1000, label='Capacidad máxima', required=True)
 
@@ -54,6 +59,11 @@ class EspacioCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         tipo = cleaned_data.get('tipo')
+
+        # Manejar el campo disponible (checkbox)
+        # Si no está marcado, se establece como False
+        if 'disponible' not in cleaned_data:
+            cleaned_data['disponible'] = False
 
         if tipo == Espacio.Tipo.FISICO:
             if not cleaned_data.get('ubicacion'):

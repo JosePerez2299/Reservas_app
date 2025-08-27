@@ -17,7 +17,10 @@ class AjaxFormMixin:
 
     def form_invalid(self, form):
         # Retorna el mismo partial con errores (HTTP 200)
-        return self.render_to_response(self.get_context_data(form=form))
+        response = self.render_to_response(self.get_context_data(form=form))
+        # Agregar trigger para hacer scroll a los errores
+        response['HX-Trigger'] = json.dumps({'scrollToErrors': True})
+        return response
 
     def form_valid(self, form):
         form.save()

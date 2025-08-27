@@ -484,4 +484,14 @@ def get_color_reserva(reserva: Reserva):
         return 'error'
     else:
         return 'info'
+
+@register.filter
+def get_field_label(form, field_name):
+    """
+    Obtiene la etiqueta de un campo del formulario.
+    """
+    try:
+        return form[field_name].label
+    except (KeyError, AttributeError):
+        return field_name.replace('_', ' ').title()
     
