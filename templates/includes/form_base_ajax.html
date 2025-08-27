@@ -1,7 +1,7 @@
 {% load widget_tweaks %}
 {% load utils %}
 
-<div class="h-full flex w-2xl flex-col p-7 bg-red-500">
+<div class="h-full flex flex-col px-4 ">
     <!-- Header -->
     <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-3">
@@ -69,9 +69,9 @@
             <button 
                 type="button" 
                 class="btn btn-ghost group" 
-                onclick="htmx.closest(this, '.modal').remove()"
+                onclick="closeModal()"
             >
-                <i class="fas fa-arrow-left transition-transform duration-300 group-hover:-translate-x-1"></i>
+                <i class="fas fa-times transition-transform duration-300 group-hover:scale-110"></i>
                 Cancelar
             </button>
             <button 

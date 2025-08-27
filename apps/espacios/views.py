@@ -138,8 +138,7 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     details = [ 
         {'label': 'Nombre', 'value': 'nombre'},
         {'label': 'Tipo', 'value': 'tipo'},
-        {'label': 'Capacidad', 'value': 'capacidad'},
+        {'label': 'Capacidad', 'value': 'capacidad_maxima'},
         {'label': 'Ubicación', 'value': 'ubicacion'},
-        {'label': 'Piso', 'value': 'piso'},
         {'label': 'Disponible', 'value': 'disponible'},
     ]

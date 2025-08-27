@@ -1,6 +1,19 @@
 const modal = document.getElementById('generic_modal');
 const modalContent = document.getElementById('generic_modal_content');
 
+/**
+ * FUNCIONES GLOBALES PARA MANEJAR LA MODAL
+ * 
+ * Disponibles globalmente:
+ * - openModal(url): Abre la modal y carga contenido
+ * - closeModal(): Cierra la modal inmediatamente
+ * - closeModalWithConfirmation(message): Cierra con confirmación
+ * 
+ * Uso en templates:
+ * <button onclick="closeModal()">Cerrar</button>
+ * <button onclick="closeModalWithConfirmation('¿Descartar cambios?')">Cancelar</button>
+ */
+
 // Función global para abrir la modal
 window.openModal = function(url) {
   // 1. Mostrar spinner inmediatamente
@@ -13,6 +26,31 @@ window.openModal = function(url) {
   htmx.ajax('GET', url, {
     target: '#generic_modal_content',
     swap: 'innerHTML'
+  });
+};
+
+// Función global para cerrar la modal
+window.closeModal = function() {
+  if (modal) {
+    modal.close();
+  }
+};
+
+// Función global para cerrar la modal con mensaje de confirmación
+window.closeModalWithConfirmation = function(message = '¿Estás seguro de que deseas cancelar?') {
+  Swal.fire({
+    title: 'Confirmar',
+    text: message,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, cancelar',
+    cancelButtonText: 'No, continuar',
+    confirmButtonColor: '#f87171',
+    cancelButtonColor: '#6b7280'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      closeModal();
+    }
   });
 };
 
@@ -31,6 +69,24 @@ if (modal) {
   modal.addEventListener('close', event => {
     showSpinner();
   });
+  
+  // Asegurar que el botón de cerrar esté siempre visible
+  const closeButton = modal.querySelector('form[method="dialog"] button');
+  if (closeButton) {
+    // Agregar estilos inline para asegurar visibilidad
+    closeButton.style.position = 'fixed';
+    closeButton.style.top = '8px';
+    closeButton.style.right = '8px';
+    closeButton.style.zIndex = '9999';
+    closeButton.style.pointerEvents = 'auto';
+    
+    // Event listener adicional por si el form method="dialog" no funciona
+    closeButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      modal.close();
+    });
+  }
 } else {
   console.warn('No encontré #generic_modal en el DOM');
 }
