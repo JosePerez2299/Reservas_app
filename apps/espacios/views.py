@@ -37,9 +37,8 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
         'id': 'ID',
         'nombre': 'Nombre',
         'tipo': 'Tipo',
-        'capacidad': 'Capacidad',
+        'capacidad_maxima': 'Capacidad',
         'ubicacion': 'Ubicación',
-        'piso': 'Piso',
         'disponible': 'Disponible',
     }
 

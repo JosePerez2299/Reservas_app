@@ -63,11 +63,17 @@ class Espacio(models.Model):
                 name='check_capacidad_max_5000'
             ),
         ]
-
+    @property
     def ubicacion(self):
         if self.tipo == 'fisico':
-            return self.detalles_fisicos.first().ubicacion.nombre
-        return self.detalles_digitales.first().plataforma.nombre
+            if self.detalles_fisicos.exists():
+                return self.detalles_fisicos.first().ubicacion.nombre
+            return None
+
+        elif self.tipo == 'digital':
+            if self.detalles_digitales.exists():
+                return self.detalles_digitales.first().plataforma.nombre
+        return None
 
     def __str__(self):
         return f"{self.nombre}"

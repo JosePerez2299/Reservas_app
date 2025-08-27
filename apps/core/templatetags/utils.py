@@ -194,7 +194,12 @@ def get_td_html(context, obj, field):
         elif field == "ubicacion":
             # Según lógica, quizá mostrar nombre de ubicación o piso
             ubic = getattr(obj, 'ubicacion', None)
-            texto = getattr(ubic, 'nombre', '') if ubic else ""
+            if ubic and isinstance(ubic, str):
+                # Si ubicacion es un string, usarlo directamente
+                texto = ubic
+            else:
+                # Si ubicacion es un objeto, intentar obtener el nombre
+                texto = getattr(ubic, 'nombre', '') if ubic else ""
             return format_html(
                 '<div><div class="font-semibold">{}</div></div>',
                 texto
