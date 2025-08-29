@@ -13,11 +13,7 @@ class Command(BaseCommand):
         password = '1234jose'
 
         # Definir o crear ubicaciones
-        nombres_ubicaciones = ['edf1', 'edf2', 'edf3', 'edf4']
-        ubicaciones = []
-        for nombre in nombres_ubicaciones:
-            ubicacion, _ = Ubicacion.objects.get_or_create(nombre=nombre)
-            ubicaciones.append(ubicacion)
+        ubicaciones = Ubicacion.objects.all()
         self.stdout.write(self.style.SUCCESS('Ubicaciones procesadas.'))
 
         # Obtener todos los grupos existentes
