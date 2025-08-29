@@ -2223,9 +2223,6 @@
   .ml-4 {
     margin-left: calc(var(--spacing) * 4);
   }
-  .ml-auto {
-    margin-left: auto;
-  }
   .status {
     display: inline-block;
     aspect-ratio: 1 / 1;
@@ -2374,14 +2371,6 @@
       box-shadow: none;
       background-image: none;
     }
-  }
-  .fieldset {
-    display: grid;
-    gap: calc(0.25rem * 1.5);
-    padding-block: calc(0.25rem * 1);
-    font-size: 0.75rem;
-    grid-template-columns: 1fr;
-    grid-auto-rows: max-content;
   }
   .card-title {
     display: flex;
@@ -2547,9 +2536,6 @@
   .h-32 {
     height: calc(var(--spacing) * 32);
   }
-  .h-40 {
-    height: calc(var(--spacing) * 40);
-  }
   .h-fit {
     height: fit-content;
   }
@@ -2661,6 +2647,9 @@
   }
   .max-w-2xl {
     max-width: var(--container-2xl);
+  }
+  .max-w-3xl {
+    max-width: var(--container-3xl);
   }
   .max-w-4xl {
     max-width: var(--container-4xl);
@@ -3073,12 +3062,6 @@
     background-color: var(--color-warning);
     color: var(--color-warning);
   }
-  .bg-accent\/10 {
-    background-color: var(--color-accent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-accent) 10%, transparent);
-    }
-  }
   .bg-base-100 {
     background-color: var(--color-base-100);
   }
@@ -3151,18 +3134,6 @@
   .bg-info {
     background-color: var(--color-info);
   }
-  .bg-info\/10 {
-    background-color: var(--color-info);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-info) 10%, transparent);
-    }
-  }
-  .bg-neutral\/10 {
-    background-color: var(--color-neutral);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-neutral) 10%, transparent);
-    }
-  }
   .bg-orange-100 {
     background-color: var(--color-orange-100);
   }
@@ -3222,12 +3193,6 @@
   }
   .bg-success {
     background-color: var(--color-success);
-  }
-  .bg-success\/10 {
-    background-color: var(--color-success);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-success) 10%, transparent);
-    }
   }
   .bg-success\/20 {
     background-color: var(--color-success);
@@ -3706,9 +3671,6 @@
   .text-info {
     color: var(--color-info);
   }
-  .text-neutral {
-    color: var(--color-neutral);
-  }
   .text-orange-500 {
     color: var(--color-orange-500);
   }
@@ -4090,56 +4052,6 @@
     &:hover {
       @media (hover: hover) {
         scale: 1.02;
-      }
-    }
-  }
-  .hover\:border-accent\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-accent);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-accent) 30%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:border-info\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-info);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-info) 30%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:border-neutral\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-neutral);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-neutral) 30%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:border-primary\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-primary);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:border-success\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-success);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-success) 30%, transparent);
-        }
       }
     }
   }
