@@ -80,8 +80,9 @@ class Espacio(models.Model):
 
 
 class DetalleEspacioDigital(models.Model):
-    espacio = models.ForeignKey(
-        Espacio, on_delete=models.CASCADE, related_name='detalles_digitales')
+    espacio = models.OneToOneField(
+        Espacio, on_delete=models.CASCADE, related_name='detalle_digital'
+    )
 
     plataforma = models.ForeignKey(
         PlataformaDigital, on_delete=models.CASCADE, related_name='detalles')
@@ -96,25 +97,19 @@ class DetalleEspacioDigital(models.Model):
                 violation_error_message="Ya existe un detalle de espacio digital para este espacio."
             )
         ]
-
     def clean(self):
         super().clean()
-        
-        # Validar que el espacio sea de tipo digital
-        if self.espacio and self.espacio.tipo != 'digital':
-            raise ValidationError({
-                'espacio': f'El espacio "{self.espacio.nombre}" debe ser de tipo digital para tener detalles digitales.'
-            })
-        
-        # Validar que no existan detalles físicos para el mismo espacio
-        if self.espacio and hasattr(self.espacio, 'detalles_fisicos') and self.espacio.detalles_fisicos.exists():
-            raise ValidationError({
-                'espacio': f'El espacio "{self.espacio.nombre}" ya tiene detalles físicos. No puede tener ambos tipos de detalles.'
-            })
+        # Si aún no se ha asignado FK, saltar validaciones dependientes de Espacio.
+        if not self.espacio_id:
+            return
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+        espacio = Espacio.objects.filter(pk=self.espacio_id).first()
+        if not espacio:
+            raise ValidationError({'espacio': 'Espacio inexistente.'})
+
+        if espacio.tipo != Espacio.Tipo.DIGITAL:
+            raise ValidationError({'espacio': 'El espacio debe ser de tipo digital.'})
+
 
     def __str__(self):
         return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.espacio.capacidad_maxima}"
@@ -126,8 +121,9 @@ class DetalleEspacioFisico(models.Model):
         LABORATORIO = 'laboratorio', 'Laboratorio'
         AUDITORIO = 'auditorio', 'Auditorio'
 
-    espacio = models.ForeignKey(
-        Espacio, on_delete=models.CASCADE, related_name='detalles_fisicos')
+    espacio = models.OneToOneField(
+        Espacio, on_delete=models.CASCADE, related_name='detalle_fisico'
+    )
     piso = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(40)],
         help_text="Piso en que se encuentra el espacio (≤ 40)"
@@ -152,17 +148,17 @@ class DetalleEspacioFisico(models.Model):
     def clean(self):
         super().clean()
         
-        # Validar que el espacio sea de tipo físico
-        if self.espacio and self.espacio.tipo != 'fisico':
-            raise ValidationError({
-                'espacio': f'El espacio "{self.espacio.nombre}" debe ser de tipo físico para tener detalles físicos.'
-            })
+        # # Validar que el espacio sea de tipo físico
+        # if self.espacio and self.espacio.tipo != 'fisico':
+        #     raise ValidationError({
+        #         'espacio': f'El espacio "{self.espacio.nombre}" debe ser de tipo físico para tener detalles físicos.'
+        #     })
         
-        # Validar que no existan detalles digitales para el mismo espacio
-        if self.espacio and hasattr(self.espacio, 'detalles_digitales') and self.espacio.detalles_digitales.exists():
-            raise ValidationError({
-                'espacio': f'El espacio "{self.espacio.nombre}" ya tiene detalles digitales. No puede tener ambos tipos de detalles.'
-            })
+        # # Validar que no existan detalles digitales para el mismo espacio
+        # if self.espacio and hasattr(self.espacio, 'detalles_digitales') and self.espacio.detalles_digitales.exists():
+        #     raise ValidationError({
+        #         'espacio': f'El espacio "{self.espacio.nombre}" ya tiene detalles digitales. No puede tener ambos tipos de detalles.'
+        #     })
 
     def save(self, *args, **kwargs):
         self.full_clean()
