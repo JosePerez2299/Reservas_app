@@ -1,6 +1,6 @@
 import django_filters
 from django import forms
-from apps.usuarios.models import Ubicacion
+from apps.core.models import Ubicacion
 from apps.usuarios.models import Usuario
 from django.contrib.auth.models import Group
 from django.conf import settings

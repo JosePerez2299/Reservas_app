@@ -1,7 +1,5 @@
 import django_filters
 from apps.reservas.models import Reserva
-from apps.usuarios.models import Ubicacion
-from apps.espacios.models import Espacio
 from django import forms
 
 class ReservaFilter(django_filters.FilterSet):

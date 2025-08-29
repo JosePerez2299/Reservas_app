@@ -1,6 +1,6 @@
 import django_filters
 from django import forms
-from apps.usuarios.models import Ubicacion
+
 class EspacioFilter(django_filters.FilterSet):
     nombre = django_filters.CharFilter(
         field_name='nombre',

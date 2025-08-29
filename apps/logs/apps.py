@@ -8,7 +8,7 @@ class LogsConfig(AppConfig):
     def ready(self):
         import apps.reservas.signals  
         from auditlog.registry import auditlog
-        from apps.usuarios.models import Ubicacion  
+        from apps.core.models import Ubicacion  
         from apps.espacios.models import Espacio
         from apps.usuarios.models import Usuario
         from apps.reservas.models import Reserva

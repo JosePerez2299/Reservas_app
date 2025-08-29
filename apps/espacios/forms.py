@@ -1,10 +1,6 @@
 from django import forms
-from apps.reservas.models import Espacio, Reserva 
-from django.utils import timezone
-from django.db import transaction
-
-from apps.usuarios.models import Ubicacion
-from apps.espacios.models import DetalleEspacioFisico, DetalleEspacioDigital, PlataformaDigital
+from apps.espacios.models import Espacio
+from apps.espacios.models import DetalleEspacioFisico, DetalleEspacioDigital
 
 class EspacioForm(forms.ModelForm):
     tipo = forms.ChoiceField(choices=Espacio.Tipo.choices, widget=forms.RadioSelect, initial=Espacio.Tipo.FISICO)

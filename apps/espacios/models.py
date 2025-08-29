@@ -2,20 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
-from apps.usuarios.models import Ubicacion
-
-
-class PlataformaDigital(models.Model):
-    nombre = models.CharField(max_length=100)
-    url = models.URLField(max_length=200)
-
-    class Meta:
-        verbose_name = "Plataforma Digital"
-        verbose_name_plural = "Plataformas Digitales"
-
-    def __str__(self):
-        return f"{self.nombre}"
-
+from apps.core.models import Ubicacion, PlataformaDigital
 
 
 

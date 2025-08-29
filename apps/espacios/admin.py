@@ -1,9 +1,8 @@
 # admin.py
 from django.contrib import admin
-from .models import Espacio, DetalleEspacioDigital, DetalleEspacioFisico, PlataformaDigital
+from .models import Espacio, DetalleEspacioDigital, DetalleEspacioFisico
 
 
-admin.site.register(PlataformaDigital)
 class DetalleDigitalInline(admin.StackedInline):
     model = DetalleEspacioDigital
     can_delete = False

@@ -6,7 +6,11 @@ from django.utils import timezone
 from datetime import date, time, timedelta
 from django.db.models import Q
 from django.contrib.auth.password_validation import validate_password
-from reservas.models import Ubicacion, Usuario, Espacio, Reserva, validate_username
+from apps.core.models import Ubicacion
+from apps.usuarios.models import Usuario
+from apps.espacios.models import Espacio
+from apps.reservas.models import Reserva
+from apps.usuarios.models import validate_username
 from django.contrib.auth import get_user_model
 
 class UbicacionModelTest(TestCase):

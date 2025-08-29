@@ -8,17 +8,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models import Q
 
 
-# ——— 1. Ubicación —————————————————————————————————————————————
-class Ubicacion(models.Model):
-    nombre = models.CharField(max_length=20, unique=True)
-
-    class Meta:
-        verbose_name_plural = "Ubicaciones"
-        ordering = ['nombre']
-
-    def __str__(self):
-        return self.nombre
-
 # ——— 2. Usuario —————————————————————————————————————————————
 def validate_username(value):
     """
@@ -66,8 +55,7 @@ class Usuario(AbstractUser):
     
     email = models.EmailField(unique=True)
     ubicacion = models.ForeignKey(
-
-        'Ubicacion', on_delete=models.SET_NULL, 
+        'core.Ubicacion', on_delete=models.SET_NULL, 
         null=True,
         help_text="La sede/edificio al que pertenece el usuario", 
     )

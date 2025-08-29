@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.db.models import Q, F
 from apps.espacios.models import Espacio
 from apps.usuarios.models import Usuario
-from apps.usuarios.models import Ubicacion
+from apps.core.models import Ubicacion
 
 
 # ——— 4. Reserva ————————————————————————————————————————————————
