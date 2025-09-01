@@ -5,7 +5,7 @@ from .views import *
 
 urlpatterns = [
     path('', EspacioListView.as_view(), name='espacios'),
-    path('create/', EspacioWizardView.as_view(), name='espacio_create'),
+    path('create/', EspacioCreateWizardView.as_view(), name='espacio_create'),
     path('view/<int:pk>/',
          EspacioDetailView.as_view(), name='espacio_view'),
     path('edit/<int:pk>/',

@@ -1,0 +1,67 @@
+{% extends "espacios/base_form_create.html" %}
+
+{% block form_content %}
+<div class="form-control">
+    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+    {{ form.nombre }}
+    {% if form.nombre.errors %}
+        <div>{{ form.nombre.errors.0 }}</div>
+    {% endif %}
+
+    {% if form.nombre.help_text %}
+        <div class="text-xs text-base-content/60">{{ form.nombre.help_text }}</div>
+    {% endif %}
+</div>
+
+<div class="form-control">
+    <label for="{{ form.capacidad_maxima.id_for_label }}">{{ form.capacidad_maxima.label }}</label>
+    {{ form.capacidad_maxima }}
+    {% if form.capacidad_maxima.errors %}
+        <div>{{ form.capacidad_maxima.errors.0 }}</div>
+    {% endif %}
+
+    {% if form.capacidad_maxima.help_text %}
+        <div class="text-xs text-base-content/60">{{ form.capacidad_maxima.help_text }}</div>
+    {% endif %}
+</div>
+
+<div class="form-control">
+    <label>{{ form.tipo.label }}</label>
+    <div class="grid grid-cols-2 gap-2">
+    {{ form.tipo }}
+    </div>
+    {% if form.tipo.errors %}
+        <div>{{ form.tipo.errors.0 }}</div>
+    {% endif %}
+
+    {% if form.tipo.help_text %}
+        <div class="text-xs text-base-content/60">{{ form.tipo.help_text }}</div>
+    {% endif %}
+</div>
+
+<div class="form-control">
+    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+    {{ form.descripcion }}
+    {% if form.descripcion.errors %}
+        <div>{{ form.descripcion.errors.0 }}</div>
+    {% endif %}
+
+    {% if form.descripcion.help_text %}
+        <div class="text-xs text-base-content/60">{{ form.descripcion.help_text }}</div>
+    {% endif %}
+</div>
+
+<div class="form-control">
+    <label for="{{ form.disponible.id_for_label }}">
+        {{ form.disponible }}
+        {{ form.disponible.label }}
+    </label>
+    {% if form.disponible.errors %}
+        <div>{{ form.disponible.errors.0 }}</div>
+    {% endif %}
+
+    {% if form.disponible.help_text %}
+        <div class="text-xs text-base-content/60">{{ form.disponible.help_text }}</div>
+    {% endif %}
+</div>
+{% endblock form_content %}

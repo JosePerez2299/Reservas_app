@@ -13,7 +13,6 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.views import View
 from .forms import *
-
 from .filters import EspacioFilter
 from .models import Espacio
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -23,6 +22,8 @@ from django.urls import reverse_lazy
 from django.db.models.functions import Lower
 from django.db.models import Count, Q   
 from django.db import IntegrityError, transaction
+from formtools.wizard.views import SessionWizardView
+
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
@@ -51,63 +52,6 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
     }
     
 
-class EspacioCreateView( View):
-    template_name = "reservas/espacios_create.html"
-
-    def get(self, request, *args, **kwargs):
-        contexto = {
-            'espacio_form': EspacioForm(prefix='esp'),
-            'detalle_digital_form': DetalleDigitalForm(prefix='dig'),
-            'detalle_fisico_form': DetalleFisicoForm(prefix='fis'),
-        }
-        return render(request, self.template_name, contexto)
-
-    def post(self, request, *args, **kwargs):
-        espacio_form = EspacioForm(request.POST, prefix='esp')
-        tipo = request.POST.get('esp-tipo')  # name incluye el prefijo
-        detalle_form = (DetalleDigitalForm(request.POST, prefix='dig')
-                        if tipo == 'digital'
-                        else DetalleFisicoForm(request.POST, prefix='fis'))
-
-        print('entra')
-        print(detalle_form.errors)
-        print(espacio_form.is_valid())
-        print(detalle_form.is_valid())
-
-        if espacio_form.is_valid() and detalle_form.is_valid():
-            try:
-                with transaction.atomic():
-                    espacio = espacio_form.save()
-                    detalle = detalle_form.save(commit=False)
-                    detalle.espacio_id = espacio.id
-                    detalle.save()
-
-                print("se guardo el espacio")
-                response = HttpResponse(status=204)
-                response['HX-Trigger'] = json.dumps({'showMessage': 'Espacio creado correctamente'})
-                return response
-            except IntegrityError as e:
-                espacio_form.add_error(None, "Error de integridad al guardar.")
-        # si hay errores, re-renderiza mostrando ambos formularios con datos y errores
-        contexto = {
-            'espacio_form': espacio_form,
-            'detalle_digital_form': DetalleDigitalForm(prefix='dig') if tipo!='digital' else detalle_form,
-            'detalle_fisico_form': DetalleFisicoForm(prefix='fis') if tipo!='fisico' else detalle_form,
-        }
-        return render(request, self.template_name, contexto)
-
-# views.py - Usando FormTools
-from django.shortcuts import redirect
-from django.http import HttpResponseRedirect, JsonResponse
-from django.urls import reverse_lazy
-from django.db import transaction
-from formtools.wizard.views import SessionWizardView, NamedUrlSessionWizardView
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-import json
-
-
-
 def es_espacio_digital(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
     return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
@@ -117,8 +61,11 @@ def es_espacio_fisico(wizard):
     return cleaned_data.get('tipo') ==  Espacio.Tipo.FISICO
 
 
-class EspacioWizardView(SessionWizardView):
-    template_name = "reservas/espacios_create.html"
+TEMPLATES = {"espacio": "espacios/espacio_form.html",
+             "detalle_digital": "espacios/detalles_digitales_form.html",
+             "detalle_fisico": "espacios/detalles_fisicos_form.html" }
+
+class EspacioCreateWizardView(SessionWizardView):
     form_list = [('espacio', EspacioForm), ('detalle_digital', DetalleDigitalForm), ('detalle_fisico', DetalleFisicoForm)]
     # condition_dict = {'1': es_espacio_digital, '2': es_espacio_fisico}
 
@@ -126,13 +73,18 @@ class EspacioWizardView(SessionWizardView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
+        ctx['steps'] = [
+            {'label': 'Espacio', 'number': '1', 'active': self.steps.current == 'espacio', 'checked': True}, 
+            {'label': 'Detalles', 'number': '2', 'active': self.steps.current == 'detalle_digital' or self.steps.current == 'detalle_fisico'}]
         # contador fijo
-        ctx['display_steps_count'] = 2
-        # si estamos en el primer step del wizard original -> mostrar 1,
-        # si estamos en alguno de los detalles (1 o 2) -> mostrar 2
-        ctx['display_step_number'] = 1 if self.steps.current == 'espacio' else 2
+       
         return ctx
 
+
+    def get_template_names(self):
+        return [TEMPLATES[self.steps.current]]
+        
     def done(self, form_list, **kwargs):
         espacio_form = form_list[0]
         detalle_form = form_list[1]
