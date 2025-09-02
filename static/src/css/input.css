@@ -8,6 +8,63 @@
 
 
 
+ /* Estilos básicos para FullCalendar */
+ .fc .fc-toolbar-chunk .fc-button-primary {
+  @apply bg-primary text-primary-content;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+ @apply bg-info/20 text-base-content;
+}
+
+.fc .fc-daygrid-day {
+ @apply cursor-pointer;
+}
+
+.fc .fc-daygrid-day.selected-date {
+  @apply bg-info/20 text-base-content;
+  @apply border-2 border-primary;
+}
+
+.fc .fc-event {
+  @apply border-none;
+  @apply rounded-md;
+  @apply text-xs;
+  @apply font-medium;
+  @apply p-1;
+  @apply bg-base-200;
+}   
+
+.fc .fc-event-title {
+  @apply font-medium;
+  @apply text-xs;
+  
+}
+
+
+/* Loading indicator para HTMX */
+.htmx-indicator {
+  @apply hidden;
+}
+.htmx-request .htmx-indicator {
+  @apply inline;
+}
+.htmx-request.htmx-indicator {
+  @apply inline;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .fc .fc-toolbar {
+      @apply flex-col;
+      @apply gap-1;
+  }
+  
+  .fc .fc-toolbar-chunk {
+      @apply flex;
+      @apply justify-center;
+  }
+}
 @layer components {
 .form-control input[type="text" ], input[type="number"] {
     @apply input w-full block ;
