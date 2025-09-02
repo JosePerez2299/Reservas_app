@@ -36,7 +36,7 @@
         <div class="divider mt-0"></div>
     
     <form
-        class="space-y-6 flex-1 overflow-y-auto"
+        class=" flex-1 overflow-y-auto"
         method="POST"
         hx-post="{% url 'espacio_create' %}"
         hx-target="#generic_modal_content"
@@ -51,12 +51,25 @@
         {% block form_script %}
         {% endblock form_script %}
 
-        <footer class="mt-6 flex items-center justify-between">
+        <footer class="mt-2 flex justify-between ">
             {% if wizard.steps.prev %}
-              <button name="wizard_goto_step"  class="btn btn-primary" type="submit" value="{{ wizard.steps.prev }}">Atrás</button>
+              <button name="wizard_goto_step" class="btn btn-primary btn-outline" type="submit" value="{{ wizard.steps.prev }}">
+                Atrás
+              </button>
+            {% else %}
+              <!-- si no hay paso previo, puedes poner un div vacío para que ocupe espacio -->
+              <div></div>
             {% endif %}
-            <input type="submit" class="btn btn-primary" value="Siguiente/Enviar">
-            </footer>
+        
+            <button type="submit" class="btn btn-primary transition-all duration-300" >
+                {% if wizard.steps.last %}
+                Enviar
+                {% else %}
+                Siguiente
+                {% endif %}
+            </button>
+        </footer>
+        
     </form>
 
 

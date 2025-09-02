@@ -1,67 +1,141 @@
 {% extends "espacios/base_form_create.html" %}
-
+{% load widget_tweaks %}
+{% load render_field_msg %}
 {% block form_content %}
-<div class="form-control">
-    <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-    {{ form.nombre }}
-    {% if form.nombre.errors %}
-        <div>{{ form.nombre.errors.0 }}</div>
-    {% endif %}
+<div class="space-y-6">
+    <!-- Información General -->
+    <div id="info_general"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 ">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-info-circle text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold"> Información General</h3>
+                <p class="text-sm text-base-content/60">Identifica y clasifica el espacio</p>
+            </div>
 
-    {% if form.nombre.help_text %}
-        <div class="text-xs text-base-content/60">{{ form.nombre.help_text }}</div>
-    {% endif %}
-</div>
+        </div>
+        <div class="space-y-4 px-4 grid grid-cols-2 gap-4">
+            <!-- Campo Nombre -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.nombre.id_for_label }}">
+                        <span>
+                            <i class="fas fa-tag h-4 w-4 "></i>
+                            Nombre
+                        </span>
 
-<div class="form-control">
-    <label for="{{ form.capacidad_maxima.id_for_label }}">{{ form.capacidad_maxima.label }}</label>
-    {{ form.capacidad_maxima }}
-    {% if form.capacidad_maxima.errors %}
-        <div>{{ form.capacidad_maxima.errors.0 }}</div>
-    {% endif %}
+                        {% if form.nombre.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
 
-    {% if form.capacidad_maxima.help_text %}
-        <div class="text-xs text-base-content/60">{{ form.capacidad_maxima.help_text }}</div>
-    {% endif %}
-</div>
+                    {{ form.nombre }}
+                </div>
 
-<div class="form-control">
-    <label>{{ form.tipo.label }}</label>
-    <div class="grid grid-cols-2 gap-2">
-    {{ form.tipo }}
+                {% field_messages form.nombre %}
+
+            </div>
+            <!-- Campo Capacidad máxima -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.capacidad_maxima.id_for_label }}">
+                        <span class="flex justify-between items-center gap-2">
+                            <i class="fas fa-users h-4 w-4  "></i>
+                            Capacidad máxima
+                        </span>
+                        {% if form.capacidad_maxima.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.capacidad_maxima }}
+                </div>
+                {% field_messages form.capacidad_maxima %}
+            
+            </div>
+
+            <!-- Campo Tipo -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.tipo.id_for_label }}">
+                        <span>
+                            <i class="fas fa-building h-4 w-4 "></i>
+                            Tipo de espacio
+                        </span>
+                        {% if form.tipo.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+
+                    </label>
+                    {{ form.tipo }}
+                </div>
+                {% field_messages form.tipo %}
+            </div>
+
+            <div>
+
+                <!-- Campo Disponible -->
+                <div class="form-control h-full">
+                    <label class="flex justify-between items-center" for="{{ form.disponible.id_for_label }}">
+                        <span>
+                            <i class="fas fa-check h-4 w-4 "></i>
+                            Disponibilidad
+                        </span>
+                        {% if form.disponible.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    <div class="flex justify-between items-center gap-2">
+                        <p class="text-xs  ">Indica si el espacio está disponible para ser reservado</p>
+                        {{ form.disponible }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    {% if form.tipo.errors %}
-        <div>{{ form.tipo.errors.0 }}</div>
-    {% endif %}
 
-    {% if form.tipo.help_text %}
-        <div class="text-xs text-base-content/60">{{ form.tipo.help_text }}</div>
-    {% endif %}
+
+    <!-- Información General -->
+    <div id="descripcion"
+        class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4"    >
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-neutral/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-info-circle text-neutrabg-neutral"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold"> Descripción</h3>
+                <p class="text-sm text-base-content/60">Describe el espacio</p>
+            </div>
+        </div>
+
+        <div class="space-y-4 px-4 ">
+            <!-- Campo Descripción -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.descripcion.id_for_label }}">
+                        <span>
+                            <i class="fas fa-info-circle h-4 w-4 "></i>
+                            Descripción (max. 250 caracteres)
+                        </span>
+
+                        {% if form.descripcion.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.descripcion|add_class:"w-full resize-none" }}
+                </div>
+                {% field_messages form.descripcion %}
+            </div>
+        </div>
+
+    </div>
+
+
 </div>
 
-<div class="form-control">
-    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
-    {{ form.descripcion }}
-    {% if form.descripcion.errors %}
-        <div>{{ form.descripcion.errors.0 }}</div>
-    {% endif %}
+{% endblock %}
 
-    {% if form.descripcion.help_text %}
-        <div class="text-xs text-base-content/60">{{ form.descripcion.help_text }}</div>
-    {% endif %}
-</div>
+{% block form_script %}
 
-<div class="form-control">
-    <label for="{{ form.disponible.id_for_label }}">
-        {{ form.disponible }}
-        {{ form.disponible.label }}
-    </label>
-    {% if form.disponible.errors %}
-        <div>{{ form.disponible.errors.0 }}</div>
-    {% endif %}
-
-    {% if form.disponible.help_text %}
-        <div class="text-xs text-base-content/60">{{ form.disponible.help_text }}</div>
-    {% endif %}
-</div>
-{% endblock form_content %}
+{% endblock form_script %}

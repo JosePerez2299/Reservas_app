@@ -6,3 +6,21 @@
 
 @source inline('progress-{warning,info,success,error}');
 
+
+
+@layer components {
+.form-control input[type="text" ], input[type="number"] {
+    @apply input w-full block ;
+}
+
+.form-control label {
+    @apply label ;
+}
+
+.form-control input[type="radio"], input[type="checkbox"] {
+    @apply radio radio-primary ;
+}
+.form-help {
+    @apply text-xs text-base-content/60;
+}
+}
