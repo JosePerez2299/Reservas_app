@@ -16,7 +16,7 @@ class EspacioForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "select select-bordered"}),
         initial=Espacio.Tipo.FISICO,
         required=True,
-        help_text="El tipo de espacio",
+        help_text="Seleccione el tipo de espacio, físico o digital",
     )
     disponible = forms.BooleanField(
         required=False,
@@ -26,7 +26,7 @@ class EspacioForm(forms.ModelForm):
     )
     capacidad_maxima = forms.IntegerField(
         required=True,
-        help_text="La capacidad máxima del espacio",
+        help_text="Cantidad máxima de personas",
         widget=forms.NumberInput(attrs={"min": 1, "max": 5000, "placeholder": "Ingrese la capacidad máxima del espacio"}),
     )
     descripcion = forms.CharField(
@@ -68,7 +68,7 @@ class DetalleFisicoForm(forms.ModelForm):
         choices=DetalleEspacioFisico.Tipo.choices,
         widget=forms.Select(attrs={"class": "select "}),
         required=True,
-        help_text="El tipo de espacio",
+        help_text="Seleccione el tipo de espacio, físico o digital",
     )
 
     class Meta:
