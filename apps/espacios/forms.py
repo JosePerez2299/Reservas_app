@@ -75,6 +75,9 @@ class DetalleFisicoForm(forms.ModelForm):
         model = DetalleEspacioFisico
         fields = ["piso", "tipo", "ubicacion"]
 
+# Formulario vacío para el paso de resumen
+class EmptyForm(forms.Form):
+    pass
 
 class EspacioUpdateForm(forms.ModelForm):
     pass

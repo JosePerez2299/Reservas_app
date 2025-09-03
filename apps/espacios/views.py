@@ -12,6 +12,7 @@ Views para los espacios
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.views import View
+from apps.espacios.services import *
 from .forms import *
 from .filters import EspacioFilter
 from .models import Espacio
@@ -51,36 +52,70 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
         'delete': 'espacio_delete',
     }
     
-
 def es_espacio_digital(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
     return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
 
 def es_espacio_fisico(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
-    return cleaned_data.get('tipo') ==  Espacio.Tipo.FISICO
+    return cleaned_data.get('tipo') == Espacio.Tipo.FISICO
 
-
-TEMPLATES = {"espacio": "espacios/espacio_form.html",
-             "detalle_digital": "espacios/detalles_digitales_form.html",
-             "detalle_fisico": "espacios/detalles_fisicos_form.html" }
+TEMPLATES = {
+    "espacio": "espacios/espacio_form.html",
+    "detalle_digital": "espacios/detalles_digitales_form.html",
+    "detalle_fisico": "espacios/detalles_fisicos_form.html",
+    "resumen": "espacios/confirm_create.html" 
+}
 
 class EspacioCreateWizardView(SessionWizardView):
-    form_list = [('espacio', EspacioForm), ('detalle_digital', DetalleDigitalForm), ('detalle_fisico', DetalleFisicoForm)]
-    # condition_dict = {'1': es_espacio_digital, '2': es_espacio_fisico}
-
-    condition_dict = {'detalle_digital': es_espacio_digital, 'detalle_fisico': es_espacio_fisico}
-
+    form_list = [
+        ('espacio', EspacioForm), 
+        ('detalle_digital', DetalleDigitalForm), 
+        ('detalle_fisico', DetalleFisicoForm),
+        ('resumen', EmptyForm)  
+    ]
+    
+    condition_dict = {
+        'detalle_digital': es_espacio_digital, 
+        'detalle_fisico': es_espacio_fisico
+    }
+    
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-
+        
+        if self.steps.current == 'resumen':
+            ctx['resumen_data'] = self.get_resumen_data()
+        
         ctx['steps'] = [
-            {'label': 'Espacio', 'number': '1', 'active': self.steps.current == 'espacio', 'checked': True}, 
-            {'label': 'Detalles', 'number': '2', 'active': self.steps.current == 'detalle_digital' or self.steps.current == 'detalle_fisico'}]
-        # contador fijo
-       
+            {'label': 'Espacio', 'number': '1', 
+             'active': self.steps.current == 'espacio', 
+             'completed': self.steps.current != 'espacio'},
+            {'label': 'Detalles', 'number': '2', 
+             'active': self.steps.current == 'detalle_digital' or self.steps.current == 'detalle_fisico',
+             'completed': self.steps.current == 'resumen'},
+            {'label': 'Resumen', 'number': '3', 
+             'active': self.steps.current == 'resumen'}
+        ]
+        
         return ctx
-
+    
+    def get_resumen_data(self):
+        """Recopila todos los datos del wizard para mostrar en el resumen"""
+        espacio_data = self.get_cleaned_data_for_step('espacio') or {}
+        detalle_data = {}
+        
+        if espacio_data.get('tipo') == Espacio.Tipo.DIGITAL:
+            detalle_data = self.get_cleaned_data_for_step('detalle_digital') or {}
+            tipo_detalle = 'Digital'
+        else:
+            detalle_data = self.get_cleaned_data_for_step('detalle_fisico') or {}
+            tipo_detalle = 'Físico'
+        
+        return {
+            'espacio': espacio_data,
+            'detalle': detalle_data,
+            'tipo_detalle': tipo_detalle
+        }
 
     def get_template_names(self):
         return [TEMPLATES[self.steps.current]]
@@ -88,17 +123,15 @@ class EspacioCreateWizardView(SessionWizardView):
     def done(self, form_list, **kwargs):
         espacio_form = form_list[0]
         detalle_form = form_list[1]
-
-        print('form_list', form_list)
-        with transaction.atomic():
-                espacio = espacio_form.save()
-                detalle = detalle_form.save(commit=False)
-                detalle.espacio_id = espacio.id
-                detalle.save()
-
-        response = HttpResponse(status=204)
-        response['HX-Trigger'] = json.dumps({'showMessage': 'Se ha creado exitosamente'})
-        return response
+        espacio_creado = create_espacio(espacio_form, detalle_form)
+        if espacio_creado:
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = json.dumps({'showMessage': 'Se ha creado exitosamente'})
+            return response
+        else:
+            response = HttpResponse(status=500)
+            response['HX-Trigger'] = json.dumps({'showMessage': 'Error al crear el espacio'})
+            return response
 
 
 class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
