@@ -107,6 +107,7 @@ class DetalleEspacioFisico(models.Model):
         SALON = 'salon', 'Salón'
         LABORATORIO = 'laboratorio', 'Laboratorio'
         AUDITORIO = 'auditorio', 'Auditorio'
+        OTRO = 'otro', 'Otro'
 
     espacio = models.OneToOneField(
         Espacio, on_delete=models.CASCADE, related_name='detalle_fisico'

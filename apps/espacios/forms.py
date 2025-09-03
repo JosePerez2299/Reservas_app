@@ -1,4 +1,5 @@
 from django import forms
+from apps.core.models import Ubicacion
 from apps.espacios.models import Espacio
 from apps.espacios.models import DetalleEspacioFisico, DetalleEspacioDigital
 
@@ -51,6 +52,25 @@ class DetalleDigitalForm(forms.ModelForm):
 
 
 class DetalleFisicoForm(forms.ModelForm):
+    ubicacion = forms.ModelChoiceField(
+        queryset=Ubicacion.objects.all(),
+        widget=forms.Select,
+        required=True,
+        help_text="El edificio en el que se encuentra el espacio",
+    )
+
+    piso = forms.IntegerField(
+        required=True,
+        help_text="En que piso se encuentra el espacio",
+        widget=forms.NumberInput(attrs={"min": 1, "max": 50, "placeholder": "Ingrese el piso del espacio"}),
+    )
+    tipo = forms.ChoiceField(
+        choices=DetalleEspacioFisico.Tipo.choices,
+        widget=forms.Select(attrs={"class": "select "}),
+        required=True,
+        help_text="El tipo de espacio",
+    )
+
     class Meta:
         model = DetalleEspacioFisico
         fields = ["piso", "tipo", "ubicacion"]

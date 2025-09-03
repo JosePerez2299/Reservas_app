@@ -40,7 +40,9 @@
   @apply text-xs;
   
 }
-
+data-select-item {
+  @apply bg-red-100;
+}
 
 /* Loading indicator para HTMX */
 .htmx-indicator {
