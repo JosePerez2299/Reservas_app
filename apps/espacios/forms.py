@@ -48,7 +48,7 @@ class EspacioForm(forms.ModelForm):
 class DetalleDigitalForm(forms.ModelForm):
     class Meta:
         model = DetalleEspacioDigital
-        fields = ["plataforma"]
+        fields = ["plataforma", "url"]
 
 
 class DetalleFisicoForm(forms.ModelForm):

@@ -1,7 +1,62 @@
 {% extends "espacios/base_form_create.html" %}
-
+{% load render_field_msg %}
+{% load widget_tweaks %}
 {% block form_content %}
-{{form.as_p}}
+    <!-- Información General -->
+    <div id="info_general"
+        class="card bg-success/5 border border-base-300 hover:border-success/30 transition-all duration-300 p-4 ">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-secborder-success/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-building text-secborder-info"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold"> Detalles del espacio físico</h3>
+                <p class="text-sm text-base-content/60">Rellena los campos para clasificar el espacio</p>
+            </div>
+
+        </div>
+        <div class="space-y-4 px-4 grid grid-cols-2 gap-4">
+            <!-- Campo Plataforma -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.plataforma.id_for_label }}">
+                        <span>
+                            <i class="fas fa-location-dot h-4 w-4 "></i>
+                            Plataforma
+                        </span>
+                        {% if form.plataforma.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.plataforma|add_class:"w-full select" }}
+                </div>
+                {% field_messages form.plataforma %}
+            </div>
+
+            <!-- Campo URL -->
+
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.url.id_for_label }}">
+                        <span>
+                            <i class="fas fa-link h-4 w-4 mr-2"></i>
+                            URL
+                        </span>
+
+                        {% if form.url.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.url|add_class:"w-full input" }}
+                </div>
+                {% field_messages form.url %}
+            </div>
+
+        </div>
+
+    </div>
+
+
 {% endblock form_content %}
 
 {% block form_script %}

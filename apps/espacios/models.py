@@ -73,7 +73,18 @@ class DetalleEspacioDigital(models.Model):
     )
 
     plataforma = models.ForeignKey(
-        PlataformaDigital, on_delete=models.CASCADE, related_name='detalles')
+        PlataformaDigital,
+        help_text="Plataforma del espacio digital",
+        on_delete=models.CASCADE,
+        related_name='detalles'
+    )
+
+    url = models.URLField(
+        max_length=200,
+        help_text="URL del espacio digital",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name = "Detalle Espacio Digital"
