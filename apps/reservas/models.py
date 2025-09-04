@@ -6,32 +6,40 @@ from apps.espacios.models import Espacio
 from apps.usuarios.models import Usuario
 from apps.core.models import Ubicacion
 
-
-# ——— 4. Reserva ————————————————————————————————————————————————
 class Reserva(models.Model):
     class Estado(models.TextChoices):
         PENDIENTE = 'pendiente', 'Pendiente'
         APROBADA = 'aprobada',  'Aprobada'
         RECHAZADA = 'rechazada', 'Rechazada'
+        CANCELADA = 'cancelada', 'Cancelada'
 
     usuario = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name='reservas'
     )
+    
+
     espacio = models.ForeignKey(
         Espacio, on_delete=models.CASCADE, related_name='reservas'
     )
+
     fecha_uso = models.DateField()
+
     hora_inicio = models.TimeField()
+    
     hora_fin = models.TimeField()   
+    
     estado = models.CharField(
         max_length=10, choices=Estado.choices, default=Estado.PENDIENTE
     )
+
     motivo = models.TextField(
         "Motivo de reserva", null=False, blank=False
     )
-    motivo_admin = models.TextField(
-        "Mensaje de aprobación/rechazo", null=True, blank=True, default=""
+
+    mensaje_aprobar_rechazar = models.TextField(
+        "Mensaje de aprobación/rechazo/cancelación", null=True, blank=True, default=""
     )
+
     aprobado_por = models.ForeignKey(
         Usuario, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='reservas_aprobadas'
@@ -78,49 +86,49 @@ class Reserva(models.Model):
     def tipo_reserva(self):
         return self.espacio.tipo
 
-    def clean(self):
-        super().clean()
+    # def clean(self):
+    #     super().clean()
 
-        # 0) Espacio disponible (solo si espacio ya ha sido asignado)
-        if self.espacio_id is not None and not self.espacio.disponible:
-            raise ValidationError("El espacio no está disponible.")
+    #     # 0) Espacio disponible (solo si espacio ya ha sido asignado)
+    #     if self.espacio_id is not None and not self.espacio.disponible:
+    #         raise ValidationError("El espacio no está disponible.")
 
-        # 1) fecha en el futuro o hoy
-        if self.fecha_uso < timezone.now().date():
-            raise ValidationError(
-                "La fecha de uso debe ser hoy o en el futuro.")
+    #     # 1) fecha en el futuro o hoy
+    #     if self.fecha_uso < timezone.now().date():
+    #         raise ValidationError(
+    #             "La fecha de uso debe ser hoy o en el futuro.")
 
-        # 2) solapamiento de franjas horarias
-        qs = Reserva.objects.filter(
-            espacio_id=self.espacio_id,
-            fecha_uso=self.fecha_uso,
-            estado=self.Estado.APROBADA
-        ).exclude(pk=self.pk).filter(
-            Q(hora_inicio__lt=self.hora_fin) &
-            Q(hora_fin__gt=self.hora_inicio)
-        )
-        if qs.exists():
-            raise ValidationError(
-                "Ya existe otra reserva solapada para este espacio.")
+    #     # 2) solapamiento de franjas horarias
+    #     qs = Reserva.objects.filter(
+    #         espacio_id=self.espacio_id,
+    #         fecha_uso=self.fecha_uso,
+    #         estado=self.Estado.APROBADA
+    #     ).exclude(pk=self.pk).filter(
+    #         Q(hora_inicio__lt=self.hora_fin) &
+    #         Q(hora_fin__gt=self.hora_inicio)
+    #     )
+    #     if qs.exists():
+    #         raise ValidationError(
+    #             "Ya existe otra reserva solapada para este espacio.")
 
-        # 3) si alguien aprueba o rechaza, debe ser administrador o moderador de ese mismo piso y ubicación
-        if self.estado in [self.Estado.APROBADA, self.Estado.RECHAZADA]:
-            if not self.aprobado_por:
-                raise ValidationError(
-                    "Debe haber un moderador o administrador que apruebe o rechace la reserva.")
+    #     # 3) si alguien aprueba o rechaza, debe ser administrador o moderador de ese mismo piso y ubicación
+    #     if self.estado in [self.Estado.APROBADA, self.Estado.RECHAZADA]:
+    #         if not self.aprobado_por:
+    #             raise ValidationError(
+    #                 "Debe haber un moderador o administrador que apruebe o rechace la reserva.")
 
-            if self.aprobado_por.is_admin:
-                return
+    #         if self.aprobado_por.is_admin:
+    #             return
 
-            if not self.aprobado_por.is_moderador:
-                raise ValidationError(
-                    "Solo un administrador o moderador puede aprobar o rechazar reservas.")
+    #         if not self.aprobado_por.is_moderador:
+    #             raise ValidationError(
+    #                 "Solo un administrador o moderador puede aprobar o rechazar reservas.")
 
-            if (self.aprobado_por.ubicacion_id != self.espacio.ubicacion_id or
-                    self.aprobado_por.piso != self.espacio.piso):
-                raise ValidationError(
-                    "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
-                )
+    #         if (self.aprobado_por.ubicacion_id != self.espacio.ubicacion_id or
+    #                 self.aprobado_por.piso != self.espacio.piso):
+    #             raise ValidationError(
+    #                 "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
+    #             )
 
 
 class DetalleReservaDigital(models.Model):
@@ -131,12 +139,13 @@ class DetalleReservaDigital(models.Model):
     )
 
     anfitrion_usuario = models.CharField(max_length=100, null=True, blank=True)
-
+    
+    # Ubicacion donde se realizara la transmision
     ubicacion_transmision = models.ForeignKey(
         Ubicacion, on_delete=models.CASCADE, related_name='reservas_digitales', null=True, blank=True
     )
 
-    # Espacio donde se realizara la transmisión
+    #  Nombre del espacio donde se realizara la transmisión
     espacio_transmision = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:

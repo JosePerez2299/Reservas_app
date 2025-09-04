@@ -14,10 +14,7 @@ urlpatterns = [
     path('api/mes/', ReservasMonthlyCount.as_view(), name='reservas_monthly_count'),
 
     path("create/", ReservaCreateWizardView.as_view(), name="reserva_create"),
-    path("create/step1/", ReservaCreateStep1View.as_view(), name="reserva_create_step1"),
-    path("create/step2/", ReservaCreateStep2View.as_view(), name="reserva_create_step2"),
-    path("create/step3/", ReservaCreateStep3View.as_view(), name="reserva_create_step3"),
-
+   
     path('api/fecha/', ReservasByDate.as_view(), name='reservas_by_date'),
     path('gestionar/<int:pk>/', ReservaApproveView.as_view(), name='reserva_approve'),
 ]

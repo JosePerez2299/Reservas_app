@@ -11,6 +11,9 @@ Views para las reservas
 import json
 from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from formtools.wizard.views import SessionWizardView
+
+from apps.espacios.forms import EmptyForm
 from .models import Reserva
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
@@ -27,48 +30,6 @@ from django.views.generic import TemplateView
 from django.http import Http404
 from django.shortcuts import render
 import time 
-
-class ReservaCreateWizardView(LoginRequiredMixin, TemplateView):
-    """
-    Vista inicial del wizard para crear reservas
-    """
-    template_name = "reservas/reservas_create/base.html"
-    
-
-class ReservaCreateStep1View(LoginRequiredMixin, TemplateView):
-    """
-    Primer paso del wizard para crear reservas - Selección de tipo
-    """
-    template_name = "reservas/reservas_create/step1.html"
-
-class ReservaCreateStep2View(LoginRequiredMixin, View):
-    """
-    Segundo paso del wizard para crear reservas - Configuración de detalles
-    """
-    template_name = "reservas/reservas_create/step2.html"
-    
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-    
-    def post(self, request, *args, **kwargs):
-        data = request.POST.dict()
-        tipo = data.get("tipo")
-        return render(request, self.template_name, {"tipo": tipo, "data": data})
-
-
-class ReservaCreateStep3View(LoginRequiredMixin, View):
-    """
-    Tercer paso del wizard para crear reservas - Vista previa y confirmación
-    """
-    template_name = "reservas/reservas_create/step3.html"
-    
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-    
-    def post(self, request, *args, **kwargs):
-        # simula vista previa con los datos posteados
-        data = request.POST.dict()
-        return render(request, self.template_name, {"data": data})
 
 def qs_condiciones(user):
     if user.is_admin:
@@ -206,67 +167,73 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         qs = qs.filter(condiciones)
         return qs
     
-class ReservaCreateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, CreateView):
-    form_class = ReservaCreateForm
-    template_name = 'reservas/reservas_create.html'
-    permission_required = 'reservas.add_reserva'
-    
-    def success_message(self):
-        return 'Reserva creada correctamente'
+
+# Templates para el wizard de creación de reservas
+TEMPLATES = {
+    'reserva': 'reservas/reservas_create/reserva_form.html',
+    'tipo': 'reservas/reservas_create/tipo_form.html',
+    'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
+    'requerimiento': 'reservas/reservas_create/requerimiento_form.html',
+    'resumen': 'reservas/reservas_create/resumen_form.html'
+}
+STEP_LABELS = {
+    'tipo': 'Tipo de Espacio',
+    'reserva': 'Información General', 
+    'detalle': 'Detalles Digitales',
+    'requerimiento': 'Requerimientos',
+    'resumen': 'Resumen'
+}
+
+# Condiciones para el wizard de creación de reservas
+def es_reserva_digital(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('tipo') or {}
+    print(cleaned_data, cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL)
+    return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
+
+class ReservaCreateWizardView(SessionWizardView):
+    """
+    Crea una nueva reserva
+    """
+    form_list = [
+        ('tipo', ReservaTipoForm),
+        ('reserva', ReservaCreateForm),
+        ('detalle', DetalleReservaDigitalForm),
+        ('requerimiento', RequerimientoReservaForm),
+        ('resumen', EmptyForm)
+    ]
+
+    condition_dict = {
+        'detalle': es_reserva_digital,
+    }
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Reserva de Espacios'
+        ctx['subtitle'] = 'Complete la información requerida'
+        ctx['header_icon'] = 'calendar-alt'
         ctx['url'] = reverse_lazy('reserva_create')
-        ctx['title'] = 'Crear Reserva'
-        ctx['subtitle'] = 'Informacion de la reserva'
+        
+        # Steps info
+        all_steps = list(self.get_form_list().keys())
+        current_index = all_steps.index(self.steps.current)
+        
+        ctx['all_steps'] = all_steps
+        ctx['current_index'] = current_index
+        ctx['step_labels'] = STEP_LABELS
+        
         return ctx
+        
+    def get_template_names(self):
+        return [TEMPLATES[self.steps.current]]
     
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-    
-    def get_initial(self):
-        initial = super().get_initial()
-        fecha_uso = self.request.GET.get('fecha_uso')
-        if fecha_uso:
-            initial['fecha_uso'] = fecha_uso
-        return initial
+    def done(self, form_list, **kwargs):
+        print(form_list)
 
-class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView ):
+class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, View):
     """
     Edita una reserva existente
     """
-    model = Reserva
-    form_class = ReservaUpdateForm  
-    template_name = 'reservas/reservas_edit.html'
-    success_url = reverse_lazy('reserva')
-    permission_required = 'reservas.change_reserva'
-
-    def success_message(self):
-        return 'Reserva editada correctamente'
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['url'] = reverse_lazy('reserva_edit', args=[self.object.pk])
-        ctx['title'] = 'Editar Reserva'
-        ctx['subtitle'] = 'Detalles de la reserva'
-        return ctx
-
-    def get_form_kwargs(self):
-        """
-        Pasa el objeto request al formulario
-        """
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones & Q(estado='pendiente'))
-        return qs
-
+    pass
 
 class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DetailView):
     """

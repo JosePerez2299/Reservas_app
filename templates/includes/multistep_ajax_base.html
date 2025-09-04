@@ -1,0 +1,57 @@
+<div class="max-w-3xl mx-auto p-6">
+    {{steps}}
+    <!-- Header con progreso a la derecha - ARRIBA -->
+    <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
+        <!-- Título a la izquierda -->
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
+                <i class="fas fa-{{header_icon|default:'edit'}} text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold">{{title}}</h1>
+                <p class="text-xs text-base-content/60">{{subtitle|default:'Complete la información requerida'}}</p>
+            </div>
+        </div>
+
+        <!-- Progreso Visual Compacto a la derecha -->
+        <ul class="steps steps-horizontal">
+            {% for step in all_steps %}
+                <li class="step {% if forloop.counter0 <= current_index %}step-primary{% endif %}">
+                    <span class="text-xs font-medium text-base-content/60">
+
+
+                        {{ step|capfirst }}
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+    </div>
+
+    <!-- Divisor -->
+    <div class="divider mt-0"></div>
+
+    <form class=" flex-1" method="POST" hx-post="{{url}}" hx-target="#generic_modal_content"
+        hx-swap="innerHTML" id="ajax-form" novalidate enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {% block form_content %}
+        {% endblock form_content %}
+        {% block form_script %}
+        {% endblock form_script %}
+
+        <footer class="mt-2 flex justify-between ">
+            {% if wizard.steps.prev %}
+            <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn ">
+                <i class="fas fa-arrow-left"></i> Anterior
+            </button>
+            {% else %}
+            <!-- si no hay paso previo, puedes poner un div vacío para que ocupe espacio -->
+            <div></div>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Confirmar y Crear
+            </button>
+        </footer>
+
+    </form>
+</div>
