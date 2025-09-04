@@ -6,3 +6,4 @@ pandas
 django-auditlog
 django-formtools
 fontawesomefree
+pillow
