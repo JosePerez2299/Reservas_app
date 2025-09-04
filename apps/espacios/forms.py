@@ -71,9 +71,15 @@ class DetalleFisicoForm(forms.ModelForm):
         help_text="Seleccione el tipo de espacio, físico o digital",
     )
 
+    foto = forms.ImageField(
+        required=True,
+        help_text="Seleccione la foto del espacio",
+        widget=forms.FileInput(attrs={}),
+    )
+
     class Meta:
         model = DetalleEspacioFisico
-        fields = ["piso", "tipo", "ubicacion"]
+        fields = ["piso", "tipo", "ubicacion", "foto"]
 
 # Formulario vacío para el paso de resumen
 class EmptyForm(forms.Form):

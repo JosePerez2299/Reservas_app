@@ -168,7 +168,8 @@ APPEND_SLASH = True
 LOGIN_REDIRECT_URL = '/inicio/'
 LOGIN_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 class GRUPOS:
     ADMINISTRADOR = 'administrador'

@@ -2404,9 +2404,6 @@
   .mr-3 {
     margin-right: calc(var(--spacing) * 3);
   }
-  .mb-0 {
-    margin-bottom: calc(var(--spacing) * 0);
-  }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
   }
@@ -3353,12 +3350,6 @@
   .bg-info {
     background-color: var(--color-info);
   }
-  .bg-info\/5 {
-    background-color: var(--color-info);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-info) 5%, transparent);
-    }
-  }
   .bg-neutral\/10 {
     background-color: var(--color-neutral);
     @supports (color: color-mix(in lab, red, red)) {
@@ -3421,12 +3412,6 @@
   }
   .bg-secondary {
     background-color: var(--color-secondary);
-  }
-  .bg-secondary\/5 {
-    background-color: var(--color-secondary);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-secondary) 5%, transparent);
-    }
   }
   .bg-success {
     background-color: var(--color-success);
@@ -3784,15 +3769,6 @@
   }
   .whitespace-normal {
     white-space: normal;
-  }
-  .file-input-info {
-    --btn-color: var(--color-info);
-    &::file-selector-button {
-      color: var(--color-info-content);
-    }
-    &, &:focus, &:focus-within {
-      --input-color: var(--color-info);
-    }
   }
   .checkbox-primary {
     color: var(--color-primary-content);
@@ -4203,10 +4179,6 @@
     --btn-color: var(--color-primary);
     --btn-fg: var(--color-primary-content);
   }
-  .btn-secondary {
-    --btn-color: var(--color-secondary);
-    --btn-fg: var(--color-secondary-content);
-  }
   .btn-success {
     --btn-color: var(--color-success);
     --btn-fg: var(--color-success-content);
@@ -4333,32 +4305,12 @@
       }
     }
   }
-  .hover\:border-info\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-info);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-info) 30%, transparent);
-        }
-      }
-    }
-  }
   .hover\:border-primary\/30 {
     &:hover {
       @media (hover: hover) {
         border-color: var(--color-primary);
         @supports (color: color-mix(in lab, red, red)) {
           border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
-        }
-      }
-    }
-  }
-  .hover\:border-secondary\/30 {
-    &:hover {
-      @media (hover: hover) {
-        border-color: var(--color-secondary);
-        @supports (color: color-mix(in lab, red, red)) {
-          border-color: color-mix(in oklab, var(--color-secondary) 30%, transparent);
         }
       }
     }

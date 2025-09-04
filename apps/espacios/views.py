@@ -9,6 +9,7 @@ Views para los espacios
 
 """
 
+import os
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from django.views import View
@@ -23,6 +24,7 @@ from django.urls import reverse_lazy
 from django.db.models.functions import Lower
 from django.db.models import Count, Q   
 from django.db import IntegrityError, transaction
+from django.core.files.storage import FileSystemStorage
 from formtools.wizard.views import SessionWizardView
 
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
@@ -68,6 +70,7 @@ TEMPLATES = {
 }
 
 class EspacioCreateWizardView(SessionWizardView):
+    file_storage = FileSystemStorage(  location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
     form_list = [
         ('espacio', EspacioForm), 
         ('detalle_digital', DetalleDigitalForm), 

@@ -71,21 +71,21 @@
             <!-- TODO: Campo Fotografia -->
             <div>
                 <div class="form-control">
-                    <label class="flex justify-between items-center" for="{{ form.fotografia.id_for_label }}">
+                    <label class="flex justify-between items-center" for="{{ form.foto.id_for_label }}">
                         <span>
                             <i class="fas fa-image h-4 w-4 "></i>
-                            Fotografia
+                            Fotografía
                         </span>
 
-                        <!-- TODO: Sustituir por el campo de la base de datos -->
-                        {% if True %}
+                        {% if form.foto.field.required %}
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    <input type="file" class="file-input" />
+                    {{form.foto}}
                     
 
                 </div>
+                {% field_messages form.foto %}
             </div>
         </div>
     </div>

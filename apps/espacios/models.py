@@ -3,7 +3,8 @@ from django.db.models import Q
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from apps.core.models import Ubicacion, PlataformaDigital
-
+import os
+import uuid
 
 
 class Espacio(models.Model):
@@ -101,6 +102,10 @@ class DetalleEspacioDigital(models.Model):
     def __str__(self):
         return f"Espacio: {self.espacio.nombre} | Capacidad Máxima: {self.espacio.capacidad_maxima}"
 
+def user_directory_path(instance, filename):
+    ext = filename.split('.')[-1] 
+    filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join("espacios/fisicos", filename)
 
 class DetalleEspacioFisico(models.Model):
     class Tipo(models.TextChoices):
@@ -121,6 +126,9 @@ class DetalleEspacioFisico(models.Model):
     
     ubicacion = models.ForeignKey(
         Ubicacion, on_delete=models.CASCADE, related_name='espacios_fisicos')
+
+
+    foto = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
 
     class Meta:
         verbose_name = "Detalle Espacio Físico"
