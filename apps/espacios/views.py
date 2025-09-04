@@ -69,8 +69,9 @@ TEMPLATES = {
     "resumen": "espacios/confirm_create.html" 
 }
 
-class EspacioCreateWizardView(SessionWizardView):
+class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
     file_storage = FileSystemStorage(  location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
+    permission_required = 'espacios.add_espacio'
     form_list = [
         ('espacio', EspacioForm), 
         ('detalle_digital', DetalleDigitalForm), 
