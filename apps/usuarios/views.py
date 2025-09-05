@@ -25,10 +25,41 @@ from django.db.models import Case, When, Value, CharField, Q
 from django.db.models.functions import Lower, Coalesce
 from .filters import UsuarioFilter
 from django.conf import settings
+from django.views import View
+from django.http import JsonResponse
 
 def custom_404_view(request, exception=None):
     """Custom 404 handler that redirects to login page."""
     return redirect(reverse('login'))
+
+
+class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    """
+    Muestra los detalles de un usuario
+    """
+    model = Usuario
+    permission_required = 'usuarios.view_usuario'
+    template_name = 'reservas/usuario_detail.html'
+
+    def get(self, request, *args, **kwargs):
+
+        username = request.GET.get('username')
+        if not username:
+            return JsonResponse({'error': 'No se proporcionó un ID de usuario'}, status=400)
+
+        queryset = self.model.objects.filter(username=username)
+        usuario = queryset.first()
+        
+        if not usuario or not usuario.is_active:
+            return JsonResponse({'error': 'No se encontró el usuario'}, status=404)
+        
+        print(usuario)
+
+        response = {
+            'username': usuario.username,
+            'email': usuario.email,
+        }
+        return JsonResponse(response, safe=False)
 
 class Dashboard(LoginRequiredMixin, TemplateView):
 

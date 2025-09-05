@@ -198,7 +198,6 @@ class ReservaCreateWizardView(SessionWizardView):
         ('tipo', ReservaTipoForm),
         ('reserva', ReservaCreateForm),
         ('detalle', DetalleReservaDigitalForm),
-        ('requerimiento', RequerimientoReservaForm),
         ('resumen', EmptyForm)
     ]
 

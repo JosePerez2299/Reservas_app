@@ -30,6 +30,10 @@
     <!-- Divisor -->
     <div class="divider mt-0"></div>
 
+    {% block form_header %}
+
+    {% endblock form_header %}
+
     <form class=" flex-1" method="POST" hx-post="{{url}}" hx-target="#generic_modal_content"
         hx-swap="innerHTML" id="ajax-form" novalidate enctype="multipart/form-data">
         {% csrf_token %}

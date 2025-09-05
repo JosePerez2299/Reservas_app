@@ -1,7 +1,8 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from django.db.models import Q, F
+from django.db.models import Q, F, OneToOneField
 from apps.espacios.models import Espacio
 from apps.usuarios.models import Usuario
 from apps.core.models import Ubicacion
@@ -13,13 +14,31 @@ class Reserva(models.Model):
         RECHAZADA = 'rechazada', 'Rechazada'
         CANCELADA = 'cancelada', 'Cancelada'
 
+    class Modalidad(models.TextChoices):
+        PRESENCIAL = 'presencial', 'Presencial'
+        VIRTUAL = 'virtual', 'Virtual'
+        MIXTA = 'mixta', 'Mixta'
+
+
+    class TipoSolicitud(models.TextChoices):
+        INTERNA = 'interna', 'Interna'
+        EXTERNA = 'externa', 'Externa'
+
+
     usuario = models.ForeignKey(
         Usuario, on_delete=models.CASCADE, related_name='reservas'
     )
     
+    modalidad = models.CharField(
+        max_length=10, choices=Modalidad.choices, default=Modalidad.PRESENCIAL
+    )
 
-    espacio = models.ForeignKey(
-        Espacio, on_delete=models.CASCADE, related_name='reservas'
+    tipo_solicitud = models.CharField(
+        max_length=10, choices=TipoSolicitud.choices, default=TipoSolicitud.INTERNA
+    )
+
+    tipo_actividad = models.ForeignKey(
+        "TipoActividad", on_delete=models.CASCADE, related_name='reservas', null=True, blank=True
     )
 
     fecha_uso = models.DateField()
@@ -32,8 +51,18 @@ class Reserva(models.Model):
         max_length=10, choices=Estado.choices, default=Estado.PENDIENTE
     )
 
+    espacios = models.ManyToManyField(
+        Espacio,
+        through="ReservaEspacio",
+        related_name="reservas"
+    )
+
     motivo = models.TextField(
         "Motivo de reserva", null=False, blank=False
+    )
+
+    observacion = models.TextField(
+        "Observación", null=True, blank=True
     )
 
     mensaje_aprobar_rechazar = models.TextField(
@@ -45,10 +74,6 @@ class Reserva(models.Model):
         related_name='reservas_aprobadas'
     )
 
-    numero_participantes = models.IntegerField(
-        "Número de participantes", null=False, blank=False, default=1
-    )
-
     fecha_creacion = models.DateTimeField(
         "Fecha de creación", auto_now_add=True
     )
@@ -56,21 +81,20 @@ class Reserva(models.Model):
         "Fecha de cambio de estado", null=True, blank=True
     )
 
+    requerimientos = models.JSONField(
+        "Requerimientos", null=True, blank=True, default=list
+    )
+
     class Meta:
         verbose_name = "Reserva"
         verbose_name_plural = "Reservas"
         ordering = ['-fecha_uso', 'hora_inicio']
         indexes = [
-            models.Index(fields=['espacio', 'fecha_uso']),
             models.Index(fields=['fecha_uso']),
         ]
         constraints = [
             # Evita que un mismo usuario haga dos reservas el mismo día en el mismo espacio
-            models.UniqueConstraint(
-                fields=['usuario', 'espacio', 'fecha_uso'],
-                name='uniq_usuario_espacio_fecha',
-                violation_error_message="Ya existe una reserva para este usuario en este espacio el mismo día."
-            ),
+
             # Asegura hora_inicio < hora_fin
             models.CheckConstraint(
                 check=Q(hora_inicio__lt=F('hora_fin')),
@@ -80,11 +104,8 @@ class Reserva(models.Model):
         ]
 
     def __str__(self):
-        return f"US:{self.usuario.username} | ESP:{self.espacio.nombre}"
+        return f"RES:{self.id} | US:{self.usuario.username} | FE:{self.fecha_uso} | HI:{self.hora_inicio} | HF:{self.hora_fin}"
 
-
-    def tipo_reserva(self):
-        return self.espacio.tipo
 
     # def clean(self):
     #     super().clean()
@@ -130,12 +151,70 @@ class Reserva(models.Model):
     #                 "El moderador solo puede aprobar o rechazar reservas de su misma ubicación y piso."
     #             )
 
+class ReservaEspacio(models.Model):
+    reserva = models.ForeignKey(
+        Reserva, on_delete=models.CASCADE, related_name='reserva_espacios'
+    )
+
+    espacio = models.ForeignKey(
+        Espacio, on_delete=models.CASCADE, related_name='reserva_espacios'
+    )
+
+    numero_participantes = models.PositiveIntegerField(
+        "Número de participantes", null=False, blank=False, default=1, validators=[MinValueValidator(1)]
+    )
+
+    class Meta:
+        verbose_name = "Reserva Espacio"
+        verbose_name_plural = "Reservas Espacios"
+        constraints = [
+            # Evita que se reserve el mismo espacio dos o más veces en la misma reserva
+            models.UniqueConstraint(
+                fields=['reserva', 'espacio'],
+                name='uniq_reserva_espacio',
+                violation_error_message="Ya existe una reserva para este espacio."
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+
+        # 1) comprobar presencia mínima
+        if bool(self.detalle_digital) == bool(self.detalle_fisico):
+            raise ValidationError("Debe rellenar exactamente uno de 'detalle_digital' o 'detalle_fisico'.")
+
+        # 2) determinar tipo de espacio de forma segura y eficiente
+        tipo = None
+        if getattr(self, "espacio_id", None):
+            # solo recuperamos el campo tipo (no toda la instancia)
+            tipo = Espacio.objects.filter(pk=self.espacio_id).values_list("tipo", flat=True).first()
+        else:
+            # si espacio ya está asignado como instancia en memoria (p. ej. form.save(commit=False))
+            espacio_obj = getattr(self, "espacio", None)
+            if espacio_obj is not None:
+                tipo = getattr(espacio_obj, "tipo", None)
+
+        # 3) validaciones según tipo
+        if tipo == "fisico":
+            if self.detalle_fisico is None:
+                raise ValidationError("Para un espacio físico debe asignar 'detalle_fisico'.")
+            if self.detalle_digital is not None:
+                raise ValidationError("No puede asignar 'detalle_digital' a un espacio físico.")
+        elif tipo == "digital":
+            if self.detalle_digital is None:
+                raise ValidationError("Para un espacio digital debe asignar 'detalle_digital'.")
+            if self.detalle_fisico is not None:
+                raise ValidationError("No puede asignar 'detalle_fisico' a un espacio digital.")
+
+    def __str__(self):
+        return f"Reserva: {self.reserva.id} | Espacio: {self.espacio.nombre}"
+
 
 class DetalleReservaDigital(models.Model):
     # To do: Validar que reserva.espacio.tipo == 'digital'
     # To do: Reserva unique constraint
-    reserva = models.ForeignKey(
-        Reserva, on_delete=models.CASCADE, related_name='detalles'
+    reserva_espacio = OneToOneField(
+        ReservaEspacio, on_delete=models.CASCADE, related_name='detalle_digital'
     )
 
     anfitrion_usuario = models.CharField(max_length=100, null=True, blank=True)
@@ -151,39 +230,57 @@ class DetalleReservaDigital(models.Model):
     class Meta:
         verbose_name = "Detalle Reserva Digital"
         verbose_name_plural = "Detalles de Reservas Digitales"
-        ordering = ['-reserva__fecha_uso', 'reserva__hora_inicio']
+        ordering = ['-reserva_espacio__reserva__fecha_uso', 'reserva_espacio__reserva__hora_inicio']
         indexes = [
-            models.Index(fields=['reserva']),
+            models.Index(fields=['reserva_espacio']),
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['reserva'],
+                fields=['reserva_espacio'],
                 name='uniq_reserva_digital',
                 violation_error_message="Ya existe un detalle de reserva digital para esta reserva."
             ),
         ]
 
     def __str__(self):
-        return f"Reserva: {self.reserva.id} | Anfitrion: {self.anfitrion_usuario}"
+        return f"Reserva: {self.reserva_espacio}"
 
 
-
-class RequerimientoReserva(models.Model):
-
-    class Tipo(models.TextChoices):
-        PRODUCCION = 'produccion', 'Producción'
-        COMUNICACIONAL = 'comunicacional', 'Comunicacional'
-        OTRO = 'otro', 'Otro'
-
-    reserva = models.ForeignKey(
-        Reserva, on_delete=models.CASCADE, related_name='requerimientos'
+class DetalleReservaFisico(models.Model):
+    reserva_espacio = OneToOneField(
+        ReservaEspacio, on_delete=models.CASCADE, related_name='detalle_fisico'
     )
+    
+    # Campos específicos para reservas de espacios físicos
+    numero_participantes_confirmados = models.IntegerField(
+        "Número de participantes confirmados", null=True, blank=True, default=0
+    )
+    
+    class Meta:
+        verbose_name = "Detalle Reserva Físico"
+        verbose_name_plural = "Detalles de Reservas Físicas"
+        indexes = [
+            models.Index(fields=['reserva_espacio']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['reserva_espacio'],
+                name='uniq_reserva_fisico',
+                violation_error_message="Ya existe un detalle de reserva físico para esta reserva."
+            ),
+        ]
 
+    def __str__(self):
+        return f"Reserva: {self.reserva_espacio}"
+
+
+class TipoActividad(models.Model):
     nombre = models.CharField(max_length=100)
-    observacion = models.TextField(null=True, blank=True)
-    tipo = models.CharField(max_length=100, choices=Tipo.choices)
 
     class Meta:
-        verbose_name = "Requerimiento de Reserva"
-        verbose_name_plural = "Requerimientos de Reservas"
-        ordering = ['-reserva__fecha_uso', 'reserva__hora_inicio']
+        verbose_name = "Tipo de Actividad"
+        verbose_name_plural = "Tipos de Actividades"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre

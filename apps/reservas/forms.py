@@ -1,14 +1,41 @@
+from django.urls import reverse
 from apps.espacios.models import Espacio
-from apps.reservas.models import DetalleReservaDigital, RequerimientoReserva, Reserva
+from apps.reservas.models import DetalleReservaDigital, Reserva
+from apps.usuarios.models import Usuario
+
 from django import forms
 
+# Selecciona el usuario que va a realizar la reserva
+class ContactoForm(forms.Form):
+    usuario = forms.ModelChoiceField(
+        queryset=Usuario.objects.all(),
+        widget=forms.Select(
+            attrs={"class": "select select-bordered"}
+        )
+    )
 
-class ReservaTipoForm(forms.Form):
-    tipo = forms.ChoiceField(choices=Espacio.Tipo.choices, widget=forms.Select(
+class ReservaTipoForm(forms.ModelForm):
+    modalidad = forms.ChoiceField(choices=Reserva.Modalidad.choices, widget=forms.Select(
         attrs={"class": "select select-bordered"}))
 
-        
+    tipo_solicitud = forms.ChoiceField(choices=Reserva.TipoSolicitud.choices, widget=forms.Select(
+        attrs={"class": "select select-bordered"}))
 
+    fecha_uso = forms.DateField(
+        widget=forms.DateInput(
+            attrs={"class": "date-input", "type": "date"}
+        )
+    )
+
+    usuario = forms.ModelChoiceField(
+        queryset=Usuario.objects.all(),
+        widget=forms.Select(
+            attrs={"class": "select select-bordered"}
+        )
+    )
+    class Meta:
+        model = Reserva
+        fields = ['modalidad', 'tipo_solicitud', 'usuario', 'fecha_uso']
 
 class ReservaCreateForm(forms.ModelForm):
     espacio = forms.ModelChoiceField(
@@ -44,7 +71,7 @@ class ReservaCreateForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = ['usuario', 'espacio', 'fecha_uso', 'hora_inicio',
-                  'hora_fin', 'motivo', 'numero_participantes']
+                  'hora_fin', 'motivo']
 
 
 class DetalleReservaDigitalForm(forms.ModelForm):
@@ -53,11 +80,6 @@ class DetalleReservaDigitalForm(forms.ModelForm):
         fields = ['anfitrion_usuario',
                   'ubicacion_transmision', 'espacio_transmision']
 
-
-class RequerimientoReservaForm(forms.ModelForm):
-    class Meta:
-        model = RequerimientoReserva
-        fields = ['nombre', 'observacion', 'tipo']
 
 
 class ReservaApproveForm(forms.ModelForm):
