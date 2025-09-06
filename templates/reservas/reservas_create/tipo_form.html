@@ -1,192 +1,47 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Reserva</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-base-200 min-h-screen">
-    <div class="container mx-auto p-6 max-w-4xl">
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-2xl mb-6">Nueva Reserva</h2>
-                
-                <form method="post" id="reservaForm">
-                    {% csrf_token %}
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Columna Izquierda - Formulario -->
-                        <div class="space-y-4">
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-medium">Modalidad</span>
-                                </label>
-                                {{ form.modalidad }}
-                            </div>
+{% extends "includes/multistep_ajax_base.html" %}
 
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-medium">Tipo de Solicitud</span>
-                                </label>
-                                {{ form.tipo_solicitud }}
-                            </div>
+{% block form_header %}
+<form id="searchForm" action="#" method="get" onsubmit="return false;">
+    <input name="q" id="valorInput" placeholder="Escribe un valor" autocomplete="off">
+    <button type="submit" id="buscarBtn">🔍</button>
+</form>
 
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-medium">Usuario</span>
-                                </label>
-                                {{ form.usuario }}
-                            </div>
+<pre id="resultado"></pre>
+{% endblock form_header %}
 
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text font-medium">Fecha de Uso</span>
-                                </label>
-                                {{ form.fecha_uso }}
-                            </div>
 
-                            <button type="submit" class="btn btn-primary w-full">
-                                Crear Reserva
-                            </button>
-                        </div>
+{% block form_content %}
+{{form.as_p}}
+{% endblock form_content %}
 
-                        <!-- Columna Derecha - Vista Previa Usuario -->
-                        <div class="space-y-4">
-                            <h3 class="text-lg font-semibold">Información del Usuario</h3>
-                            
-                            <!-- Mensaje inicial -->
-                            <div id="usuario-placeholder" class="text-center py-8 text-base-content/60">
-                                <div class="text-4xl mb-2">👤</div>
-                                <p>Selecciona un usuario para ver su información</p>
-                            </div>
+{% block form_script %}
+<script>
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('valorInput');
+    const resultado = document.getElementById('resultado');
 
-                            <!-- Loading -->
-                            <div id="usuario-loading" class="text-center py-8 hidden">
-                                <span class="loading loading-spinner loading-lg"></span>
-                                <p class="mt-2">Cargando información...</p>
-                            </div>
-
-                            <!-- Información del usuario -->
-                            <div id="usuario-info" class="hidden">
-                                <div class="card bg-base-200 shadow-sm">
-                                    <div class="card-body p-4">
-                                        <div class="space-y-3">
-                                            <div>
-                                                <span class="font-medium text-sm">Nombre:</span>
-                                                <p id="usuario-nombre" class="text-base"></p>
-                                            </div>
-                                            
-                                            <div>
-                                                <span class="font-medium text-sm">Email:</span>
-                                                <p id="usuario-email" class="text-base"></p>
-                                            </div>
-                                            
-                                            <div>
-                                                <span class="font-medium text-sm">Teléfono:</span>
-                                                <p id="usuario-telefono" class="text-base"></p>
-                                            </div>
-                                            
-                                            <div>
-                                                <span class="font-medium text-sm">Departamento:</span>
-                                                <p id="usuario-departamento" class="text-base"></p>
-                                            </div>
-                                            
-                                            <div>
-                                                <span class="font-medium text-sm">Estado:</span>
-                                                <span id="usuario-estado" class="badge badge-sm"></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Error -->
-                            <div id="usuario-error" class="hidden">
-                                <div class="alert alert-error">
-                                    <span>Error al cargar la información del usuario</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Obtener el select de usuario
-        const usuarioSelect = document.querySelector('select[name="usuario"]');
-        
-        // Elementos de la interfaz
-        const placeholder = document.getElementById('usuario-placeholder');
-        const loading = document.getElementById('usuario-loading');
-        const info = document.getElementById('usuario-info');
-        const error = document.getElementById('usuario-error');
-        
-        // Elementos de información
-        const nombre = document.getElementById('usuario-nombre');
-        const email = document.getElementById('usuario-email');
-        const telefono = document.getElementById('usuario-telefono');
-        const departamento = document.getElementById('usuario-departamento');
-        const estado = document.getElementById('usuario-estado');
-        
-        function mostrarSeccion(seccion) {
-            // Ocultar todas las secciones
-            placeholder.classList.add('hidden');
-            loading.classList.add('hidden');
-            info.classList.add('hidden');
-            error.classList.add('hidden');
-            
-            // Mostrar la sección específica
-            seccion.classList.remove('hidden');
+    async function doSearch(valor) {
+        if (!valor) return;
+        try {
+            const res = await fetch(`/usuarios/api/search/${encodeURIComponent(valor)}/`);
+            if (!res.ok) { resultado.textContent = `Error ${res.status}` + res.statusText; return; }
+            const data = await res.json();
+            resultado.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+            resultado.textContent = `Fetch error: ${err.message}`;
         }
-        
-        function cargarUsuario(usuarioId) {
-            if (!usuarioId) {
-                mostrarSeccion(placeholder);
-                return;
-            }
-            
-            mostrarSeccion(loading);
-            
-            // Hacer petición AJAX
-            fetch(`/usuarios/api/?username=${usuarioId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        mostrarSeccion(error);
-                        return;
-                    }
-                    
-                    // Llenar información
-                    nombre.textContent = data.nombre || 'No especificado';
-                    email.textContent = data.email || 'No especificado';
-                    telefono.textContent = data.telefono || 'No especificado';
-                    departamento.textContent = data.departamento || 'No especificado';
-                    
-                    // Estado con badge
-                    estado.textContent = data.activo ? 'Activo' : 'Inactivo';
-                    estado.className = `badge badge-sm ${data.activo ? 'badge-success' : 'badge-error'}`;
-                    
-                    mostrarSeccion(info);
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    mostrarSeccion(error);
-                });
-        }
-        
-        // Evento change del select
-        usuarioSelect.addEventListener('change', function() {
-            cargarUsuario(this.value);
-        });
-        
-        // Si hay un usuario preseleccionado, cargarlo
-        if (usuarioSelect.value) {
-            cargarUsuario(usuarioSelect.value);
-        }
-    </script>
-</body>
-</html>
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        doSearch(input.value.trim());
+    });
+
+    // opcional: botón sigue funcionando por accesibilidad
+    document.getElementById('buscarBtn').addEventListener('click', () =>
+        doSearch(input.value.trim())
+    );
+
+    input.focus();
+</script>
+{% endblock %}

@@ -14,5 +14,5 @@ urlpatterns = [
          UsuarioUpdateView.as_view(), name='usuario_edit'),
     path('delete/<int:pk>/',
          UsuarioDeleteView.as_view(), name='usuario_delete'),
-     path('api/', UsuarioApiView.as_view(), name='usuario_api'),
+     path('api/search/<str:username>/', UsuarioApiView.as_view(), name='usuario_api'),
 ]

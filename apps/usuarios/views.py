@@ -43,23 +43,14 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
 
-        username = request.GET.get('username')
-        if not username:
-            return JsonResponse({'error': 'No se proporcionó un ID de usuario'}, status=400)
-
-        queryset = self.model.objects.filter(username=username)
-        usuario = queryset.first()
-        
-        if not usuario or not usuario.is_active:
-            return JsonResponse({'error': 'No se encontró el usuario'}, status=404)
-        
-        print(usuario)
-
-        response = {
-            'username': usuario.username,
-            'email': usuario.email,
+        # ejemplo estático. Reemplaza por tu lookup.
+        data = {
+            "nombre": "responsable de la solicitud",
+            "area": "Gerencia general",
+            "email": "contacto@ejemplo.com",
+            "telefono": "+58 412 555 1212"
         }
-        return JsonResponse(response, safe=False)
+        return JsonResponse(data)
 
 class Dashboard(LoginRequiredMixin, TemplateView):
 

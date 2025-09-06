@@ -25,14 +25,23 @@ class Reserva(models.Model):
         EXTERNA = 'externa', 'Externa'
 
 
-    usuario = models.ForeignKey(
-        Usuario, on_delete=models.CASCADE, related_name='reservas'
-    )
+    p00_solicitante = models.CharField(max_length=100)
     
+    nombre_solicitante = models.CharField(max_length=100)
+    
+    email_solicitante = models.EmailField()
+
+    telefono_solicitante = models.CharField(max_length=100)
+
+    vicepresidencia_solicitante = models.CharField(max_length=100)
+
+    gerencia_solicitante = models.CharField(max_length=100)
+
+
+    # Datos de la reserva
     modalidad = models.CharField(
         max_length=10, choices=Modalidad.choices, default=Modalidad.PRESENCIAL
     )
-
     tipo_solicitud = models.CharField(
         max_length=10, choices=TipoSolicitud.choices, default=TipoSolicitud.INTERNA
     )
@@ -104,7 +113,7 @@ class Reserva(models.Model):
         ]
 
     def __str__(self):
-        return f"RES:{self.id} | US:{self.usuario.username} | FE:{self.fecha_uso} | HI:{self.hora_inicio} | HF:{self.hora_fin}"
+        return f"RES:{self.id} | US:{self.p00_solicitante} | FE:{self.fecha_uso} | HI:{self.hora_inicio} | HF:{self.hora_fin}"
 
 
     # def clean(self):

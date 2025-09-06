@@ -40,9 +40,7 @@
         {{ wizard.management_form }}
         {% block form_content %}
         {% endblock form_content %}
-        {% block form_script %}
-        {% endblock form_script %}
-
+       
         <footer class="mt-2 flex justify-between ">
             {% if wizard.steps.prev %}
             <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn ">
@@ -58,4 +56,8 @@
         </footer>
 
     </form>
+
+    {% block form_script %}
+    {% endblock form_script %}
+
 </div>

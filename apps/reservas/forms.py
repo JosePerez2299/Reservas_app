@@ -27,15 +27,14 @@ class ReservaTipoForm(forms.ModelForm):
         )
     )
 
-    usuario = forms.ModelChoiceField(
-        queryset=Usuario.objects.all(),
-        widget=forms.Select(
-            attrs={"class": "select select-bordered"}
+    p00_solicitante = forms.CharField(
+        widget=forms.TextInput(
+            attrs={"class": "input "}
         )
     )
     class Meta:
         model = Reserva
-        fields = ['modalidad', 'tipo_solicitud', 'usuario', 'fecha_uso']
+        fields = ['modalidad', 'tipo_solicitud', 'p00_solicitante', 'fecha_uso']
 
 class ReservaCreateForm(forms.ModelForm):
     espacio = forms.ModelChoiceField(
@@ -63,15 +62,11 @@ class ReservaCreateForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = [
-            'usuario', 'espacio', 'fecha_uso',
+            'p00_solicitante', 'espacio', 'fecha_uso',
             'hora_inicio', 'hora_fin',
-            'motivo', 'numero_participantes'
+            'motivo', 
         ]
 
-    class Meta:
-        model = Reserva
-        fields = ['usuario', 'espacio', 'fecha_uso', 'hora_inicio',
-                  'hora_fin', 'motivo']
 
 
 class DetalleReservaDigitalForm(forms.ModelForm):
