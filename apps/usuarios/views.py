@@ -37,17 +37,16 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """
     Muestra los detalles de un usuario
     """
-    model = Usuario
     permission_required = 'usuarios.view_usuario'
-    template_name = 'reservas/usuario_detail.html'
-
+    
     def get(self, request, *args, **kwargs):
-
+        username = kwargs.get('username')
         # ejemplo estático. Reemplaza por tu lookup.
         data = {
-            "nombre": "responsable de la solicitud",
-            "area": "Gerencia general",
+            "nombre": "jhon doe asd asdadeafs sasdasdasdaaaaaaaaaaaaaaaaaaaa",
+            "nom_gerencia": "Gerencia general",
             "email": "contacto@ejemplo.com",
+            "nom_vicepresidencia": "Vicepresidencia general",
             "telefono": "+58 412 555 1212"
         }
         return JsonResponse(data)

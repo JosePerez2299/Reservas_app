@@ -1,0 +1,375 @@
+{% extends "includes/multistep_ajax_base.html" %}
+{% load widget_tweaks %}
+{% load render_field_msg %}
+
+{% block form_header %}
+<!-- Buscador de Usuario -->
+<div class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 mb-6">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 bg-base-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-search text-base-content"></i>
+        </div>
+        <div>
+            <h3 class="font-semibold text-base">Buscar Usuario</h3>
+            <p class="text-sm text-base-content/60">Ingresa el P00 del usuario para autocompletar los datos</p>
+        </div>
+    </div>
+    
+    <form id="searchForm" action="#" method="get" onsubmit="return false;" class="flex gap-2">
+
+        <label class="input w-full">
+            <span class="flex items-center gap-2">
+                <i class="fas fa-id-card h-4 w-4"></i>
+                P00 
+
+                <div class="divider divider-horizontal"></div>
+            </span>
+            <input type="text" class="grow" name="q" id="valorInput" value="{{ request.GET.q|default:'' }}" autocomplete="off" placeholder="P00 del usuario" />
+          </label>
+          
+        
+        <button type="submit" id="buscarBtn" class="btn btn-info">
+            <i class="fas fa-search"></i>
+            Buscar
+        </button>
+    </form>
+
+    <div id="resultado" class="mt-3 text-sm"></div>
+</div>
+{% endblock form_header %}
+
+{% block form_content %}
+<div class="space-y-6">
+    <!-- Información del Solicitante -->
+    <div id="info_solicitante"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold">Información del Solicitante</h3>
+                <p class="text-sm text-base-content/60">Datos de la persona que solicita la reserva</p>
+            </div>
+        </div>
+        
+        <div class="space-y-4 px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Usuario Solicitante -->
+            <div class=>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.p00_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-at h-4 w-4"></i>
+                            Usuario Solicitante
+                        </span>
+                        {% if form.p00_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.p00_solicitante|add_class:"input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.p00_solicitante %}
+            </div>
+
+            <!-- Nombre Completo -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.nombre_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-user h-4 w-4"></i>
+                            Nombre Completo
+                        </span>
+                        {% if form.nombre_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.nombre_solicitante|add_class:"input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.nombre_solicitante %}
+            </div>
+
+            <!-- Email -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.email_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-envelope h-4 w-4"></i>
+                            Email
+                        </span>
+                        {% if form.email_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.email_solicitante|add_class:"input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.email_solicitante %}
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.telefono_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-phone h-4 w-4"></i>
+                            Teléfono
+                        </span>
+                        {% if form.telefono_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.telefono_solicitante }}
+                </div>
+                {% field_messages form.telefono_solicitante %}
+            </div>
+
+            <!-- Vicepresidencia -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.vicepresidencia_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-building h-4 w-4"></i>
+                            Vicepresidencia
+                        </span>
+                        {% if form.vicepresidencia_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.vicepresidencia_solicitante|add_class:"input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.vicepresidencia_solicitante %}
+            </div>
+
+            <!-- Gerencia -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.gerencia_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-users h-4 w-4"></i>
+                            Gerencia
+                        </span>
+                        {% if form.gerencia_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.gerencia_solicitante|add_class:"input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.gerencia_solicitante %}
+            </div>
+        </div>
+    </div>
+
+
+</div>
+{% endblock form_content %}
+
+{% block form_script %}
+<script>
+    (() => {
+        const form = document.getElementById('searchForm');
+        const input = document.getElementById('valorInput');
+        const resultado = document.getElementById('resultado');
+
+        // Detectar automáticamente el prefijo del step
+        function detectStepPrefix() {
+            const formFields = document.querySelectorAll('input[name*="-"], select[name*="-"], textarea[name*="-"]');
+            
+            for (let field of formFields) {
+                const name = field.name;
+                if (name.includes('-')) {
+                    const prefix = name.split('-')[0];
+                    if (/^[a-zA-Z0-9_]+$/.test(prefix)) {
+                        console.log('Prefijo detectado:', prefix);
+                        return prefix;
+                    }
+                }
+            }
+            return '';
+        }
+
+        const stepPrefix = detectStepPrefix();
+
+        // Preservar el valor después de errores
+        const initialValue = input.value;
+        if (initialValue) {
+            doSearch(initialValue);
+        }
+
+        // Mapeo de campos del JSON a los campos del formulario
+        const fieldMapping = {
+            'nombre': 'nombre_solicitante',
+            'nom_gerencia': 'gerencia_solicitante', 
+            'email': 'email_solicitante',
+            'nom_vicepresidencia': 'vicepresidencia_solicitante',
+            'telefono': 'telefono_solicitante'
+        };
+
+        function getFieldName(fieldName) {
+            return stepPrefix ? `${stepPrefix}-${fieldName}` : fieldName;
+        }
+
+        function fillFormFields(data) {
+            let fieldsUpdated = 0;
+            const updatedFields = [];
+            
+            Object.keys(fieldMapping).forEach(apiField => {
+                const formFieldName = fieldMapping[apiField];
+                const fullFieldName = getFieldName(formFieldName);
+                
+                let formField = document.querySelector(`[name="${fullFieldName}"]`) ||
+                              document.querySelector(`[name$="-${formFieldName}"]`) ||
+                              document.querySelector(`[name="${formFieldName}"]`);
+                
+                if (formField && data[apiField]) {
+                    // Temporalmente habilitar el campo si está readonly
+                    const wasReadonly = formField.readOnly;
+                    if (wasReadonly) {
+                        formField.readOnly = false;
+                    }
+                    
+                    formField.value = data[apiField];
+                    formField.dispatchEvent(new Event('change', { bubbles: true }));
+                    formField.dispatchEvent(new Event('input', { bubbles: true }));
+                    fieldsUpdated++;
+                    
+                    // Volver a readonly si era readonly
+                    if (wasReadonly) {
+                        formField.readOnly = true;
+                    }
+                    
+                    // Efecto visual
+                    formField.classList.add('field-updated');
+                    setTimeout(() => {
+                        formField.classList.remove('field-updated');
+                    }, 2000);
+                }
+            });
+
+            // Llenar p00_solicitante
+            const solicitanteFieldName = getFieldName('p00_solicitante');
+            let solicitanteField = document.querySelector(`[name="${solicitanteFieldName}"]`) ||
+                                 document.querySelector(`[name$="-p00_solicitante"]`) ||
+                                 document.querySelector(`[name="p00_solicitante"]`);
+            
+            if (solicitanteField) {
+                const wasReadonly = solicitanteField.readOnly;
+                if (wasReadonly) {
+                    solicitanteField.readOnly = false;
+                }
+                
+                solicitanteField.value = input.value.trim();
+                solicitanteField.dispatchEvent(new Event('change', { bubbles: true }));
+                fieldsUpdated++;
+                
+                if (wasReadonly) {
+                    solicitanteField.readOnly = true;
+                }
+            }
+
+            return fieldsUpdated;
+        }
+
+        async function doSearch(valor) {
+            if (!valor) {
+                resultado.innerHTML = '<div class="alert alert-warning alert-sm"><i class="fas fa-exclamation-triangle"></i> Por favor ingresa un valor para buscar</div>';
+                return;
+            }
+            
+            resultado.innerHTML = '<div class="alert alert-info alert-sm"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+            
+            try {
+                const res = await fetch(`/usuarios/api/search/${encodeURIComponent(valor)}/`);
+                if (!res.ok) { 
+                    resultado.innerHTML = `<div class="alert alert-error alert-sm"><i class="fas fa-times"></i> Error ${res.status}: ${res.statusText}</div>`;
+                    return; 
+                }
+                const data = await res.json();
+                
+                const fieldsUpdated = fillFormFields(data);
+                
+                if (fieldsUpdated > 0) {
+                    resultado.innerHTML = `<div class="alert alert-success alert-sm"><i class="fas fa-check"></i> ✅ ${fieldsUpdated} campos actualizados correctamente</div>`;
+                } else {
+                    resultado.innerHTML = `<div class="alert alert-warning alert-sm"><i class="fas fa-exclamation-triangle"></i> ⚠️ Datos encontrados pero no se pudieron cargar los campos</div>`;
+                }
+                
+                setTimeout(() => {
+                    resultado.innerHTML = '';
+                }, 4000);
+                
+            } catch (err) {
+                resultado.innerHTML = `<div class="alert alert-error alert-sm"><i class="fas fa-times"></i> ❌ Error: ${err.message}</div>`;
+            }
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            doSearch(input.value.trim());
+        });
+
+        document.getElementById('buscarBtn').addEventListener('click', () =>
+            doSearch(input.value.trim())
+        );
+
+        // Buscar al presionar Enter en el input
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                doSearch(input.value.trim());
+            }
+        });
+
+        input.focus();
+    })();
+</script>
+
+<style>
+.field-updated {
+    background-color: #d4edda !important;
+    border-color: #28a745 !important;
+    transition: all 0.3s ease;
+}
+
+.input-disabled {
+    cursor: not-allowed;
+}
+
+.alert-sm {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+</style>
+{% endblock form_script %}

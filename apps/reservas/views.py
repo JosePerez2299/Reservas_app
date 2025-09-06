@@ -170,6 +170,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
 
 # Templates para el wizard de creación de reservas
 TEMPLATES = {
+    'contacto': 'reservas/reservas_create/contacto_form.html',
     'reserva': 'reservas/reservas_create/reserva_form.html',
     'tipo': 'reservas/reservas_create/tipo_form.html',
     'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
@@ -177,6 +178,7 @@ TEMPLATES = {
     'resumen': 'reservas/reservas_create/resumen_form.html'
 }
 STEP_LABELS = {
+    'contacto': 'Contacto',
     'tipo': 'Tipo de Espacio',
     'reserva': 'Información General', 
     'detalle': 'Detalles Digitales',
@@ -195,7 +197,8 @@ class ReservaCreateWizardView(SessionWizardView):
     Crea una nueva reserva
     """
     form_list = [
-        ('tipo', ReservaTipoForm),
+        ('contacto', ContactoForm),
+        ('tipo', ReservaForm),
         ('reserva', ReservaCreateForm),
         ('detalle', DetalleReservaDigitalForm),
         ('resumen', EmptyForm)

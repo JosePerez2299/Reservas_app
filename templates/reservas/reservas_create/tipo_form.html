@@ -1,47 +1,13 @@
 {% extends "includes/multistep_ajax_base.html" %}
-
-{% block form_header %}
-<form id="searchForm" action="#" method="get" onsubmit="return false;">
-    <input name="q" id="valorInput" placeholder="Escribe un valor" autocomplete="off">
-    <button type="submit" id="buscarBtn">🔍</button>
-</form>
-
-<pre id="resultado"></pre>
-{% endblock form_header %}
-
+{% load widget_tweaks %}
+{% load render_field_msg %}
 
 {% block form_content %}
-{{form.as_p}}
+<div>
+
+    {{form.as_p}}
+</div>
+
+
+
 {% endblock form_content %}
-
-{% block form_script %}
-<script>
-    const form = document.getElementById('searchForm');
-    const input = document.getElementById('valorInput');
-    const resultado = document.getElementById('resultado');
-
-    async function doSearch(valor) {
-        if (!valor) return;
-        try {
-            const res = await fetch(`/usuarios/api/search/${encodeURIComponent(valor)}/`);
-            if (!res.ok) { resultado.textContent = `Error ${res.status}` + res.statusText; return; }
-            const data = await res.json();
-            resultado.textContent = JSON.stringify(data, null, 2);
-        } catch (err) {
-            resultado.textContent = `Fetch error: ${err.message}`;
-        }
-    }
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        doSearch(input.value.trim());
-    });
-
-    // opcional: botón sigue funcionando por accesibilidad
-    document.getElementById('buscarBtn').addEventListener('click', () =>
-        doSearch(input.value.trim())
-    );
-
-    input.focus();
-</script>
-{% endblock %}
