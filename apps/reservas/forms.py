@@ -1,6 +1,6 @@
 from django.urls import reverse
 from apps.espacios.models import Espacio
-from apps.reservas.models import DetalleReservaDigital, Reserva
+from apps.reservas.models import DetalleReservaDigital, Reserva, TipoActividad
 from apps.usuarios.models import Usuario
 
 from django import forms
@@ -89,7 +89,26 @@ class ReservaForm(forms.ModelForm):
         widget=forms.DateInput(attrs={"class": "input", "type": "date"})
     )
 
-  
+    tipo_actividad = forms.ModelChoiceField(
+        queryset=TipoActividad.objects.all(),
+        widget=forms.Select(attrs={"class": "select select-bordered"}),
+    )
+
+    motivo = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered"}),
+    )
+
+    hora_inicio = forms.TimeField(
+        widget=forms.TimeInput(attrs={"class": "input", "type": "time"})
+    )
+
+    hora_fin = forms.TimeField(
+        widget=forms.TimeInput(attrs={"class": "input", "type": "time"})
+    )
+
+    observacion = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered"}),
+    )
 
     class Meta:
         model = Reserva
@@ -101,7 +120,7 @@ class ReservaForm(forms.ModelForm):
             "hora_inicio",
             "hora_fin",
             "motivo",
-           
+            "observacion",
         ]
 
 
