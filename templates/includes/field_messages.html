@@ -1,13 +1,17 @@
 {% if field.help_text %}
+<div id="{{ field.id_for_label }}-help-text">
 <p class="text-xs text-base-content/60">
     <i class="fas fa-info-circle text-base-content/40"></i>
-    {{ field.help_text }}
-</p>
+        {{ field.help_text }}
+    </p>
+</div>
 {% endif %}
 
 {% if field.errors %}
+<div id="{{ field.id_for_label }}-errors">
 <p class="text-xs text-error flex items-center gap-2">
     <i class="fas fa-exclamation-circle text-error"></i>
-    {{ field.errors.0 }}
-</p>
+        {{ field.errors.0 }}
+    </p>
+</div>
 {% endif %}

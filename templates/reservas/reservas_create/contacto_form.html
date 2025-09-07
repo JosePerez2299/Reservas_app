@@ -11,22 +11,32 @@
         </div>
         <div>
             <h3 class="font-semibold text-base">Buscar Usuario</h3>
-            <p class="text-sm text-base-content/60">Ingresa el P00 del usuario para autocompletar los datos</p>
+            <p class="text-sm text-base-content/60">Ingresa el P00 (número entero positivo de 6 dígitos) para autocompletar los datos</p>
         </div>
     </div>
     
     <form id="searchForm" action="#" method="get" onsubmit="return false;" class="flex gap-2">
-
         <label class="input w-full">
             <span class="flex items-center gap-2">
                 <i class="fas fa-id-card h-4 w-4"></i>
-                P00 
-
+                P00
                 <div class="divider divider-horizontal"></div>
             </span>
-            <input type="text" class="grow" name="q" id="valorInput" value="{{ request.GET.q|default:'' }}" autocomplete="off" placeholder="P00 del usuario" />
-          </label>
-          
+            <input
+                type="text"
+                inputmode="numeric"
+                pattern="[1-9][0-9]{5}"
+                minlength="6"
+                maxlength="6"
+                title="Ingrese un número entero positivo de 6 dígitos (ej. 123456)"
+                class="grow"
+                name="q"
+                id="valorInput"
+                value="{{ request.GET.q|default:'' }}"
+                autocomplete="off"
+                placeholder="Ej: 123456"
+            />
+        </label>
         
         <button type="submit" id="buscarBtn" class="btn btn-info">
             <i class="fas fa-search"></i>
@@ -55,7 +65,7 @@
         
         <div class="space-y-4 px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Usuario Solicitante -->
-            <div class=>
+            <div>
                 <div class="form-control">
                     <label class="flex justify-between items-center" for="{{ form.p00_solicitante.id_for_label }}">
                         <span class="flex items-center gap-2">
@@ -157,8 +167,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 {% endblock form_content %}
 
@@ -169,18 +177,15 @@
         const input = document.getElementById('valorInput');
         const resultado = document.getElementById('resultado');
 
-        // Detectar automáticamente el prefijo del step
+        const p00Regex = /^[1-9]\d{5}$/; // entero positivo de 6 dígitos (100000-999999)
+
         function detectStepPrefix() {
             const formFields = document.querySelectorAll('input[name*="-"], select[name*="-"], textarea[name*="-"]');
-            
             for (let field of formFields) {
                 const name = field.name;
                 if (name.includes('-')) {
                     const prefix = name.split('-')[0];
-                    if (/^[a-zA-Z0-9_]+$/.test(prefix)) {
-                        console.log('Prefijo detectado:', prefix);
-                        return prefix;
-                    }
+                    if (/^[a-zA-Z0-9_]+$/.test(prefix)) return prefix;
                 }
             }
             return '';
@@ -188,13 +193,6 @@
 
         const stepPrefix = detectStepPrefix();
 
-        // Preservar el valor después de errores
-        const initialValue = input.value;
-        if (initialValue) {
-            doSearch(initialValue);
-        }
-
-        // Mapeo de campos del JSON a los campos del formulario
         const fieldMapping = {
             'nombre': 'nombre_solicitante',
             'nom_gerencia': 'gerencia_solicitante', 
@@ -209,42 +207,25 @@
 
         function fillFormFields(data) {
             let fieldsUpdated = 0;
-            const updatedFields = [];
-            
             Object.keys(fieldMapping).forEach(apiField => {
                 const formFieldName = fieldMapping[apiField];
                 const fullFieldName = getFieldName(formFieldName);
-                
                 let formField = document.querySelector(`[name="${fullFieldName}"]`) ||
                               document.querySelector(`[name$="-${formFieldName}"]`) ||
                               document.querySelector(`[name="${formFieldName}"]`);
-                
                 if (formField && data[apiField]) {
-                    // Temporalmente habilitar el campo si está readonly
                     const wasReadonly = formField.readOnly;
-                    if (wasReadonly) {
-                        formField.readOnly = false;
-                    }
-                    
+                    if (wasReadonly) formField.readOnly = false;
                     formField.value = data[apiField];
                     formField.dispatchEvent(new Event('change', { bubbles: true }));
                     formField.dispatchEvent(new Event('input', { bubbles: true }));
                     fieldsUpdated++;
-                    
-                    // Volver a readonly si era readonly
-                    if (wasReadonly) {
-                        formField.readOnly = true;
-                    }
-                    
-                    // Efecto visual
+                    if (wasReadonly) formField.readOnly = true;
                     formField.classList.add('field-updated');
-                    setTimeout(() => {
-                        formField.classList.remove('field-updated');
-                    }, 2000);
+                    setTimeout(() => formField.classList.remove('field-updated'), 2000);
                 }
             });
 
-            // Llenar p00_solicitante
             const solicitanteFieldName = getFieldName('p00_solicitante');
             let solicitanteField = document.querySelector(`[name="${solicitanteFieldName}"]`) ||
                                  document.querySelector(`[name$="-p00_solicitante"]`) ||
@@ -252,20 +233,19 @@
             
             if (solicitanteField) {
                 const wasReadonly = solicitanteField.readOnly;
-                if (wasReadonly) {
-                    solicitanteField.readOnly = false;
-                }
-                
+                if (wasReadonly) solicitanteField.readOnly = false;
                 solicitanteField.value = input.value.trim();
                 solicitanteField.dispatchEvent(new Event('change', { bubbles: true }));
                 fieldsUpdated++;
-                
-                if (wasReadonly) {
-                    solicitanteField.readOnly = true;
-                }
+                if (wasReadonly) solicitanteField.readOnly = true;
             }
 
             return fieldsUpdated;
+        }
+
+        function showValidationError(msg) {
+            resultado.innerHTML = `<div class="alert alert-error alert-sm"><div class="font-medium">Formato P00 inválido</div><div class="text-sm">${msg}</div></div>`;
+            setTimeout(() => { resultado.innerHTML = ''; }, 5000);
         }
 
         async function doSearch(valor) {
@@ -273,31 +253,68 @@
                 resultado.innerHTML = '<div class="alert alert-warning alert-sm"><i class="fas fa-exclamation-triangle"></i> Por favor ingresa un valor para buscar</div>';
                 return;
             }
+
+            if (!p00Regex.test(valor)) {
+                showValidationError('El P00 debe ser un número entero positivo de 6 dígitos (100000–999999).');
+                return;
+            }
             
             resultado.innerHTML = '<div class="alert alert-info alert-sm"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
             
             try {
                 const res = await fetch(`/usuarios/api/search/${encodeURIComponent(valor)}/`);
-                if (!res.ok) { 
-                    resultado.innerHTML = `<div class="alert alert-error alert-sm"><i class="fas fa-times"></i> Error ${res.status}: ${res.statusText}</div>`;
-                    return; 
-                }
                 const data = await res.json();
                 
-                const fieldsUpdated = fillFormFields(data);
-                
-                if (fieldsUpdated > 0) {
-                    resultado.innerHTML = `<div class="alert alert-success alert-sm"><i class="fas fa-check"></i> ✅ ${fieldsUpdated} campos actualizados correctamente</div>`;
-                } else {
-                    resultado.innerHTML = `<div class="alert alert-warning alert-sm"><i class="fas fa-exclamation-triangle"></i> ⚠️ Datos encontrados pero no se pudieron cargar los campos</div>`;
+                if (!res.ok || data.error) {
+                    let errorMessage = '';
+                    let errorIcon = 'fas fa-user-times';
+                    
+                    if (data && data.code === 'USER_NOT_FOUND') {
+                        errorMessage = `No se encontró ningún usuario con el código P00 "${valor}". <br><small class="opacity-70">Verifica que el código esté escrito correctamente.</small>`;
+                        errorIcon = 'fas fa-search';
+                    } else {
+                        errorMessage = data?.message || `Error ${res.status}: ${res.statusText}`;
+                        errorIcon = 'fas fa-exclamation-triangle';
+                    }
+                    
+                    resultado.innerHTML = `
+                        <div class="alert alert-error alert-sm">
+                            <div class="flex items-start gap-2">
+                                <i class="${errorIcon} flex-shrink-0 mt-0.5"></i>
+                                <div>
+                                    <div class="font-medium">Usuario no encontrado</div>
+                                    <div class="text-sm">${errorMessage}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    setTimeout(() => { resultado.innerHTML = ''; }, 8000);
+                    return; 
                 }
                 
                 setTimeout(() => {
-                    resultado.innerHTML = '';
-                }, 4000);
+                    const fieldsUpdated = fillFormFields(data);
+                    if (fieldsUpdated > 0) {
+                        resultado.innerHTML = `<div class="alert alert-success alert-sm"><i class="fas fa-check"></i> ${fieldsUpdated} campos actualizados correctamente</div>`;
+                    } else {
+                        resultado.innerHTML = `<div class="alert alert-warning alert-sm"><i class="fas fa-exclamation-triangle"></i> Datos encontrados pero no se pudieron cargar los campos</div>`;
+                    }
+                    setTimeout(() => { resultado.innerHTML = ''; }, 4000);
+                }, 150);
                 
             } catch (err) {
-                resultado.innerHTML = `<div class="alert alert-error alert-sm"><i class="fas fa-times"></i> ❌ Error: ${err.message}</div>`;
+                resultado.innerHTML = `
+                    <div class="alert alert-error alert-sm">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-wifi flex-shrink-0 mt-0.5"></i>
+                            <div>
+                                <div class="font-medium">Error de conexión</div>
+                                <div class="text-sm">No se pudo conectar con el servidor. Verifica tu conexión e intenta nuevamente.</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
@@ -310,7 +327,6 @@
             doSearch(input.value.trim())
         );
 
-        // Buscar al presionar Enter en el input
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -341,35 +357,20 @@
 
 .alert {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
     border-radius: 0.5rem;
     border: 1px solid transparent;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
-.alert-info {
-    background-color: #dbeafe;
-    border-color: #3b82f6;
-    color: #1e40af;
-}
+.alert-info { background-color: #dbeafe; border-color: #3b82f6; color: #1e40af; }
+.alert-success { background-color: #d1fae5; border-color: #10b981; color: #065f46; }
+.alert-warning { background-color: #fef3c7; border-color: #f59e0b; color: #92400e; }
+.alert-error { background-color: #fef2f2; border-color: #fca5a5; color: #991b1b; }
 
-.alert-success {
-    background-color: #d1fae5;
-    border-color: #10b981;
-    color: #065f46;
-}
-
-.alert-warning {
-    background-color: #fef3c7;
-    border-color: #f59e0b;
-    color: #92400e;
-}
-
-.alert-error {
-    background-color: #fee2e2;
-    border-color: #ef4444;
-    color: #991b1b;
-}
+.alert-error .font-medium { font-weight: 600; margin-bottom: 0.25rem; }
+.alert-error .text-sm { font-size: 0.875rem; line-height: 1.4; }
 </style>
 {% endblock form_script %}
