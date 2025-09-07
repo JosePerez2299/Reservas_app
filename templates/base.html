@@ -50,7 +50,7 @@
     {% include 'includes/modal.html' %}
 
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'src/js/sweetalert2.js' %}"></script>
 
     <!-- Alpine Plugins -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
@@ -60,7 +60,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Htmx -->
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="{% static 'src/js/htmx.min.js' %}"></script>
 
     <!-- Scripts base -->
     <script src="{% static 'src/js/theme-controller.js' %}"></script>
