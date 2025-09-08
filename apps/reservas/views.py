@@ -178,25 +178,50 @@ STEP_LABELS = {
     'resumen': 'Resumen'
 }
 
-# Condiciones para el wizard de creación de reservas
-def es_reserva_digital(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('tipo') or {}
-    print(cleaned_data, cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL)
-    return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
+def es_reserva_presencial(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
+    return cleaned_data.get('modalidad') == Reserva.Modalidad.PRESENCIAL
+
+def es_reserva_virtual(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
+    return cleaned_data.get('modalidad') == Reserva.Modalidad.VIRTUAL
+
+def es_reserva_mixta(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
+    return cleaned_data.get('modalidad') == Reserva.Modalidad.MIXTA
+
+def es_presencial_o_mixta(wizard):
+    """Muestra el paso de requerimientos si la modalidad es presencial o mixta"""
+    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
+    modalidad = cleaned_data.get('modalidad')
+    return modalidad in [Reserva.Modalidad.PRESENCIAL, Reserva.Modalidad.MIXTA]
+
+
+def es_virtual_o_mixta(wizard):
+    """Muestra el paso de requerimientos si la modalidad es presencial o mixta"""
+    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
+    modalidad = cleaned_data.get('modalidad')
+    return modalidad in [Reserva.Modalidad.VIRTUAL, Reserva.Modalidad.MIXTA]
 
 class ReservaCreateWizardView(SessionWizardView):
     """
     Crea una nueva reserva
     """
     form_list = [
-        ('contacto', ContactoForm),
+        # ('contacto', ContactoForm),
         ('reserva', ReservaForm),
         ('requerimiento', RequerimientoForm),
+        ('espacio_presencial', ReservaEspacioFisicoForm),
+        ('espacio_digital', ReservaEspacioDigitalForm),
+        ('detalle_digital', DetalleReservaDigitalForm),
         ('resumen', EmptyForm)
     ]
 
     condition_dict = {
-        'detalle': es_reserva_digital,
+        'requerimiento': es_presencial_o_mixta,
+        'espacio_presencial': es_presencial_o_mixta,
+        'espacio_digital': es_virtual_o_mixta,
+        'detalle_digital': es_virtual_o_mixta,
     }
 
     def get_context_data(self, **kwargs):
@@ -212,12 +237,8 @@ class ReservaCreateWizardView(SessionWizardView):
         
         ctx['all_steps'] = all_steps
         ctx['current_index'] = current_index
-        ctx['step_labels'] = STEP_LABELS
         
         if self.steps.current == 'resumen':
-
-            print(self.get_cleaned_data_for_step('requerimiento'))
-            
 
             ctx['resumen_data'] = self.get_resumen_data()
             
@@ -226,9 +247,15 @@ class ReservaCreateWizardView(SessionWizardView):
     def get_resumen_data(self):
         """Recopila todos los datos del wizard para mostrar en el resumen"""
         reserva_data = {}   
-        for step in self.form_list:
-            data = self.get_cleaned_data_for_step(step) or {}
-            reserva_data[step] = data
+        # Obtener la lista de pasos que realmente se han mostrado/usado
+        all_steps = self.get_form_list().keys()
+        for step in all_steps:
+            try:
+                data = self.get_cleaned_data_for_step(step) or {}
+                reserva_data[step] = data
+            except KeyError:
+                # Si el paso fue omitido por una condición, simplemente lo saltamos
+                continue
         return reserva_data
     
     def get_template_names(self):
@@ -239,6 +266,9 @@ class ReservaCreateWizardView(SessionWizardView):
             'tipo': 'reservas/reservas_create/tipo_form.html',
             'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
             'requerimiento': 'reservas/reservas_create/requerimiento_form.html',
+            'espacio_presencial': 'reservas/reservas_create/espacio_fisico_form.html',
+            'espacio_digital': 'reservas/reservas_create/espacio_digital_form.html',
+            'detalle_digital': 'reservas/reservas_create/detalles_digitales_form.html',
             'resumen': 'reservas/reservas_create/resumen_form.html'
         }
         return [TEMPLATES[self.steps.current]]

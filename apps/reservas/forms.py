@@ -1,7 +1,7 @@
 from datetime import timedelta
 from django.urls import reverse
 from apps.espacios.models import Espacio
-from apps.reservas.models import DetalleReservaDigital, Reserva, TipoActividad
+from apps.reservas.models import DetalleReservaDigital, Reserva, TipoActividad, ReservaEspacio
 from apps.usuarios.models import Usuario
 
 from django import forms
@@ -88,13 +88,13 @@ class ReservaForm(forms.ModelForm):
     modalidad = forms.ChoiceField(
         choices=Reserva.Modalidad.choices,
         help_text="Indica la modalidad de la reserva (presencial o virtual)",
-        widget=forms.Select(attrs={"class": "select select-bordered"}),
+        widget=forms.Select(attrs={"class": "select select-bordered w-full"}),
     )
 
     tipo_solicitud = forms.ChoiceField(
         choices=Reserva.TipoSolicitud.choices,
         help_text="Indica el tipo de solicitud de la reserva",
-        widget=forms.Select(attrs={"class": "select select-bordered"}),
+        widget=forms.Select(attrs={"class": "select select-bordered w-full"}),
     )
 
     fecha_uso = forms.DateField(
@@ -110,20 +110,20 @@ class ReservaForm(forms.ModelForm):
 
     motivo = forms.CharField(
         help_text="Indica el motivo de la reserva",
-        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered"}),
+        widget=forms.Textarea(attrs={"class": "w-full textarea textarea-bordered"}),
     )
 
     hora_inicio = forms.TimeField(
         help_text="Indica la hora de inicio de la reserva",
         widget=forms.TimeInput(
-            attrs={"class": "input", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
+            attrs={"class": "input w-full", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
         )
     )
 
     hora_fin = forms.TimeField(
         help_text="Indica la hora de fin de la reserva",
         widget=forms.TimeInput(
-            attrs={"class": "input", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
+            attrs={"class": "input w-full", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
         )
     )
 
@@ -139,10 +139,35 @@ class ReservaForm(forms.ModelForm):
             "motivo",
         ]
 
+#Step3: Requerimiento (Solo presencial o mixta)
 class RequerimientoForm(forms.ModelForm):
     class Meta:
         model = Reserva
         fields = ["requerimientos" , "observacion"]
+
+
+#Step4: Espacio Presencial (Solo presencial o mixta)
+class ReservaEspacioFisicoForm(forms.ModelForm):
+    class Meta:
+        model = ReservaEspacio
+        fields = ["espacio", "numero_participantes"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.FISICO)
+
+#Step5: Espacio Virtual (Solo virtual o mixta)
+class ReservaEspacioDigitalForm(forms.ModelForm):
+    class Meta:
+        model = ReservaEspacio
+        fields = ["espacio", "numero_participantes"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.DIGITAL)
+
+class DetalleReservaDigitalForm(forms.ModelForm):
+    class Meta:
+        model = DetalleReservaDigital
+        fields = ["anfitrion_usuario", "ubicacion_transmision", "espacio_transmision"]
 
 # Modelo Reserva:
 # Requerimientos y observacion adicionales.
@@ -150,6 +175,10 @@ class RequerimientoForm(forms.ModelForm):
 # Modelo ReservaEspacio:
 # Numero de participantes y seleccion de espacios (mostrar sede, y despues los espacios de esa sede).
 # Crear el form para cada uno, si es mixta, hacer doble insert, ejecutar cada step.
+
+
+
+
 
 
 class ReservaCreateForm(forms.ModelForm):

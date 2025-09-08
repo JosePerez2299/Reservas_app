@@ -188,11 +188,7 @@ class ReservaEspacio(models.Model):
     def clean(self):
         super().clean()
 
-        # 1) comprobar presencia mínima
-        if bool(self.detalle_digital) == bool(self.detalle_fisico):
-            raise ValidationError("Debe rellenar exactamente uno de 'detalle_digital' o 'detalle_fisico'.")
-
-        # 2) determinar tipo de espacio de forma segura y eficiente
+        # 1) determinar tipo de espacio de forma segura y eficiente
         tipo = None
         if getattr(self, "espacio_id", None):
             # solo recuperamos el campo tipo (no toda la instancia)
@@ -202,18 +198,30 @@ class ReservaEspacio(models.Model):
             espacio_obj = getattr(self, "espacio", None)
             if espacio_obj is not None:
                 tipo = getattr(espacio_obj, "tipo", None)
+        
+        # En el proceso de creación mediante FormWizard, no podemos verificar detalle_digital/fisico
+        # ya que estas relaciones aún no existen cuando se valida inicialmente el modelo
+        try:
+            has_detalle_digital = bool(self.detalle_digital)
+        except ReservaEspacio.detalle_digital.RelatedObjectDoesNotExist:
+            has_detalle_digital = False
+            
+        try:
+            has_detalle_fisico = bool(self.detalle_fisico)
+        except ReservaEspacio.detalle_fisico.RelatedObjectDoesNotExist:
+            has_detalle_fisico = False
+        
+        # Solo validamos si ya existen los detalles (en edición o después de creación)
+        if self.pk and has_detalle_digital == has_detalle_fisico:
+            raise ValidationError("Debe rellenar exactamente uno de 'detalle_digital' o 'detalle_fisico'.")
 
-        # 3) validaciones según tipo
+        # 3) validaciones según tipo - solo aplicamos si tenemos un tipo definido
         if tipo == "fisico":
-            if self.detalle_fisico is None:
+            if self.pk and not has_detalle_fisico and has_detalle_digital:
                 raise ValidationError("Para un espacio físico debe asignar 'detalle_fisico'.")
-            if self.detalle_digital is not None:
-                raise ValidationError("No puede asignar 'detalle_digital' a un espacio físico.")
         elif tipo == "digital":
-            if self.detalle_digital is None:
+            if self.pk and not has_detalle_digital and has_detalle_fisico:
                 raise ValidationError("Para un espacio digital debe asignar 'detalle_digital'.")
-            if self.detalle_fisico is not None:
-                raise ValidationError("No puede asignar 'detalle_fisico' a un espacio digital.")
 
     def __str__(self):
         return f"Reserva: {self.reserva.id} | Espacio: {self.espacio.nombre}"

@@ -1,4 +1,4 @@
-<div class="max-w-3xl mx-auto p-6">
+<div class="w-5xl mx-auto p-6">
     {{steps}}
     <!-- Header con progreso a la derecha - ARRIBA -->
     <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
@@ -16,13 +16,13 @@
         <!-- Progreso Visual Compacto a la derecha -->
         <ul class="steps steps-horizontal">
             {% for step in all_steps %}
-                <li class="step {% if forloop.counter0 <= current_index %}step-primary{% endif %}">
-                    <span class="text-xs font-medium text-base-content/60">
-                        {{ step|capfirst }}
-                    </span>
-                </li>
+            <li class="step {% if forloop.counter0 <= current_index %}step-primary{% endif %}">
+                <span class="text-xs font-medium text-base-content/60">
+                    {{ step|capfirst }}
+                </span>
+            </li>
             {% endfor %}
-        </ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+        </ul>
     </div>
 
     <!-- Divisor -->
@@ -31,41 +31,42 @@
     {% block form_header %}
 
     {% endblock form_header %}
+    {% if form.errors %}
+    <div id="form-errors"
+        class="bg-error/50 text-error-content mb-4 border border-error-content/20 rounded-lg p-4 transition-all duration-500 ease-in-out">
+        <h4 class="font-semibold text-lg mb-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Por favor, corrija los errores antes de continuar.
 
-    <form class=" flex-1" method="POST" hx-post="{{url}}" hx-target="#generic_modal_content"
-        hx-swap="innerHTML" id="ajax-form" novalidate enctype="multipart/form-data">
+        </h4>
+
+
+        {% for field in form.visible_fields %}
+        {% for error in field.errors %}
+        <li>Error en el campo <strong>'{{ field.label }}':</strong> {{ error }}</li>
+
+
+        {% endfor %}
+        {% endfor %}
+        </ul>
+
+        {% for error in form.non_field_errors %}
+        <li><strong>Error general:</strong> {{ error }}</li>
+        {% endfor %}
+
+    </div>
+    {% endif %}
+    <form class=" flex-1" method="POST" hx-post="{{url}}" hx-target="#generic_modal_content" hx-swap="innerHTML"
+        id="ajax-form" novalidate enctype="multipart/form-data">
         {% csrf_token %}
         {{ wizard.management_form }}
         {% block form_content %}
         {% endblock form_content %}
-       
+
         <footer>
 
-            {% if form.errors %}
-                <div id="form-errors" class="bg-error/50 text-error-content mt-4 border border-error-content/20 rounded-lg p-4 transition-all duration-500 ease-in-out">
-                    <h4 class="font-semibold text-lg mb-2">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Por favor, corrija los errores antes de continuar.
 
-                     </h4>
-    
-
-                    {% for field in form.visible_fields %}
-                        {% for error in field.errors %}
-                            <li>Error en el campo <strong>'{{ field.label }}':</strong> {{ error }}</li>
-
-                            
-                        {% endfor %}
-                    {% endfor %}
-                    </ul>
-
-                    {% for error in form.non_field_errors %}
-                            <li><strong>Error general:</strong> {{ error }}</li>
-                    {% endfor %}
-                   
-                </div>
-            {% endif %}
-            <div  class="mt-2 flex justify-between ">
+            <div class="mt-2 flex justify-between ">
                 {% if wizard.steps.prev %}
                 <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn ">
                     <i class="fas fa-arrow-left"></i> Anterior
@@ -79,15 +80,15 @@
                 </button>
             </div>
 
-         
-            
+
+
         </footer>
 
     </form>
 
     {% block form_script %}
     {% endblock form_script %}
-    
+
     <style>
         .fade-out {
             opacity: 0;
@@ -100,21 +101,21 @@
             border-width: 0;
         }
     </style>
-    
+
     <script>
         setTimeout(() => {
             const formErrors = document.getElementById('form-errors');
             if (formErrors) {
                 // Agregar clase de animación para deslizar hacia arriba
                 formErrors.classList.add('error-slide-up');
-                
+
                 // Remover completamente el elemento después de la animación
                 setTimeout(() => {
                     formErrors.remove();
                 }, 700); // 700ms coincide con la duración de la animación
             }
-        }, 5000); // 4 segundos para dar tiempo a leer el mensaje
-        
+        }, 6000); // 4 segundos para dar tiempo a leer el mensaje
+
         // Función para cerrar manualmente los errores (opcional)
         function closeErrors() {
             const formErrors = document.getElementById('form-errors');
@@ -125,5 +126,5 @@
                 }, 700);
             }
         }
-    </script>   
+    </script>
 </div>

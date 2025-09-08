@@ -167,6 +167,13 @@ htmx.on('htmx:beforeSwap', function(event) {
 // Manejar la carga del contenido
 htmx.on('htmx:afterSwap', function(event) {
   if (event.detail.target.id === 'generic_modal_content') {
+    // Scrollear al principio del modal
+    const modalBox = document.querySelector('.modal-box');
+    if (modalBox) {
+      console.log('Scrolleando al principio del modal');
+      modalBox.scrollTop = 0;
+    }
+    
     setTimeout(function() {
       // Reinicializar componentes comunes
       initializeSelect2();
