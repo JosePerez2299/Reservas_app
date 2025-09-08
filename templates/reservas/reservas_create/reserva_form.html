@@ -81,65 +81,65 @@
 
     <!-- Fecha y horario -->
     <div id="fecha_horario"
-        class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
-        <div class="flex items-center gap-3 mb-2">
-            <div class="w-8 h-8 bg-neutral/10 rounded-full flex items-center justify-center">
-                <i class="fas fa-calendar-alt text-neutrabg-neutral"></i>
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-primary"></i>
             </div>
             <div>
-                <h3 class="font-semibold"> Fecha y horario</h3>
+                <h3 class="font-semibold">Fecha y horario</h3>
                 <p class="text-sm text-base-content/60">Proporciona la fecha y horario de la reserva</p>
             </div>
         </div>
 
-        <div class="space-y-4 px-4 grid grid-cols-2 gap-4">
+        <div class="space-y-4 px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Campo fecha de uso -->
-            <div class="col-span-2">
+            <div class="md:col-span-2">
                 <div class="form-control">
                     <label class="flex justify-between items-center" for="{{ form.fecha_uso.id_for_label }}">
-                        <span>
-                            <i class="fas fa-calendar-alt h-4 w-4 "></i>
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-calendar-day h-4 w-4"></i>
                             Fecha de uso
                         </span>
                         {% if form.fecha_uso.field.required %}
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.fecha_uso }}
+                    {{ form.fecha_uso|add_class:"w-full" }}
                 </div>
                 {% field_messages form.fecha_uso %}
             </div>
 
-            <!-- Campo hora de fin -->
+            <!-- Campo hora de inicio (corregido) -->
             <div>
                 <div class="form-control">
-                    <label class="flex justify-between items-center" for="{{ form.hora_fin.id_for_label }}">
-                        <span>
-                            <i class="fas fa-clock h-4 w-4 "></i>
+                    <label class="flex justify-between items-center" for="{{ form.hora_inicio.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-hourglass-start h-4 w-4"></i>
                             Hora de inicio
                         </span>
                         {% if form.hora_inicio.field.required %}
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.hora_inicio }}
+                    {{ form.hora_inicio|add_class:"w-full" }}
                 </div>
                 {% field_messages form.hora_inicio %}
             </div>
 
-            <!-- Campo hora de inicio -->
+            <!-- Campo hora de fin (corregido) -->
             <div>
                 <div class="form-control">
-                    <label class="flex justify-between items-center" for="{{ form.hora_inicio.id_for_label }}">
-                        <span>
-                            <i class="fas fa-clock h-4 w-4 "></i>
+                    <label class="flex justify-between items-center" for="{{ form.hora_fin.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-hourglass-end h-4 w-4"></i>
                             Hora de fin
                         </span>
                         {% if form.hora_fin.field.required %}
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.hora_fin }}
+                    {{ form.hora_fin|add_class:"w-full" }}
                 </div>
                 {% field_messages form.hora_fin %}
             </div>
@@ -148,24 +148,24 @@
 
     <!-- Detalles de la reserva -->
     <div id="descripcion"
-        class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
-        <div class="flex items-center gap-3 mb-2">
-            <div class="w-8 h-8 bg-neutral/10 rounded-full flex items-center justify-center">
-                <i class="fas fa-paragraph text-neutrabg-neutral"></i>
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-paragraph text-primary"></i>
             </div>
             <div>
-                <h3 class="font-semibold"> Motivo</h3>
+                <h3 class="font-semibold">Motivo</h3>
                 <p class="text-sm text-base-content/60">Describe el motivo de la reserva</p>
             </div>
         </div>
 
-        <div class="space-y-4 px-4 ">
+        <div class="space-y-4 px-4">
             <!-- Campo Motivo -->
             <div>
                 <div class="form-control">
                     <label class="flex justify-between items-center" for="{{ form.motivo.id_for_label }}">
-                        <span>
-                            <i class="fas fa-info-circle h-4 w-4 "></i>
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-info-circle h-4 w-4"></i>
                             Motivo (max. 250 caracteres)
                         </span>
 
@@ -173,12 +173,14 @@
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.motivo|add_class:"w-full resize-none" }}
+                    {{ form.motivo|add_class:"textarea textarea-bordered w-full resize-none" }}
+                </div>
+                <div class="text-xs text-base-content/60 mt-1">
+                    Describe brevemente el propósito de la reserva
                 </div>
                 {% field_messages form.motivo %}
             </div>
         </div>
-
     </div>
 
 

@@ -244,7 +244,7 @@ class ReservaCreateWizardView(SessionWizardView):
         return [TEMPLATES[self.steps.current]]
     
     def done(self, form_list, **kwargs):
-        print(form_list)
+        return HttpResponse('Reserva creada correctamente' )
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, View):
     """

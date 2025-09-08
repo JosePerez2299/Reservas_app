@@ -1,5 +1,76 @@
 {% extends "includes/multistep_ajax_base.html" %}
+{% load widget_tweaks %}
+{% load render_field_msg %}
 
 {% block form_content %}
-{{form.as_p}}
+<div class="space-y-6">
+    <!-- Detalles Digitales -->
+    <div class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-desktop text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold">Detalles Digitales</h3>
+                <p class="text-sm text-base-content/60">Información adicional para reservas virtuales o mixtas</p>
+            </div>
+        </div>
+
+        <div class="space-y-6 px-4">
+            <!-- Anfitrión -->
+            <div class="form-control">
+                <label class="flex justify-between items-center" for="{{ form.anfitrion_usuario.id_for_label }}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-user-tie h-4 w-4"></i>
+                        Anfitrión
+                    </span>
+                    {% if form.anfitrion_usuario.field.required %}
+                    <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                    {% endif %}
+                </label>
+                {{ form.anfitrion_usuario|add_class:"input input-bordered w-full" }}
+                <div class="text-xs text-base-content/60 mt-1">
+                    Persona que se encargará de moderar la reunión virtual
+                </div>
+                {% field_messages form.anfitrion_usuario %}
+            </div>
+
+            <!-- Ubicación de transmisión -->
+            <div class="form-control">
+                <label class="flex justify-between items-center" for="{{ form.ubicacion_transmision.id_for_label }}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt h-4 w-4"></i>
+                        Ubicación de transmisión
+                    </span>
+                    {% if form.ubicacion_transmision.field.required %}
+                    <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                    {% endif %}
+                </label>
+                {{ form.ubicacion_transmision|add_class:"select select-bordered w-full" }}
+                <div class="text-xs text-base-content/60 mt-1">
+                    Ubicación física desde donde se realizará la transmisión
+                </div>
+                {% field_messages form.ubicacion_transmision %}
+            </div>
+
+            <!-- Espacio de transmisión -->
+            <div class="form-control">
+                <label class="flex justify-between items-center" for="{{ form.espacio_transmision.id_for_label }}">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-building h-4 w-4"></i>
+                        Espacio de transmisión
+                    </span>
+                    {% if form.espacio_transmision.field.required %}
+                    <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                    {% endif %}
+                </label>
+                {{ form.espacio_transmision|add_class:"input input-bordered w-full" }}
+                <div class="text-xs text-base-content/60 mt-1">
+                    Nombre o número del espacio físico desde donde se realizará la transmisión
+                </div>
+                {% field_messages form.espacio_transmision %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock form_content %}

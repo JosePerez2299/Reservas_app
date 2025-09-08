@@ -432,6 +432,7 @@ function initializeRequerimientos() {
         }
     });
 
+
     // Función para construir el JSON de requerimientos
     function updateRequerimientosJSON() {
         const requerimientos = {
@@ -545,15 +546,49 @@ function initializeRequerimientos() {
 
         // Contacto de apoyo
         const contactoChecked = document.getElementById('req_contacto_apoyo')?.checked || false;
-        requerimientos.contacto_apoyo.solicitado = contactoChecked;
         
+        // Si está marcado, verificar que los campos obligatorios estén completos
         if (contactoChecked) {
-            requerimientos.contacto_apoyo.datos = {
-                nombre: document.getElementById('contacto_apoyo_nombre')?.value || '',
-                telefono: document.getElementById('contacto_apoyo_telefono')?.value || '',
-                email: document.getElementById('contacto_apoyo_email')?.value || '',
-                cargo: document.getElementById('contacto_apoyo_cargo')?.value || ''
-            };
+            const nombre = document.getElementById('contacto_apoyo_nombre')?.value || '';
+            const telefono = document.getElementById('contacto_apoyo_telefono')?.value || '';
+            const email = document.getElementById('contacto_apoyo_email')?.value || '';
+            const cargo = document.getElementById('contacto_apoyo_cargo')?.value || '';
+            
+            // Si los campos obligatorios están vacíos, tratar como si no estuviera marcado
+            if (!nombre.trim() || !telefono.trim() || !email.trim()) {
+                requerimientos.contacto_apoyo.solicitado = false;
+                
+                // Mostrar indicadores visuales de campos requeridos
+                if (contactoChecked) {
+                    if (!nombre.trim()) {
+                        document.getElementById('contacto_apoyo_nombre')?.classList.add('input-error');
+                    }
+                    
+                    if (!telefono.trim()) {
+                        document.getElementById('contacto_apoyo_telefono')?.classList.add('input-error');
+                    }
+                    
+                    if (!email.trim()) {
+                        document.getElementById('contacto_apoyo_email')?.classList.add('input-error');
+                    }
+                }
+            } else {
+                // Si los campos están completos, guardar los datos
+                requerimientos.contacto_apoyo.solicitado = true;
+                requerimientos.contacto_apoyo.datos = {
+                    nombre: nombre,
+                    telefono: telefono,
+                    email: email,
+                    cargo: cargo
+                };
+                
+                // Quitar indicadores de error
+                document.getElementById('contacto_apoyo_nombre')?.classList.remove('input-error');
+                document.getElementById('contacto_apoyo_telefono')?.classList.remove('input-error');
+                document.getElementById('contacto_apoyo_email')?.classList.remove('input-error');
+            }
+        } else {
+            requerimientos.contacto_apoyo.solicitado = false;
         }
 
         // Actualizar el campo hidden
@@ -761,8 +796,51 @@ function initializeRequerimientos() {
     updateRequerimientosJSON(); // Luego actualizar el JSON por si faltó algo
 }
 
+// Mostrar feedback visual cuando faltan campos
+function setupContactoFeedback() {
+    // Añadir mensajes de ayuda debajo de los campos
+    const campoNombre = document.getElementById('contacto_apoyo_nombre');
+    const campoTelefono = document.getElementById('contacto_apoyo_telefono');
+    const campoEmail = document.getElementById('contacto_apoyo_email');
+    
+    if (campoNombre && campoTelefono && campoEmail) {
+        // Crear mensaje de ayuda si no existe
+        if (!document.querySelector('.mensaje-ayuda-contacto')) {
+            const mensajeAyuda = document.createElement('div');
+            mensajeAyuda.className = 'mensaje-ayuda-contacto text-sm text-warning mt-2 mb-2';
+            mensajeAyuda.innerHTML = 'Todos los campos con <span class="text-error">*</span> son obligatorios si seleccionas contacto de apoyo';
+            
+            // Insertarlo después del div de contacto de apoyo
+            const divContacto = document.getElementById('div_contacto_apoyo_detalles');
+            if (divContacto) {
+                divContacto.appendChild(mensajeAyuda);
+            }
+        }
+        
+        // Agregar asteriscos a las etiquetas
+        const etiquetas = document.querySelectorAll('#div_contacto_apoyo_detalles .label-text');
+        etiquetas.forEach(etiqueta => {
+            if (!etiqueta.innerHTML.includes('*') && 
+                (etiqueta.innerHTML.includes('Nombre') || 
+                 etiqueta.innerHTML.includes('Teléfono') || 
+                 etiqueta.innerHTML.includes('Email'))) {
+                etiqueta.innerHTML += ' <span class="text-error">*</span>';
+            }
+        });
+        
+        // Añadir listeners para validación en tiempo real
+        [campoNombre, campoTelefono, campoEmail].forEach(campo => {
+            campo.addEventListener('blur', function() {
+                // Actualizar el JSON al perder el foco para aplicar validación
+                updateRequerimientosJSON();
+            });
+        });
+    }
+}
+
 // Ejecutar inmediatamente
 initializeRequerimientos();
+setupContactoFeedback();
 
 // También ejecutar cuando HTMX intercambie contenido
 document.addEventListener('htmx:afterSwap', function(event) {
@@ -775,11 +853,12 @@ document.addEventListener('htmx:afterSwap', function(event) {
             requerimientosDiv.dataset.initialized = 'false';
         }
         // Reinicializar después de un pequeño delay
-        setTimeout(() => {
-            if (typeof initializeRequerimientos === 'function') {
-                initializeRequerimientos();
-            }
-        }, 100);
+                setTimeout(() => {
+                    if (typeof initializeRequerimientos === 'function') {
+                        initializeRequerimientos();
+                        setupContactoFeedback(); // Configurar feedback visual
+                    }
+                }, 100);
     }
 });
 </script>

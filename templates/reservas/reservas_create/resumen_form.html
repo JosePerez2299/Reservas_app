@@ -1,15 +1,184 @@
 {% extends "includes/multistep_ajax_base.html" %}
 
 {% block form_content %}
+<div class="space-y-6">
+    <!-- Título de resumen -->
+    <div class="card bg-primary/10 border border-primary/20 shadow-sm p-5 mb-4">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                <i class="fas fa-clipboard-check text-primary text-lg"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg">Resumen de la Reserva</h3>
+                <p class="text-sm text-base-content/70">Revise los detalles de su solicitud antes de confirmar</p>
+            </div>
+        </div>
+    </div>
 
 {% for step, data in resumen_data.items %}
-    <h3>{{ step }}</h3>
-    <ul>
+        <!-- Sección por cada paso -->
+        {% if step == "contacto" %}
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200">
+                <h3 class="text-base font-medium mb-3 flex items-center gap-2">
+                    <i class="fas fa-user text-info"></i>
+                    Información del Solicitante
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if data.p00_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Usuario</span>
+                            <span class="font-medium">{{ data.p00_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.nombre_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Nombre</span>
+                            <span class="font-medium">{{ data.nombre_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.email_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Email</span>
+                            <span class="font-medium">{{ data.email_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.telefono_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Teléfono</span>
+                            <span class="font-medium">{{ data.telefono_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.vicepresidencia_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Vicepresidencia</span>
+                            <span class="font-medium">{{ data.vicepresidencia_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.gerencia_solicitante %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Gerencia</span>
+                            <span class="font-medium">{{ data.gerencia_solicitante }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% elif step == "reserva" %}
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200">
+                <h3 class="text-base font-medium mb-3 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-primary"></i>
+                    Detalles de la Reserva
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if data.tipo_solicitud %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Tipo de solicitud</span>
+                            <span class="font-medium">{{ data.tipo_solicitud }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.modalidad %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Modalidad</span>
+                            <span class="font-medium">{{ data.modalidad }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.tipo_actividad %}
+                        <div class="flex flex-col md:col-span-2">
+                            <span class="text-xs text-base-content/60">Tipo de actividad</span>
+                            <span class="font-medium">{{ data.tipo_actividad }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.fecha_uso %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Fecha de uso</span>
+                            <span class="font-medium">{{ data.fecha_uso }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if data.hora_inicio and data.hora_fin %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">Horario</span>
+                            <span class="font-medium">{{ data.hora_inicio }} - {{ data.hora_fin }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if data.motivo %}
+                    <div class="mt-4 p-3 bg-base-200/50 rounded-lg">
+                        <span class="text-xs text-base-content/60 block mb-1">Motivo:</span>
+                        <p class="text-sm">{{ data.motivo }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% elif step == "requerimiento" %}
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200">
+                <h3 class="text-base font-medium mb-3 flex items-center gap-2">
+                    <i class="fas fa-cogs text-secondary"></i>
+                    Requerimientos
+                </h3>
+                
+                {% if data.requerimientos %}
+                    <div class="space-y-4">
+                        <div class="p-3 bg-base-200/30 rounded-lg">
+                            <pre class="text-xs overflow-auto p-2 max-h-40">{{ data.requerimientos|pprint }}</pre>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if data.observacion %}
+                    <div class="mt-4 p-3 bg-base-200/50 rounded-lg">
+                        <span class="text-xs text-base-content/60 block mb-1">Observaciones adicionales:</span>
+                        <p class="text-sm">{{ data.observacion }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% elif step == "detalle" %}
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200">
+                <h3 class="text-base font-medium mb-3 flex items-center gap-2">
+                    <i class="fas fa-desktop text-accent"></i>
+                    Detalles Digitales
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for key, value in data.items %}
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">{{ key|title }}</span>
+                            <span class="font-medium">{{ value }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <!-- Otros pasos que puedan añadirse en el futuro -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200">
+                <h3 class="text-base font-medium mb-3 capitalize">{{ step }}</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for key, value in data.items %}
-            <li>{{ key }}: {{ value }}</li>
+                        <div class="flex flex-col">
+                            <span class="text-xs text-base-content/60">{{ key|title }}</span>
+                            <span class="font-medium">{{ value }}</span>
+                        </div>
         {% endfor %}
-    </ul>
-    <hr>
+                </div>
+            </div>
+        {% endif %}
 {% endfor %}
 
+    <!-- Mensaje de confirmación -->
+    <div class="alert alert-info mt-6">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <h4 class="font-medium">¿Todo correcto?</h4>
+            <p class="text-sm">Si todos los datos son correctos, haga clic en "Confirmar" para enviar su solicitud.</p>
+        </div>
+    </div>
+</div>
 {% endblock form_content %}
