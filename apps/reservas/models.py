@@ -50,11 +50,11 @@ class Reserva(models.Model):
         "TipoActividad", on_delete=models.CASCADE, related_name='reservas', null=True, blank=True
     )
 
-    fecha_uso = models.DateField()
+    fecha_uso = models.DateField(null=False, blank=False)
 
-    hora_inicio = models.TimeField()
+    hora_inicio = models.TimeField(null=False, blank=False)
     
-    hora_fin = models.TimeField()   
+    hora_fin = models.TimeField(null=False, blank=False)   
     
     estado = models.CharField(
         max_length=10, choices=Estado.choices, default=Estado.PENDIENTE

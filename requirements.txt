@@ -7,3 +7,4 @@ django-auditlog
 django-formtools
 fontawesomefree
 pillow
+django-phonenumber-field[phonenumbers]

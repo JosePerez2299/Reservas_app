@@ -1,12 +1,15 @@
+from datetime import timedelta
 from django.urls import reverse
 from apps.espacios.models import Espacio
 from apps.reservas.models import DetalleReservaDigital, Reserva, TipoActividad
 from apps.usuarios.models import Usuario
 
 from django import forms
+from django.utils import timezone
+from phonenumber_field.formfields import PhoneNumberField
 
 
-# Selecciona el usuario que va a realizar la reserva
+# Step1: Contacto
 class ContactoForm(forms.ModelForm):
     p00_solicitante = forms.CharField(
         widget=forms.TextInput(attrs={"class": "input ", "readonly": True})
@@ -33,11 +36,17 @@ class ContactoForm(forms.ModelForm):
         )
     )
 
-    telefono_solicitante = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(
-            attrs={"class": "input ", "placeholder": "Teléfono del solicitante"}
-        ),
+    telefono_solicitante = PhoneNumberField(
+        widget=forms.TextInput(attrs={
+            'type': 'tel',
+            'placeholder': '+58 414 123 4567',
+            'class': 'input input-bordered'
+        }),
+        error_messages={
+            'invalid': 'Por favor, ingrese un número de teléfono válido.',
+        },
+        label='Número de Celular',
+        region='VE'  
     )
 
     vicepresidencia_solicitante = forms.CharField(
@@ -74,40 +83,48 @@ class ContactoForm(forms.ModelForm):
             "gerencia_solicitante",]
 
 
+# Step2: Reserva
 class ReservaForm(forms.ModelForm):
     modalidad = forms.ChoiceField(
         choices=Reserva.Modalidad.choices,
+        help_text="Indica la modalidad de la reserva (presencial o virtual)",
         widget=forms.Select(attrs={"class": "select select-bordered"}),
     )
 
     tipo_solicitud = forms.ChoiceField(
         choices=Reserva.TipoSolicitud.choices,
+        help_text="Indica el tipo de solicitud de la reserva",
         widget=forms.Select(attrs={"class": "select select-bordered"}),
     )
 
     fecha_uso = forms.DateField(
-        widget=forms.DateInput(attrs={"class": "input", "type": "date"})
+        help_text="Indica la fecha de uso de la reserva",
+        widget=forms.DateInput(attrs={"class": "input w-full", "type": "date", "min": timezone.now().date(), "max": timezone.now().date() + timedelta(days=30)}),
     )
 
     tipo_actividad = forms.ModelChoiceField(
         queryset=TipoActividad.objects.all(),
-        widget=forms.Select(attrs={"class": "select select-bordered"}),
+        help_text="Indica el tipo de actividad que se realizará en el espacio, si no existe, selecionar 'otro'",
+        widget=forms.Select(attrs={"class": "select2 w-full"}),
     )
 
     motivo = forms.CharField(
+        help_text="Indica el motivo de la reserva",
         widget=forms.Textarea(attrs={"class": "textarea textarea-bordered"}),
     )
 
     hora_inicio = forms.TimeField(
-        widget=forms.TimeInput(attrs={"class": "input", "type": "time"})
+        help_text="Indica la hora de inicio de la reserva",
+        widget=forms.TimeInput(
+            attrs={"class": "input", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
+        )
     )
 
     hora_fin = forms.TimeField(
-        widget=forms.TimeInput(attrs={"class": "input", "type": "time"})
-    )
-
-    observacion = forms.CharField(
-        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered"}),
+        help_text="Indica la hora de fin de la reserva",
+        widget=forms.TimeInput(
+            attrs={"class": "input", "type": "time", "min": "09:00", "max": "20:00", "step": "900"},
+        )
     )
 
     class Meta:
@@ -120,8 +137,14 @@ class ReservaForm(forms.ModelForm):
             "hora_inicio",
             "hora_fin",
             "motivo",
-            "observacion",
         ]
+
+# Modelo Reserva:
+# Requerimientos y observacion adicionales.
+
+# Modelo ReservaEspacio:
+# Numero de participantes y seleccion de espacios (mostrar sede, y despues los espacios de esa sede).
+# Crear el form para cada uno, si es mixta, hacer doble insert, ejecutar cada step.
 
 
 class ReservaCreateForm(forms.ModelForm):

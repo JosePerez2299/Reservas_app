@@ -198,9 +198,7 @@ class ReservaCreateWizardView(SessionWizardView):
     """
     form_list = [
         ('contacto', ContactoForm),
-        ('tipo', ReservaForm),
-        ('reserva', ReservaCreateForm),
-        ('detalle', DetalleReservaDigitalForm),
+        ('reserva', ReservaForm),
         ('resumen', EmptyForm)
     ]
 
