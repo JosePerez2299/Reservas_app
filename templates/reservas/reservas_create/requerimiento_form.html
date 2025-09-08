@@ -1,5 +1,786 @@
 {% extends "includes/multistep_ajax_base.html" %}
+{% load widget_tweaks %}
+{% load render_field_msg %}
 
 {% block form_content %}
-{{form.as_p}}
+    <!-- Requerimientos -->
+    <div id="requerimientos"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-cogs text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold">Requerimientos</h3>
+                <p class="text-sm text-base-content/60">Especifica los requerimientos necesarios para tu evento</p>
+            </div>
+        </div>
+
+        <div class="space-y-6 px-4">
+            
+            <!-- Requerimientos Técnicos -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="requerimientos-tecnicos">
+                <h4 class="font-medium text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-microchip text-primary"></i>
+                    Requerimientos Técnicos
+                    <small class="text-xs badge badge-outline badge-primary">Solo espacios físicos</small>
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Micrófono -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_microfono">
+                            <span class="label-text">Micrófono</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_microfono">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="10" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_microfono" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sistema de sonido -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_sonido">
+                            <span class="label-text">Sistema de sonido</span>
+                        </label>
+                    </div>
+
+                    <!-- Proyector -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_proyector">
+                            <span class="label-text">Proyector</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_proyector">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="5" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_proyector" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pantallas -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_pantallas">
+                            <span class="label-text">Pantallas adicionales</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_pantallas">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="8" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_pantallas" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Computadoras -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_computadoras">
+                            <span class="label-text">Computadoras</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_computadoras">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="20" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_computadoras" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wi-Fi -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_wifi">
+                            <span class="label-text">Wi-Fi reforzado</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materiales de Apoyo -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="materiales-apoyo">
+                <h4 class="font-medium text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-chair text-secondary"></i>
+                    Materiales de Apoyo
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Mesas adicionales -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_mesas">
+                            <span class="label-text">Mesas adicionales</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_mesas">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="20" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_mesas" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sillas adicionales -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_sillas">
+                            <span class="label-text">Sillas adicionales</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_sillas">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="50" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_sillas" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Atriles -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_atriles">
+                            <span class="label-text">Atriles</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_atriles">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="5" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_atriles" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pizarras -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_pizarras">
+                            <span class="label-text">Pizarras/Flipchart</span>
+                        </label>
+                        <div class="hidden pl-6 mt-1" id="div_cantidad_pizarras">
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="3" value="1" class="input input-bordered input-xs w-20" 
+                                      id="cantidad_pizarras" placeholder="Cant.">
+                                <span class="text-xs text-base-content/60">unidades</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios Adicionales -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="servicios-adicionales">
+                <h4 class="font-medium text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-concierge-bell text-accent"></i>
+                    Servicios Adicionales
+                </h4>
+                <div class="space-y-4">
+                    <!-- Catering -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-accent toggle-sm" id="req_catering">
+                            <span class="label-text">Servicio de catering</span>
+                        </label>
+                        <div class="hidden pl-6 space-y-3 mt-1 p-3 bg-base-200/50 rounded-md" id="div_catering_detalles">
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_cafe">
+                                    <span class="text-sm">Café</span>
+                                </label>
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_refrigerios">
+                                    <span class="text-sm">Refrigerios</span>
+                                </label>
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_almuerzo">
+                                    <span class="text-sm">Almuerzo</span>
+                                </label>
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_agua">
+                                    <span class="text-sm">Agua</span>
+                                </label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" min="1" max="200" value="10" class="input input-bordered input-xs w-24" 
+                                      id="catering_personas" placeholder="Personas">
+                                <span class="text-xs text-base-content/60">personas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal de apoyo -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="toggle toggle-accent toggle-sm" id="req_personal">
+                            <span class="label-text">Personal de apoyo</span>
+                        </label>
+                        <div class="hidden pl-6 space-y-2 mt-1 p-3 bg-base-200/50 rounded-md" id="div_personal_detalles">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_fotografo">
+                                    <span class="text-sm">Fotógrafo</span>
+                                </label>
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_tecnico">
+                                    <span class="text-sm">Técnico de sonido</span>
+                                </label>
+                                <label class="label cursor-pointer justify-start gap-2">
+                                    <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_protocolo">
+                                    <span class="text-sm">Personal de protocolo</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nivel de Seguridad -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="nivel-seguridad">
+                <h4 class="font-medium text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-warning"></i>
+                    Nivel de Seguridad
+                </h4>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">¿El evento requiere seguridad adicional?</span>
+                    </label>
+                    <select class="select select-bordered w-full" id="nivel_seguridad">
+                        <option value="">Sin requerimientos especiales</option>
+                        <option value="basica">Seguridad básica</option>
+                        <option value="protocolar">Evento protocolar</option>
+                        <option value="politico">Evento político</option>
+                        <option value="alto_riesgo">Alto riesgo</option>
+                    </select>
+                    <div class="label">
+                        <span class="label-text-alt text-base-content/60">
+                            Eventos protocolares o políticos pueden requerir coordinación adicional
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacto de Apoyo -->
+            <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="contacto-apoyo">
+                <h4 class="font-medium text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-friends text-info"></i>
+                    Contacto de Apoyo
+                </h4>
+                <div class="form-control mb-3">
+                    <label class="label cursor-pointer justify-start gap-3">
+                        <input type="checkbox" class="toggle toggle-info toggle-sm" id="req_contacto_apoyo">
+                        <span class="label-text">Designar persona de contacto diferente al solicitante</span>
+                    </label>
+                </div>
+                <div class="hidden space-y-3 mt-1 p-3 bg-base-200/50 rounded-md" id="div_contacto_apoyo_detalles">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Nombre completo</span>
+                            </label>
+                            <input type="text" class="input input-bordered input-sm w-full" 
+                                  id="contacto_apoyo_nombre" placeholder="Nombre del contacto">
+                        </div>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Teléfono</span>
+                            </label>
+                            <input type="tel" class="input input-bordered input-sm w-full" 
+                                  id="contacto_apoyo_telefono" placeholder="+58 414 123 4567">
+                        </div>
+                        <div class="form-control md:col-span-2">
+                            <label class="label">
+                                <span class="label-text">Email</span>
+                            </label>
+                            <input type="email" class="input input-bordered input-sm w-full" 
+                                  id="contacto_apoyo_email" placeholder="contacto@ejemplo.com">
+                        </div>
+                        <div class="form-control md:col-span-2">
+                            <label class="label">
+                                <span class="label-text">Cargo/Función</span>
+                            </label>
+                            <input type="text" class="input input-bordered input-sm w-full" 
+                                  id="contacto_apoyo_cargo" placeholder="Coordinador del evento">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campo oculto para el JSON -->
+            {{ form.requerimientos|add_class:"hidden"|attr:"id:id_requerimientos" }}
+        </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div id="observaciones"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-sticky-note text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold">Observaciones</h3>
+                <p class="text-sm text-base-content/60">Información adicional o comentarios especiales</p>
+            </div>
+        </div>
+        
+        <div class="space-y-4 px-4">
+            <div class="form-control">
+                <label class="flex justify-between items-center" for="{{ form.observacion.id_for_label }}">
+                    <span>
+                        <i class="fas fa-comment h-4 w-4"></i>
+                        Observaciones adicionales
+                    </span>
+                </label>
+                {{ form.observacion|add_class:"textarea textarea-bordered w-full resize-none" }}
+            </div>
+            {% field_messages form.observacion %}
+        </div>
+    </div>
 {% endblock form_content %}
+
+
+
+{% block form_script %}
+<script>
+// Función principal para inicializar requerimientos - accesible globalmente para HTMX
+function initializeRequerimientos() {
+    // Verificar que los elementos existen
+    if (!document.getElementById('requerimientos')) {
+        console.log('Elementos de requerimientos no encontrados, saltando inicialización');
+        return;
+    }
+    
+    console.log('Inicializando sistema de requerimientos...');
+    
+    // Marcar como inicializado para evitar duplicación
+    const requerimientosDiv = document.getElementById('requerimientos');
+    if (requerimientosDiv.dataset.initialized === 'true') {
+        console.log('Ya inicializado, saltando...');
+        return;
+    }
+    requerimientosDiv.dataset.initialized = 'true';
+    
+    // Función para mostrar/ocultar controles de cantidad
+    function toggleCantidadControl(checkboxId, divId) {
+        const checkbox = document.getElementById(checkboxId);
+        const div = document.getElementById(divId);
+        
+        if (checkbox && div) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    div.classList.remove('hidden');
+                } else {
+                    div.classList.add('hidden');
+                }
+                updateRequerimientosJSON();
+            });
+        }
+    }
+
+    // Función para mostrar/ocultar secciones completas
+    function toggleSection(checkboxId, divId) {
+        const checkbox = document.getElementById(checkboxId);
+        const div = document.getElementById(divId);
+        
+        if (checkbox && div) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    div.classList.remove('hidden');
+                } else {
+                    div.classList.add('hidden');
+                    // Limpiar campos cuando se oculta
+                    const inputs = div.querySelectorAll('input, select');
+                    inputs.forEach(input => {
+                        if (input.type === 'checkbox') {
+                            input.checked = false;
+                        } else {
+                            input.value = '';
+                        }
+                    });
+                }
+                updateRequerimientosJSON();
+            });
+        }
+    }
+
+    // Configurar toggles para controles de cantidad
+    toggleCantidadControl('req_microfono', 'div_cantidad_microfono');
+    toggleCantidadControl('req_proyector', 'div_cantidad_proyector');
+    toggleCantidadControl('req_pantallas', 'div_cantidad_pantallas');
+    toggleCantidadControl('req_computadoras', 'div_cantidad_computadoras');
+    toggleCantidadControl('req_mesas', 'div_cantidad_mesas');
+    toggleCantidadControl('req_sillas', 'div_cantidad_sillas');
+    toggleCantidadControl('req_atriles', 'div_cantidad_atriles');
+    toggleCantidadControl('req_pizarras', 'div_cantidad_pizarras');
+
+    // Configurar toggles para secciones
+    toggleSection('req_catering', 'div_catering_detalles');
+    toggleSection('req_personal', 'div_personal_detalles');
+    toggleSection('req_contacto_apoyo', 'div_contacto_apoyo_detalles');
+
+    // Agregar listeners para todos los inputs que afectan el JSON
+    const allInputs = document.querySelectorAll('#requerimientos input, #requerimientos select');
+    allInputs.forEach(input => {
+        input.addEventListener('change', updateRequerimientosJSON);
+        if (input.type === 'number' || input.type === 'text' || input.type === 'tel' || input.type === 'email') {
+            input.addEventListener('input', updateRequerimientosJSON);
+        }
+    });
+
+    // Función para construir el JSON de requerimientos
+    function updateRequerimientosJSON() {
+        const requerimientos = {
+            requerimientos_tecnicos: {},
+            materiales_apoyo: {},
+            servicios_adicionales: {
+                catering: {
+                    solicitado: false,
+                    detalles: [],
+                    personas: 0
+                },
+                personal: {
+                    solicitado: false,
+                    tipos: []
+                }
+            },
+            nivel_seguridad: '',
+            contacto_apoyo: {
+                solicitado: false,
+                datos: {}
+            }
+        };
+
+        // Requerimientos técnicos
+        requerimientos.requerimientos_tecnicos.microfono = {
+            solicitado: document.getElementById('req_microfono')?.checked || false,
+            cantidad: document.getElementById('req_microfono')?.checked ? 
+                parseInt(document.getElementById('cantidad_microfono')?.value || '1') : 0
+        };
+
+        requerimientos.requerimientos_tecnicos.sonido = 
+            document.getElementById('req_sonido')?.checked || false;
+
+        requerimientos.requerimientos_tecnicos.proyector = {
+            solicitado: document.getElementById('req_proyector')?.checked || false,
+            cantidad: document.getElementById('req_proyector')?.checked ? 
+                parseInt(document.getElementById('cantidad_proyector')?.value || '1') : 0
+        };
+
+        requerimientos.requerimientos_tecnicos.pantallas = {
+            solicitado: document.getElementById('req_pantallas')?.checked || false,
+            cantidad: document.getElementById('req_pantallas')?.checked ? 
+                parseInt(document.getElementById('cantidad_pantallas')?.value || '1') : 0
+        };
+
+        requerimientos.requerimientos_tecnicos.computadoras = {
+            solicitado: document.getElementById('req_computadoras')?.checked || false,
+            cantidad: document.getElementById('req_computadoras')?.checked ? 
+                parseInt(document.getElementById('cantidad_computadoras')?.value || '1') : 0
+        };
+
+        requerimientos.requerimientos_tecnicos.wifi = 
+            document.getElementById('req_wifi')?.checked || false;
+
+        // Materiales de apoyo
+        requerimientos.materiales_apoyo.mesas = {
+            solicitado: document.getElementById('req_mesas')?.checked || false,
+            cantidad: document.getElementById('req_mesas')?.checked ? 
+                parseInt(document.getElementById('cantidad_mesas')?.value || '1') : 0
+        };
+
+        requerimientos.materiales_apoyo.sillas = {
+            solicitado: document.getElementById('req_sillas')?.checked || false,
+            cantidad: document.getElementById('req_sillas')?.checked ? 
+                parseInt(document.getElementById('cantidad_sillas')?.value || '1') : 0
+        };
+
+        requerimientos.materiales_apoyo.atriles = {
+            solicitado: document.getElementById('req_atriles')?.checked || false,
+            cantidad: document.getElementById('req_atriles')?.checked ? 
+                parseInt(document.getElementById('cantidad_atriles')?.value || '1') : 0
+        };
+
+        requerimientos.materiales_apoyo.pizarras = {
+            solicitado: document.getElementById('req_pizarras')?.checked || false,
+            cantidad: document.getElementById('req_pizarras')?.checked ? 
+                parseInt(document.getElementById('cantidad_pizarras')?.value || '1') : 0
+        };
+
+        // Servicios adicionales - Catering
+        const cateringChecked = document.getElementById('req_catering')?.checked || false;
+        requerimientos.servicios_adicionales.catering.solicitado = cateringChecked;
+        
+        if (cateringChecked) {
+            const cateringDetalles = [];
+            if (document.getElementById('catering_cafe')?.checked) cateringDetalles.push('cafe');
+            if (document.getElementById('catering_refrigerios')?.checked) cateringDetalles.push('refrigerios');
+            if (document.getElementById('catering_almuerzo')?.checked) cateringDetalles.push('almuerzo');
+            if (document.getElementById('catering_agua')?.checked) cateringDetalles.push('agua');
+            
+            requerimientos.servicios_adicionales.catering.detalles = cateringDetalles;
+            requerimientos.servicios_adicionales.catering.personas = 
+                parseInt(document.getElementById('catering_personas')?.value || '10');
+        }
+
+        // Servicios adicionales - Personal
+        const personalChecked = document.getElementById('req_personal')?.checked || false;
+        requerimientos.servicios_adicionales.personal.solicitado = personalChecked;
+        
+        if (personalChecked) {
+            const personalTipos = [];
+            if (document.getElementById('personal_fotografo')?.checked) personalTipos.push('fotografo');
+            if (document.getElementById('personal_tecnico')?.checked) personalTipos.push('tecnico_sonido');
+            if (document.getElementById('personal_protocolo')?.checked) personalTipos.push('protocolo');
+            
+            requerimientos.servicios_adicionales.personal.tipos = personalTipos;
+        }
+
+        // Nivel de seguridad
+        requerimientos.nivel_seguridad = document.getElementById('nivel_seguridad')?.value || '';
+
+        // Contacto de apoyo
+        const contactoChecked = document.getElementById('req_contacto_apoyo')?.checked || false;
+        requerimientos.contacto_apoyo.solicitado = contactoChecked;
+        
+        if (contactoChecked) {
+            requerimientos.contacto_apoyo.datos = {
+                nombre: document.getElementById('contacto_apoyo_nombre')?.value || '',
+                telefono: document.getElementById('contacto_apoyo_telefono')?.value || '',
+                email: document.getElementById('contacto_apoyo_email')?.value || '',
+                cargo: document.getElementById('contacto_apoyo_cargo')?.value || ''
+            };
+        }
+
+        // Actualizar el campo hidden
+        const hiddenField = document.getElementById('id_requerimientos');
+        if (hiddenField) {
+            hiddenField.value = JSON.stringify(requerimientos);
+        }
+
+        console.log('Requerimientos JSON actualizados:', requerimientos);
+    }
+
+    // Función para mostrar/ocultar requerimientos técnicos según modalidad
+    function toggleRequerimientosTecnicos() {
+        const modalidad = document.getElementById('id_modalidad')?.value;
+        const tecnicos = document.getElementById('requerimientos-tecnicos');
+        
+        if (tecnicos) {
+            if (modalidad === 'virtual') {
+                tecnicos.classList.add('hidden');
+                // Desmarcar todos los checkboxes técnicos
+                const checkboxesTecnicos = tecnicos.querySelectorAll('input[type="checkbox"]');
+                checkboxesTecnicos.forEach(cb => cb.checked = false);
+                // Ocultar controles de cantidad
+                const divsCantidad = tecnicos.querySelectorAll('[id^="div_cantidad_"]');
+                divsCantidad.forEach(div => div.classList.add('hidden'));
+            } else {
+                tecnicos.classList.remove('hidden');
+            }
+            updateRequerimientosJSON();
+        }
+    }
+
+    // Listener para cambio de modalidad
+    const modalidadSelect = document.getElementById('id_modalidad');
+    if (modalidadSelect) {
+        modalidadSelect.addEventListener('change', toggleRequerimientosTecnicos);
+        // Ejecutar una vez al cargar
+        toggleRequerimientosTecnicos();
+    }
+
+    // Función para cargar valores existentes desde JSON
+    function loadRequerimientosFromJSON() {
+        const hiddenField = document.getElementById('id_requerimientos');
+        if (!hiddenField || !hiddenField.value) {
+            return;
+        }
+        
+        try {
+            const requerimientos = JSON.parse(hiddenField.value);
+            console.log('Cargando requerimientos guardados:', requerimientos);
+            
+            // Requerimientos técnicos
+            if (requerimientos.requerimientos_tecnicos) {
+                const tecnicos = requerimientos.requerimientos_tecnicos;
+                
+                // Micrófono
+                if (tecnicos.microfono) {
+                    document.getElementById('req_microfono').checked = tecnicos.microfono.solicitado;
+                    if (tecnicos.microfono.solicitado) {
+                        document.getElementById('div_cantidad_microfono').classList.remove('hidden');
+                        document.getElementById('cantidad_microfono').value = tecnicos.microfono.cantidad;
+                    }
+                }
+                
+                // Sonido
+                if (tecnicos.sonido !== undefined) {
+                    document.getElementById('req_sonido').checked = tecnicos.sonido;
+                }
+                
+                // Proyector
+                if (tecnicos.proyector) {
+                    document.getElementById('req_proyector').checked = tecnicos.proyector.solicitado;
+                    if (tecnicos.proyector.solicitado) {
+                        document.getElementById('div_cantidad_proyector').classList.remove('hidden');
+                        document.getElementById('cantidad_proyector').value = tecnicos.proyector.cantidad;
+                    }
+                }
+                
+                // Pantallas
+                if (tecnicos.pantallas) {
+                    document.getElementById('req_pantallas').checked = tecnicos.pantallas.solicitado;
+                    if (tecnicos.pantallas.solicitado) {
+                        document.getElementById('div_cantidad_pantallas').classList.remove('hidden');
+                        document.getElementById('cantidad_pantallas').value = tecnicos.pantallas.cantidad;
+                    }
+                }
+                
+                // Computadoras
+                if (tecnicos.computadoras) {
+                    document.getElementById('req_computadoras').checked = tecnicos.computadoras.solicitado;
+                    if (tecnicos.computadoras.solicitado) {
+                        document.getElementById('div_cantidad_computadoras').classList.remove('hidden');
+                        document.getElementById('cantidad_computadoras').value = tecnicos.computadoras.cantidad;
+                    }
+                }
+                
+                // WiFi
+                if (tecnicos.wifi !== undefined) {
+                    document.getElementById('req_wifi').checked = tecnicos.wifi;
+                }
+            }
+            
+            // Materiales de apoyo
+            if (requerimientos.materiales_apoyo) {
+                const materiales = requerimientos.materiales_apoyo;
+                
+                // Mesas
+                if (materiales.mesas) {
+                    document.getElementById('req_mesas').checked = materiales.mesas.solicitado;
+                    if (materiales.mesas.solicitado) {
+                        document.getElementById('div_cantidad_mesas').classList.remove('hidden');
+                        document.getElementById('cantidad_mesas').value = materiales.mesas.cantidad;
+                    }
+                }
+                
+                // Sillas
+                if (materiales.sillas) {
+                    document.getElementById('req_sillas').checked = materiales.sillas.solicitado;
+                    if (materiales.sillas.solicitado) {
+                        document.getElementById('div_cantidad_sillas').classList.remove('hidden');
+                        document.getElementById('cantidad_sillas').value = materiales.sillas.cantidad;
+                    }
+                }
+                
+                // Atriles
+                if (materiales.atriles) {
+                    document.getElementById('req_atriles').checked = materiales.atriles.solicitado;
+                    if (materiales.atriles.solicitado) {
+                        document.getElementById('div_cantidad_atriles').classList.remove('hidden');
+                        document.getElementById('cantidad_atriles').value = materiales.atriles.cantidad;
+                    }
+                }
+                
+                // Pizarras
+                if (materiales.pizarras) {
+                    document.getElementById('req_pizarras').checked = materiales.pizarras.solicitado;
+                    if (materiales.pizarras.solicitado) {
+                        document.getElementById('div_cantidad_pizarras').classList.remove('hidden');
+                        document.getElementById('cantidad_pizarras').value = materiales.pizarras.cantidad;
+                    }
+                }
+            }
+            
+            // Servicios adicionales
+            if (requerimientos.servicios_adicionales) {
+                const servicios = requerimientos.servicios_adicionales;
+                
+                // Catering
+                if (servicios.catering) {
+                    document.getElementById('req_catering').checked = servicios.catering.solicitado;
+                    if (servicios.catering.solicitado) {
+                        document.getElementById('div_catering_detalles').classList.remove('hidden');
+                        document.getElementById('catering_personas').value = servicios.catering.personas;
+                        
+                        if (servicios.catering.detalles) {
+                            document.getElementById('catering_cafe').checked = servicios.catering.detalles.includes('cafe');
+                            document.getElementById('catering_refrigerios').checked = servicios.catering.detalles.includes('refrigerios');
+                            document.getElementById('catering_almuerzo').checked = servicios.catering.detalles.includes('almuerzo');
+                            document.getElementById('catering_agua').checked = servicios.catering.detalles.includes('agua');
+                        }
+                    }
+                }
+                
+                // Personal
+                if (servicios.personal) {
+                    document.getElementById('req_personal').checked = servicios.personal.solicitado;
+                    if (servicios.personal.solicitado) {
+                        document.getElementById('div_personal_detalles').classList.remove('hidden');
+                        
+                        if (servicios.personal.tipos) {
+                            document.getElementById('personal_fotografo').checked = servicios.personal.tipos.includes('fotografo');
+                            document.getElementById('personal_tecnico').checked = servicios.personal.tipos.includes('tecnico_sonido');
+                            document.getElementById('personal_protocolo').checked = servicios.personal.tipos.includes('protocolo');
+                        }
+                    }
+                }
+            }
+            
+            // Nivel de seguridad
+            if (requerimientos.nivel_seguridad) {
+                document.getElementById('nivel_seguridad').value = requerimientos.nivel_seguridad;
+            }
+            
+            // Contacto de apoyo
+            if (requerimientos.contacto_apoyo) {
+                document.getElementById('req_contacto_apoyo').checked = requerimientos.contacto_apoyo.solicitado;
+                if (requerimientos.contacto_apoyo.solicitado && requerimientos.contacto_apoyo.datos) {
+                    document.getElementById('div_contacto_apoyo_detalles').classList.remove('hidden');
+                    
+                    const datos = requerimientos.contacto_apoyo.datos;
+                    if (datos.nombre) document.getElementById('contacto_apoyo_nombre').value = datos.nombre;
+                    if (datos.telefono) document.getElementById('contacto_apoyo_telefono').value = datos.telefono;
+                    if (datos.email) document.getElementById('contacto_apoyo_email').value = datos.email;
+                    if (datos.cargo) document.getElementById('contacto_apoyo_cargo').value = datos.cargo;
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error al cargar requerimientos JSON:', error);
+        }
+    }
+
+    // Ejecutar una vez al cargar para inicializar el JSON
+    loadRequerimientosFromJSON(); // Cargar valores existentes primero
+    updateRequerimientosJSON(); // Luego actualizar el JSON por si faltó algo
+}
+
+// Ejecutar inmediatamente
+initializeRequerimientos();
+
+// También ejecutar cuando HTMX intercambie contenido
+document.addEventListener('htmx:afterSwap', function(event) {
+    // Verificar si hay elementos de requerimientos después del swap
+    if (document.getElementById('requerimientos')) {
+        console.log('HTMX swap detectado, reinicializando requerimientos...');
+        // Limpiar marca de inicialización para permitir reinicialización
+        const requerimientosDiv = document.getElementById('requerimientos');
+        if (requerimientosDiv) {
+            requerimientosDiv.dataset.initialized = 'false';
+        }
+        // Reinicializar después de un pequeño delay
+        setTimeout(() => {
+            if (typeof initializeRequerimientos === 'function') {
+                initializeRequerimientos();
+            }
+        }, 100);
+    }
+});
+</script>
+{% endblock form_script %}

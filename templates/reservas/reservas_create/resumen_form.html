@@ -1,0 +1,15 @@
+{% extends "includes/multistep_ajax_base.html" %}
+
+{% block form_content %}
+
+{% for step, data in resumen_data.items %}
+    <h3>{{ step }}</h3>
+    <ul>
+        {% for key, value in data.items %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+    <hr>
+{% endfor %}
+
+{% endblock form_content %}

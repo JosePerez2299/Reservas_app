@@ -2394,6 +2394,26 @@
   .mx-auto {
     margin-inline: auto;
   }
+  .input-sm {
+    --size: calc(var(--size-field, 0.25rem) * 8);
+    font-size: 0.75rem;
+    &[type="number"] {
+      &::-webkit-inner-spin-button {
+        margin-block: calc(0.25rem * -2);
+        margin-inline-end: calc(0.25rem * -3);
+      }
+    }
+  }
+  .input-xs {
+    --size: calc(var(--size-field, 0.25rem) * 6);
+    font-size: 0.6875rem;
+    &[type="number"] {
+      &::-webkit-inner-spin-button {
+        margin-block: calc(0.25rem * -1);
+        margin-inline-end: calc(0.25rem * -3);
+      }
+    }
+  }
   .my-0 {
     margin-block: calc(var(--spacing) * 0);
   }
@@ -3037,6 +3057,9 @@
   .w-20 {
     width: calc(var(--spacing) * 20);
   }
+  .w-24 {
+    width: calc(var(--spacing) * 24);
+  }
   .w-40 {
     width: calc(var(--spacing) * 40);
   }
@@ -3353,6 +3376,9 @@
   .rounded-lg {
     border-radius: var(--radius-lg);
   }
+  .rounded-md {
+    border-radius: var(--radius-md);
+  }
   .rounded-xl {
     border-radius: var(--radius-xl);
   }
@@ -3440,9 +3466,6 @@
   }
   .border-error {
     border-color: var(--color-error);
-  }
-  .border-error-content {
-    border-color: var(--color-error-content);
   }
   .border-error-content\/20 {
     border-color: var(--color-error-content);
@@ -3555,12 +3578,6 @@
   .bg-error {
     background-color: var(--color-error);
   }
-  .bg-error-content\/10 {
-    background-color: var(--color-error-content);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-error-content) 10%, transparent);
-    }
-  }
   .bg-error\/20 {
     background-color: var(--color-error);
     @supports (color: color-mix(in lab, red, red)) {
@@ -3571,18 +3588,6 @@
     background-color: var(--color-error);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-error) 50%, transparent);
-    }
-  }
-  .bg-error\/60 {
-    background-color: var(--color-error);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-error) 60%, transparent);
-    }
-  }
-  .bg-error\/80 {
-    background-color: var(--color-error);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-error) 80%, transparent);
     }
   }
   .bg-gray-50 {
@@ -3821,6 +3826,9 @@
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
   .p-6 {
     padding: calc(var(--spacing) * 6);
   }
@@ -4007,6 +4015,10 @@
   }
   .whitespace-normal {
     white-space: normal;
+  }
+  .checkbox-accent {
+    color: var(--color-accent-content);
+    --input-color: var(--color-accent);
   }
   .checkbox-primary {
     color: var(--color-primary-content);
@@ -4456,6 +4468,11 @@
       --input-color: var(--color-accent);
     }
   }
+  .toggle-info {
+    &:checked, &[aria-checked="true"] {
+      --input-color: var(--color-info);
+    }
+  }
   .toggle-primary {
     &:checked, &[aria-checked="true"] {
       --input-color: var(--color-primary);
@@ -4464,6 +4481,11 @@
   .toggle-secondary {
     &:checked, &[aria-checked="true"] {
       --input-color: var(--color-secondary);
+    }
+  }
+  .toggle-sm {
+    &:is([type="checkbox"]), &:has([type="checkbox"]) {
+      --size: calc(var(--size-selector, 0.25rem) * 5);
     }
   }
   .toggle-success {
@@ -4894,6 +4916,11 @@
     @media (width >= 40rem) {
       font-size: var(--text-sm);
       line-height: var(--tw-leading, var(--text-sm--line-height));
+    }
+  }
+  .md\:col-span-2 {
+    @media (width >= 48rem) {
+      grid-column: span 2 / span 2;
     }
   }
   .md\:flex {

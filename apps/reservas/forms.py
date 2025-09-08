@@ -139,6 +139,11 @@ class ReservaForm(forms.ModelForm):
             "motivo",
         ]
 
+class RequerimientoForm(forms.ModelForm):
+    class Meta:
+        model = Reserva
+        fields = ["requerimientos" , "observacion"]
+
 # Modelo Reserva:
 # Requerimientos y observacion adicionales.
 

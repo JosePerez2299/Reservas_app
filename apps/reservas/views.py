@@ -168,15 +168,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         return qs
     
 
-# Templates para el wizard de creación de reservas
-TEMPLATES = {
-    'contacto': 'reservas/reservas_create/contacto_form.html',
-    'reserva': 'reservas/reservas_create/reserva_form.html',
-    'tipo': 'reservas/reservas_create/tipo_form.html',
-    'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
-    'requerimiento': 'reservas/reservas_create/requerimiento_form.html',
-    'resumen': 'reservas/reservas_create/resumen_form.html'
-}
+
 STEP_LABELS = {
     'contacto': 'Contacto',
     'tipo': 'Tipo de Espacio',
@@ -199,6 +191,7 @@ class ReservaCreateWizardView(SessionWizardView):
     form_list = [
         ('contacto', ContactoForm),
         ('reserva', ReservaForm),
+        ('requerimiento', RequerimientoForm),
         ('resumen', EmptyForm)
     ]
 
@@ -221,9 +214,33 @@ class ReservaCreateWizardView(SessionWizardView):
         ctx['current_index'] = current_index
         ctx['step_labels'] = STEP_LABELS
         
+        if self.steps.current == 'resumen':
+
+            print(self.get_cleaned_data_for_step('requerimiento'))
+            
+
+            ctx['resumen_data'] = self.get_resumen_data()
+            
         return ctx
-        
+    
+    def get_resumen_data(self):
+        """Recopila todos los datos del wizard para mostrar en el resumen"""
+        reserva_data = {}   
+        for step in self.form_list:
+            data = self.get_cleaned_data_for_step(step) or {}
+            reserva_data[step] = data
+        return reserva_data
+    
     def get_template_names(self):
+        # Templates para el wizard de creación de reservas
+        TEMPLATES = {
+            'contacto': 'reservas/reservas_create/contacto_form.html',
+            'reserva': 'reservas/reservas_create/reserva_form.html',
+            'tipo': 'reservas/reservas_create/tipo_form.html',
+            'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
+            'requerimiento': 'reservas/reservas_create/requerimiento_form.html',
+            'resumen': 'reservas/reservas_create/resumen_form.html'
+        }
         return [TEMPLATES[self.steps.current]]
     
     def done(self, form_list, **kwargs):
