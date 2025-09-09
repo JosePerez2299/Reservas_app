@@ -151,18 +151,89 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
     class Meta:
         model = ReservaEspacio
         fields = ["espacio", "numero_participantes"]
+    
     def __init__(self, *args, **kwargs):
+        # Recibimos la reserva desde el wizard
+        self.reserva = kwargs.pop('reserva', None)
         super().__init__(*args, **kwargs)
         self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.FISICO)
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        espacio = cleaned_data.get('espacio')
+        
+        # Si no tenemos el objeto reserva o el espacio, no podemos validar
+        if not self.reserva or not espacio:
+            return cleaned_data
+            
+        # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
+        from django.db.models import Q
+        from .models import ReservaEspacio, Reserva
+        
+        reservas_solapadas = ReservaEspacio.objects.filter(
+            espacio=espacio,
+            reserva__fecha_uso=self.reserva.fecha_uso,
+            reserva__estado=Reserva.Estado.APROBADA
+        ).filter(
+            # Condición para detectar solapamiento de horarios:
+            # (hora_inicio < hora_fin_nueva) AND (hora_fin > hora_inicio_nueva)
+            Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+            Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+        )
+        
+        if reservas_solapadas.exists():
+            from django.core.exceptions import ValidationError
+            raise ValidationError(
+                "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+            )
+            
+        return cleaned_data
+            
+        return cleaned_data
 
+    
 #Step5: Espacio Virtual (Solo virtual o mixta)
 class ReservaEspacioDigitalForm(forms.ModelForm):
     class Meta:
         model = ReservaEspacio
         fields = ["espacio", "numero_participantes"]
+    
     def __init__(self, *args, **kwargs):
+        # Recibimos la reserva desde el wizard
+        self.reserva = kwargs.pop('reserva', None)
         super().__init__(*args, **kwargs)
         self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.DIGITAL)
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        espacio = cleaned_data.get('espacio')
+        
+        # Si no tenemos el objeto reserva o el espacio, no podemos validar
+        if not self.reserva or not espacio:
+            return cleaned_data
+            
+        # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
+        from django.db.models import Q
+        from .models import ReservaEspacio, Reserva
+        
+        reservas_solapadas = ReservaEspacio.objects.filter(
+            espacio=espacio,
+            reserva__fecha_uso=self.reserva.fecha_uso,
+            reserva__estado=Reserva.Estado.APROBADA
+        ).filter(
+            # Condición para detectar solapamiento de horarios:
+            # (hora_inicio < hora_fin_nueva) AND (hora_fin > hora_inicio_nueva)
+            Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+            Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+        )
+        
+        if reservas_solapadas.exists():
+            from django.core.exceptions import ValidationError
+            raise ValidationError(
+                "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+            )
+            
+        return cleaned_data
 
 class DetalleReservaDigitalForm(forms.ModelForm):
     class Meta:

@@ -14,7 +14,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
 from formtools.wizard.views import SessionWizardView
 
 from apps.espacios.forms import EmptyForm
-from .models import Reserva
+from .models import Reserva, ReservaEspacio, DetalleReservaDigital, DetalleReservaFisico
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django_filters.views import FilterView
 from library.mixins.helpers import *
@@ -27,8 +27,10 @@ from django.http import JsonResponse
 from datetime import datetime
 from django.views import View
 from django.views.generic import TemplateView
-from django.http import Http404
-from django.shortcuts import render
+from django.http import Http404, HttpResponse
+from django.core.exceptions import ValidationError
+from django.shortcuts import render, redirect
+from django.db import transaction
 import time 
 
 def qs_condiciones(user):
@@ -208,7 +210,7 @@ class ReservaCreateWizardView(SessionWizardView):
     Crea una nueva reserva
     """
     form_list = [
-        # ('contacto', ContactoForm),
+        ('contacto', ContactoForm),
         ('reserva', ReservaForm),
         ('requerimiento', RequerimientoForm),
         ('espacio_presencial', ReservaEspacioFisicoForm),
@@ -216,6 +218,64 @@ class ReservaCreateWizardView(SessionWizardView):
         ('detalle_digital', DetalleReservaDigitalForm),
         ('resumen', EmptyForm)
     ]
+    
+    def process_step(self, form):
+        """
+        Procesa cada paso del wizard y guarda mensajes de error si ocurren
+        """
+        try:
+            return super().process_step(form)
+        except ValidationError as e:
+            # Guardar el error para usarlo después
+            self.storage.extra_data['validation_error'] = str(e)
+            return self.get_form_step_data(form)
+    
+    def render_next_step(self, form, **kwargs):
+        """
+        Personaliza el comportamiento cuando se avanza al siguiente paso
+        """
+        # Verifica si hay un error de validación almacenado
+        if self.storage.extra_data.get('validation_error'):
+            error_msg = self.storage.extra_data.pop('validation_error')
+            # Redirigir al paso 1 (reserva) cuando hay un error de solapamiento
+            self.storage.current_step = 'reserva'
+            form = self.get_form(
+                step='reserva',
+                data=self.storage.get_step_data('reserva'),
+                files=self.storage.get_step_files('reserva')
+            )
+            form.add_error(None, error_msg)  # Agregar error al formulario
+            return self.render(form, **kwargs)
+        
+        # Comportamiento normal si no hay errores
+        return super().render_next_step(form, **kwargs)
+    
+    def get_form_kwargs(self, step=None):
+        """
+        Pasamos el objeto reserva temporal a los formularios de espacio
+        para que puedan validar el solapamiento
+        """
+        kwargs = super().get_form_kwargs(step)
+        
+        # Solo para los pasos que necesitan la reserva para validar solapamientos
+        if step in ['espacio_presencial', 'espacio_digital']:
+            # Obtenemos los datos de contacto y reserva para crear una reserva temporal
+            contacto_data = self.get_cleaned_data_for_step('contacto') or {}
+            reserva_data = self.get_cleaned_data_for_step('reserva') or {}
+            
+            if contacto_data and reserva_data:
+                # Creamos un objeto reserva temporal (sin guardar en la BD)
+                from apps.reservas.models import Reserva
+                reserva = Reserva(
+                    p00_solicitante=contacto_data.get('p00_solicitante', ''),
+                    nombre_solicitante=contacto_data.get('nombre_solicitante', ''),
+                    fecha_uso=reserva_data.get('fecha_uso'),
+                    hora_inicio=reserva_data.get('hora_inicio'),
+                    hora_fin=reserva_data.get('hora_fin')
+                )
+                kwargs['reserva'] = reserva
+                
+        return kwargs
 
     condition_dict = {
         'requerimiento': es_presencial_o_mixta,
@@ -273,8 +333,127 @@ class ReservaCreateWizardView(SessionWizardView):
         }
         return [TEMPLATES[self.steps.current]]
     
-    def done(self, form_list, **kwargs):
-        return HttpResponse('Reserva creada correctamente' )
+    def done(self, form_list, form_dict, **kwargs):
+        try:
+            # Todas las operaciones se realizan dentro de una transacción atómica
+            with transaction.atomic():
+                # Obtenemos los datos de cada paso del wizard
+                contacto_data = form_dict['contacto'].cleaned_data
+                reserva_data = form_dict['reserva'].cleaned_data
+                modalidad = reserva_data.get('modalidad')
+                
+                # Creamos la reserva base
+                reserva = Reserva(
+                    p00_solicitante=contacto_data.get('p00_solicitante'),
+                    nombre_solicitante=contacto_data.get('nombre_solicitante'),
+                    email_solicitante=contacto_data.get('email_solicitante'),
+                    telefono_solicitante=contacto_data.get('telefono_solicitante'),
+                    vicepresidencia_solicitante=contacto_data.get('vicepresidencia_solicitante'),
+                    gerencia_solicitante=contacto_data.get('gerencia_solicitante'),
+                    modalidad=modalidad,
+                    tipo_solicitud=reserva_data.get('tipo_solicitud'),
+                    tipo_actividad=reserva_data.get('tipo_actividad'),
+                    fecha_uso=reserva_data.get('fecha_uso'),
+                    hora_inicio=reserva_data.get('hora_inicio'),
+                    hora_fin=reserva_data.get('hora_fin'),
+                    motivo=reserva_data.get('motivo'),
+                )
+                
+                # Si tiene requerimientos (presencial o mixta)
+                if es_presencial_o_mixta(self):
+                    requerimiento_data = form_dict['requerimiento'].cleaned_data
+                    reserva.requerimientos = requerimiento_data.get('requerimientos')
+                    reserva.observacion = requerimiento_data.get('observacion')
+                
+                # Guardamos la reserva primero para poder crear las relaciones
+                reserva.save()
+                
+                # Procesamos espacio presencial si aplica
+                if es_presencial_o_mixta(self):
+                    espacio_presencial_data = form_dict['espacio_presencial'].cleaned_data
+                    espacio_presencial = espacio_presencial_data.get('espacio')
+                    
+                    if espacio_presencial:
+                        # Creamos la relación reserva-espacio físico
+                        reserva_espacio_fisico = ReservaEspacio(
+                            reserva=reserva,
+                            espacio=espacio_presencial,
+                            numero_participantes=espacio_presencial_data.get('numero_participantes')
+                        )
+                        # La validación de solapamiento ocurrirá en el método clean() que ya implementamos
+                        reserva_espacio_fisico.clean()
+                        reserva_espacio_fisico.save()
+                        
+                        # Creamos el detalle físico relacionado
+                        detalle_fisico = DetalleReservaFisico(
+                            reserva_espacio=reserva_espacio_fisico,
+                            numero_participantes_confirmados=0  # Inicialmente 0 confirmados
+                        )
+                        detalle_fisico.save()
+                
+                # Procesamos espacio digital si aplica
+                if es_virtual_o_mixta(self):
+                    espacio_digital_data = form_dict['espacio_digital'].cleaned_data
+                    espacio_digital = espacio_digital_data.get('espacio')
+                    
+                    if espacio_digital:
+                        # Creamos la relación reserva-espacio digital
+                        reserva_espacio_digital = ReservaEspacio(
+                            reserva=reserva,
+                            espacio=espacio_digital,
+                            numero_participantes=espacio_digital_data.get('numero_participantes')
+                        )
+                        # La validación de solapamiento ocurrirá en el método clean() que ya implementamos
+                        reserva_espacio_digital.clean()
+                        reserva_espacio_digital.save()
+                        
+                        # Procesamos los detalles digitales
+                        detalle_digital_data = form_dict['detalle_digital'].cleaned_data
+                        detalle_digital = DetalleReservaDigital(
+                            reserva_espacio=reserva_espacio_digital,
+                            anfitrion_usuario=detalle_digital_data.get('anfitrion_usuario'),
+                            ubicacion_transmision=detalle_digital_data.get('ubicacion_transmision'),
+                            espacio_transmision=detalle_digital_data.get('espacio_transmision')
+                        )
+                        detalle_digital.save()
+            
+            # Redirigimos a la página de detalle de la reserva creada
+            return redirect('reserva_view', pk=reserva.pk)
+            
+        except ValidationError as e:
+            # Capturamos errores de validación (como el solapamiento de reservas)
+            print(f"Error de validación: {e}")
+            
+            # Redirigimos al paso de reserva con el error
+            self.storage.extra_data['validation_error'] = str(e)
+            self.storage.current_step = 'reserva'  # Regresamos al paso de reserva
+            
+            # Preparamos el formulario con el error
+            form = self.get_form(
+                step='reserva',
+                data=self.storage.get_step_data('reserva'),
+                files=self.storage.get_step_files('reserva')
+            )
+            form.add_error(None, str(e))
+            
+            # Renderizamos el paso de reserva con el error
+            return self.render(form)
+        
+        except Exception as e:
+            # Capturamos cualquier otro tipo de error que pueda ocurrir
+            print(f"Error inesperado: {e}")
+            # Redirigimos al paso inicial con un mensaje de error
+            self.storage.extra_data['validation_error'] = f"Ocurrió un error inesperado: {e}"
+            self.storage.current_step = 'contacto'
+            
+            form = self.get_form(
+                step='contacto',
+                data=self.storage.get_step_data('contacto'),
+                files=self.storage.get_step_files('contacto')
+            )
+            form.add_error(None, f"Ocurrió un error inesperado: {e}")
+            
+            return self.render(form)
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, View):
     """
