@@ -223,6 +223,30 @@ class ReservaEspacio(models.Model):
             if self.pk and not has_detalle_digital and has_detalle_fisico:
                 raise ValidationError("Para un espacio digital debe asignar 'detalle_digital'.")
 
+
+        # 4) Validar que no exista una reserva aprobada para el espacio seleccionado en ese horario
+        if hasattr(self, 'espacio') and hasattr(self, 'reserva'):
+            # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
+            reservas_solapadas = ReservaEspacio.objects.filter(
+                espacio=self.espacio,
+                reserva__fecha_uso=self.reserva.fecha_uso,
+                reserva__estado=Reserva.Estado.APROBADA
+            ).exclude(
+                reserva=self.reserva  # Excluir la reserva actual si estamos editando
+            ).filter(
+                # Condición para detectar solapamiento de horarios:
+                # (hora_inicio < hora_fin_nueva) AND (hora_fin > hora_inicio_nueva)
+                Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+                Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+            )
+            
+            if reservas_solapadas.exists():
+                raise ValidationError(
+                    "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+                )
+        
+        
+
     def __str__(self):
         return f"Reserva: {self.reserva.id} | Espacio: {self.espacio.nombre}"
 
