@@ -45,7 +45,6 @@ def get_stats(request):
     stats_func_map = {
         'is_admin': get_stats_administrador,
         'is_usuario': get_stats_administrador, 
-        'is_moderador': get_stats_administrador
     }
     
     for attr, func in stats_func_map.items():
@@ -212,46 +211,6 @@ def get_stats_usuario(request):
     
     return calc.create_base_response(cards, month_summary, proximas_reservas)
 
-
-def get_stats_moderador(request):
-    """Estadísticas para moderadores"""
-    calc = StatsCalculator(request)
-    
-    # Filtro base para la ubicación y piso del moderador
-    location_filter = Q(espacio__ubicacion=request.user.ubicacion, espacio__piso=request.user.piso)
-    approved_by_filter = Q(aprobado_por=request.user)
-    
-    # Para pendientes usamos location_filter, para aprobadas/rechazadas usamos approved_by_filter
-    counts = {
-        'pendientes': Reserva.objects.filter(location_filter, estado=Reserva.Estado.PENDIENTE).count(),
-        'aprobadas': Reserva.objects.filter(approved_by_filter, estado=Reserva.Estado.APROBADA).count(),
-        'rechazadas': Reserva.objects.filter(approved_by_filter, estado=Reserva.Estado.RECHAZADA).count()
-    }
-    
-    # Para estadísticas mensuales
-    month_filter = Q(fecha_uso__month=calc.month, fecha_uso__year=calc.year)
-    counts_mes = {
-        'total': Reserva.objects.filter(location_filter & month_filter).count(),
-        'aprobadas': Reserva.objects.filter(approved_by_filter & month_filter, estado=Reserva.Estado.APROBADA).count(),
-        'rechazadas': Reserva.objects.filter(approved_by_filter & month_filter, estado=Reserva.Estado.RECHAZADA).count(),
-        'pendientes': Reserva.objects.filter(location_filter & month_filter, estado=Reserva.Estado.PENDIENTE).count()
-    }
-    
-    percentages = calc.calculate_percentages(counts_mes)
-    
-    # Próximas reservas en la ubicación del moderador
-    proximas_reservas = calc.get_proximas_reservas(location_filter)
-    
-    # Cards específicas del moderador
-    cards = [
-        {'title': 'Reservas Aprobadas', 'value': counts['aprobadas'], 'icon': 'reserva', 'color': 'text-success'},
-        {'title': 'Reservas Pendientes (por revisar)', 'value': counts['pendientes'], 'icon': 'reserva', 'color': 'text-warning'},
-        {'title': 'Reservas Rechazadas', 'value': counts['rechazadas'], 'icon': 'reserva', 'color': 'text-error'},
-    ]
-    
-    month_summary = calc.create_month_summary(counts_mes, percentages, use_ceil_floor=False)
-    
-    return calc.create_base_response(cards, month_summary, proximas_reservas)
 
 def get_logs(user):
     qs = LogEntry.objects.all()
