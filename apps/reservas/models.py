@@ -1,3 +1,4 @@
+from datetime import time
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -109,6 +110,20 @@ class Reserva(models.Model):
                 check=Q(hora_inicio__lt=F('hora_fin')),
                 name='check_hora_inicio_menor_fin',
                 violation_error_message="La hora de inicio debe ser menor a la hora de fin."
+            ),
+
+            # desde 8am a 10pm
+            models.CheckConstraint(
+                check=Q(hora_inicio__gte=time(8, 0)) & Q(hora_fin__lte=time(22, 0)),
+                name='check_hora_inicio_menor_fin_8am_10pm',
+                violation_error_message="Solo se permite reservar entre las 8:00 AM y las 10:00 PM."
+            ),
+
+            # fecha en el futuro o hoy
+            models.CheckConstraint(
+                check=Q(fecha_uso__gte=timezone.now().date()),
+                name='check_fecha_uso_futuro_o_hoy',
+                violation_error_message="La fecha de uso debe ser hoy o en el futuro."
             ),
         ]
 

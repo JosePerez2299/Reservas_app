@@ -42,6 +42,10 @@
             <i class="fas fa-search"></i>
             Buscar
         </button>
+        <button type="button" id="limpiarBtn" class="btn btn-warning">
+            <i class="fas fa-eraser"></i>
+            Limpiar
+        </button>
     </form>
 
     <div id="resultado" class="mt-3 text-sm"></div>
@@ -243,6 +247,48 @@
             return fieldsUpdated;
         }
 
+        function clearFormFields() {
+            let fieldsCleared = 0;
+
+            // Vaciar campos del mapeo
+            Object.values(fieldMapping).forEach((formFieldName) => {
+                const fullFieldName = getFieldName(formFieldName);
+                let formField = document.querySelector(`[name="${fullFieldName}"]`) ||
+                                document.querySelector(`[name$="-${formFieldName}"]`) ||
+                                document.querySelector(`[name="${formFieldName}"]`);
+                if (formField) {
+                    const wasReadonly = formField.readOnly;
+                    if (wasReadonly) formField.readOnly = false;
+                    formField.value = '';
+                    formField.dispatchEvent(new Event('change', { bubbles: true }));
+                    formField.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (wasReadonly) formField.readOnly = true;
+                    fieldsCleared++;
+                }
+            });
+
+            // Vaciar p00 del solicitante
+            const solicitanteFieldName = getFieldName('p00_solicitante');
+            let solicitanteField = document.querySelector(`[name="${solicitanteFieldName}"]`) ||
+                                   document.querySelector(`[name$="-p00_solicitante"]`) ||
+                                   document.querySelector(`[name="p00_solicitante"]`);
+            if (solicitanteField) {
+                const wasReadonly = solicitanteField.readOnly;
+                if (wasReadonly) solicitanteField.readOnly = false;
+                solicitanteField.value = '';
+                solicitanteField.dispatchEvent(new Event('change', { bubbles: true }));
+                if (wasReadonly) solicitanteField.readOnly = true;
+                fieldsCleared++;
+            }
+
+            // Limpiar input de búsqueda y mensajes
+            input.value = '';
+            resultado.innerHTML = '';
+            input.focus();
+
+            return fieldsCleared;
+        }
+
         function showValidationError(msg) {
             resultado.innerHTML = `<div class="alert alert-error alert-sm"><div class="font-medium">Formato P00 inválido</div><div class="text-sm">${msg}</div></div>`;
             setTimeout(() => { resultado.innerHTML = ''; }, 5000);
@@ -333,6 +379,15 @@
                 doSearch(input.value.trim());
             }
         });
+
+        const btnLimpiar = document.getElementById('limpiarBtn');
+        if (btnLimpiar) {
+            btnLimpiar.addEventListener('click', () => {
+                const cleared = clearFormFields();
+                resultado.innerHTML = `<div class="alert alert-info alert-sm"><i class="fas fa-eraser"></i> ${cleared} campos limpiados</div>`;
+                setTimeout(() => { resultado.innerHTML = ''; }, 2500);
+            });
+        }
 
         input.focus();
     })();

@@ -417,8 +417,9 @@ class ReservaCreateWizardView(SessionWizardView):
                         )
                         detalle_digital.save()
             
-            # Redirigimos a la página de detalle de la reserva creada
-            return redirect('reserva_view', pk=reserva.pk)
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = json.dumps({'showMessage': 'Se ha creado exitosamente'})
+            return response
             
         except ValidationError as e:
             # Capturamos errores de validación (como el solapamiento de reservas)

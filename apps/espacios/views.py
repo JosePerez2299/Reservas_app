@@ -62,12 +62,7 @@ def es_espacio_fisico(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
     return cleaned_data.get('tipo') == Espacio.Tipo.FISICO
 
-TEMPLATES = {
-    "espacio": "espacios/espacio_form.html",
-    "detalle_digital": "espacios/detalles_digitales_form.html",
-    "detalle_fisico": "espacios/detalles_fisicos_form.html",
-    "resumen": "espacios/confirm_create.html" 
-}
+
 
 class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
     file_storage = FileSystemStorage(  location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
@@ -86,21 +81,22 @@ class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
     
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Creación de Espacio'
+        ctx['subtitle'] = 'Complete la información requerida'
+        ctx['header_icon'] = 'building'
+        ctx['url'] = reverse_lazy('espacio_create')
+        
+        # Steps info
+        all_steps = list(self.get_form_list().keys())
+        current_index = all_steps.index(self.steps.current)
+        
+        ctx['all_steps'] = all_steps
+        ctx['current_index'] = current_index
         
         if self.steps.current == 'resumen':
+
             ctx['resumen_data'] = self.get_resumen_data()
-        
-        ctx['steps'] = [
-            {'label': 'Espacio', 'number': '1', 
-             'active': self.steps.current == 'espacio', 
-             'completed': self.steps.current != 'espacio'},
-            {'label': 'Detalles', 'number': '2', 
-             'active': self.steps.current == 'detalle_digital' or self.steps.current == 'detalle_fisico',
-             'completed': self.steps.current == 'resumen'},
-            {'label': 'Resumen', 'number': '3', 
-             'active': self.steps.current == 'resumen'}
-        ]
-        
+            
         return ctx
     
     def get_resumen_data(self):
@@ -122,6 +118,12 @@ class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
         }
 
     def get_template_names(self):
+        TEMPLATES = {
+            "espacio": "espacios/espacio_form.html",
+            "detalle_digital": "espacios/detalles_digitales_form.html",
+            "detalle_fisico": "espacios/detalles_fisicos_form.html",
+            "resumen": "espacios/confirm_create.html" 
+        }
         return [TEMPLATES[self.steps.current]]
         
     def done(self, form_list, **kwargs):
