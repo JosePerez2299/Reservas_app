@@ -37,6 +37,7 @@ DASHBOARD_ACCESS = {
     GRUPOS.USUARIO:   
         [
             {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
+            {'model': MODELOS.ESPACIO, 'perms':['view']},
             {'model': MODELOS.LOGENTRY, 'perms':['view']},
 
         ],

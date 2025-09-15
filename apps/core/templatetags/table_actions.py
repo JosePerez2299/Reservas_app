@@ -14,21 +14,23 @@ register = template.Library()
 # pero no se quieren habilitar para usuarios que no tengan permisos.
 # En su lugar, se dejan deshabilitados, y se verifica el permiso en
 # el view de edicion o eliminacion.
-@register.simple_tag
-def puede_editar(objeto):
-
+@register.simple_tag(takes_context=True)
+def puede_editar(context, objeto):
+    user = context['user']
     return (
         isinstance(objeto, Reserva) and objeto.estado == 'pendiente') or \
         isinstance(objeto, Usuario) or \
-        isinstance(objeto, Espacio)
+        (isinstance(objeto, Espacio) and user.is_admin)
 
 
-@register.simple_tag
-def puede_eliminar(objeto):
+@register.simple_tag(takes_context=True)
+def puede_eliminar(context, objeto):
+    user = context['user']
     return (
         isinstance(objeto, Reserva) and objeto.estado == 'pendiente') or \
         isinstance(objeto, Usuario) or \
-        isinstance(objeto, Espacio)
+        (isinstance(objeto, Espacio) and user.is_admin)
+
 
 @register.simple_tag(takes_context=True)
 def puede_aprobar(context, objeto):

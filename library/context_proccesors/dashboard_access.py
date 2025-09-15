@@ -42,6 +42,7 @@ class DashboardAccess:
             GRUPOS.USUARIO: [
                 LinksTitle.INICIO,
                 LinksTitle.RESERVA,
+                LinksTitle.ESPACIOS,
             ],
         }
  
