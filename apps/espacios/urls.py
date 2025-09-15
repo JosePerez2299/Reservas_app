@@ -9,7 +9,7 @@ urlpatterns = [
     path('view/<int:pk>/',
          EspacioDetailView.as_view(), name='espacio_view'),
     path('edit/<int:pk>/',
-         EspacioUpdateView.as_view(), name='espacio_edit'),
+         EspacioUpdateWizardView.as_view(), name='espacio_edit'),
     path('delete/<int:pk>/',
          EspacioDeleteView.as_view(), name='espacio_delete'),
 ]

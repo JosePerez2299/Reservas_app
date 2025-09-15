@@ -25,6 +25,8 @@ from django.db.models.functions import Lower
 from django.db import IntegrityError, transaction
 from django.core.files.storage import FileSystemStorage
 from formtools.wizard.views import SessionWizardView
+from django.shortcuts import get_object_or_404
+
 
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """
@@ -140,33 +142,135 @@ class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             response['HX-Trigger'] = json.dumps({'showMessage': 'Error al crear el espacio'})
             return response
 
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.http import HttpResponse
+from formtools.wizard.views import SessionWizardView
+from django.core.files.storage import FileSystemStorage
+import json
 
-class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, UpdateView):
-    """
-    Edita un espacio existente
-    """
-    model = Espacio
-    permission_required = 'espacios.change_espacio'
-    form_class = EspacioUpdateForm
-    template_name = 'reservas/espacios_edit.html'
-    success_url = reverse_lazy('espacio')
-    html_title = 'Editar Espacio'
+class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
+    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
+    permission_required = 'espacios.change_espacio'   # <-- permiso de cambio
+    form_list = [
+        ('espacio', EspacioForm),
+        ('detalle_digital', DetalleDigitalForm),
+        ('detalle_fisico', DetalleFisicoForm),
+        ('resumen', EmptyForm),
+    ]
+    condition_dict = {
+        'detalle_digital': es_espacio_digital,
+        'detalle_fisico': es_espacio_fisico
+    }
 
-    def get_form_kwargs(self):
-        """
-        Pasa el objeto request al formulario
-        """
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs   
+    def dispatch(self, request, *args, **kwargs):
+        # Carga la instancia que vamos a editar (pk en la URL)
+        self.espacio = get_object_or_404(Espacio, pk=kwargs.get('pk'))
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['title'] = 'Editar Espacio'
-        ctx['url'] = reverse_lazy('espacio_edit', args=[self.object.pk])
-        ctx['subtitle'] = 'Información del espacio'
+        ctx['title'] = 'Edición de Espacio'
+        ctx['subtitle'] = 'Modifica la información necesaria'
+        ctx['header_icon'] = 'building'
+        ctx['url'] = reverse_lazy('espacio_edit', kwargs={'pk': self.espacio.pk})
+
+        all_steps = list(self.get_form_list().keys())
+        current_index = all_steps.index(self.steps.current)
+        ctx['all_steps'] = all_steps
+        ctx['current_index'] = current_index
+
+        if self.steps.current == 'resumen':
+            ctx['resumen_data'] = self.get_resumen_data()
+
         return ctx
 
+    def get_resumen_data(self):
+        espacio_data = self.get_cleaned_data_for_step('espacio') or {}
+        detalle_data = {}
+
+        tipo = espacio_data.get('tipo') or getattr(self.espacio, 'tipo', None)
+        if tipo == Espacio.Tipo.DIGITAL:
+            detalle_data = self.get_cleaned_data_for_step('detalle_digital') or {}
+            tipo_detalle = 'Digital'
+        else:
+            detalle_data = self.get_cleaned_data_for_step('detalle_fisico') or {}
+            tipo_detalle = 'Físico'
+
+        return {
+            'espacio': espacio_data,
+            'detalle': detalle_data,
+            'tipo_detalle': tipo_detalle
+        }
+
+    def get_template_names(self):
+        TEMPLATES = {
+            "espacio": "espacios/espacio_form.html",
+            "detalle_digital": "espacios/detalles_digitales_form.html",
+            "detalle_fisico": "espacios/detalles_fisicos_form.html",
+            "resumen": "espacios/confirm_create.html"
+        }
+        return [TEMPLATES[self.steps.current]]
+
+    # Si tus formularios son ModelForm -> devuelve la instancia correspondiente
+    def get_form_instance(self, step):
+        if step == 'espacio':
+            return self.espacio
+        if step == 'detalle_digital':
+            # asumo relación one-to-one o FK con related_name 'detalle_digital'
+            try:
+                return self.espacio.detalle_digital
+            except (AttributeError, DetalleDigital.DoesNotExist):
+                return None
+        if step == 'detalle_fisico':
+            try:
+                return self.espacio.detalle_fisico
+            except (AttributeError, DetalleFisico.DoesNotExist):
+                return None
+        return None
+
+
+    def done(self, form_list, **kwargs):
+        # form_list ya está binded; si son ModelForm con instancia, save() actualizará
+        espacio_form = form_list[0]  # ModelForm con instancia -> save() actualiza
+        detalle_digital_form = None
+        detalle_fisico_form = None
+
+        # dependiendo del tipo el wizard habrá incluido uno u otro
+        for form in form_list[1:]:
+            # distingues por form.__class__ o por step names si prefieres
+            if isinstance(form, DetalleDigitalForm):
+                detalle_digital_form = form
+            elif isinstance(form, DetalleFisicoForm):
+                detalle_fisico_form = form
+
+        try:
+            # Guardar/actualizar Espacio
+            espacio = espacio_form.save()  # actualiza porque get_form_instance devolvió la instancia
+
+            # Guardar detalle digital (si existe en este flujo)
+            if detalle_digital_form:
+                detalle = detalle_digital_form.save(commit=False)
+                detalle.espacio = espacio  # asegurar relación
+                detalle.save()
+
+            # Guardar detalle físico (si existe)
+            if detalle_fisico_form:
+                detalle = detalle_fisico_form.save(commit=False)
+                detalle.espacio = espacio
+                detalle.save()
+
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = json.dumps({'showMessage': 'Se ha actualizado exitosamente'})
+            # opcional: limpiar datos de wizard en session
+            self.storage.reset()
+            return response
+
+        except Exception as e:
+            # loguea e si quieres
+            response = HttpResponse(status=500)
+            response['HX-Trigger'] = json.dumps({'showMessage': 'Error al actualizar el espacio'})
+            return response
 
 class EspacioDetailView(DetailView):
     model = Espacio
@@ -190,7 +294,7 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     model = Espacio
     permission_required = 'espacios.delete_espacio'
     template_name = 'reservas/delete.html'
-    success_url = reverse_lazy('espacio') 
+    success_url = reverse_lazy('espacios    ') 
     url = 'espacio_delete'
     details = [ 
         {'label': 'Nombre', 'value': 'nombre'},
