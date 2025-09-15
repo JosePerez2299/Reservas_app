@@ -69,7 +69,7 @@
                         {% endif %}
 
                     </label>
-                    {{ form.tipo }}
+                    {{ form.tipo|add_class:"w-full" }}
                 </div>
                 {% field_messages form.tipo %}
             </div>

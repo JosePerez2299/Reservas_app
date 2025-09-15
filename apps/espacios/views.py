@@ -26,6 +26,8 @@ from django.db import IntegrityError, transaction
 from django.core.files.storage import FileSystemStorage
 from formtools.wizard.views import SessionWizardView
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
+import json
 
 
 class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
@@ -142,12 +144,6 @@ class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             response['HX-Trigger'] = json.dumps({'showMessage': 'Error al crear el espacio'})
             return response
 
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
-from django.http import HttpResponse
-from formtools.wizard.views import SessionWizardView
-from django.core.files.storage import FileSystemStorage
-import json
 
 class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
@@ -272,8 +268,9 @@ class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             response['HX-Trigger'] = json.dumps({'showMessage': 'Error al actualizar el espacio'})
             return response
 
-class EspacioDetailView(DetailView):
+class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Espacio
+    permission_required = 'espacios.view_espacio'
     template_name = "reservas/espacio_detail.html"
     context_object_name = "espacio"
     

@@ -163,12 +163,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     filterset_class = ReservaFilter 
 
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones)
-        return qs
-    
+
 
 
 STEP_LABELS = {

@@ -2,45 +2,30 @@ from django.db import models
 from django.core.exceptions import ValidationError
 import re
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.admin.models import LogEntry
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db.models import Q
 
-
-# ——— 2. Usuario —————————————————————————————————————————————
 def validate_username(value):
     """
-    Validador personalizado para username:
-    - Mínimo 3 caracteres
-    - Máximo 20 caracteres  
-    - No puede comenzar con número o carácter especial
-    - Solo permite letras, números y guiones bajos
+    Validador para username:
+    - 3 a 20 caracteres
+    - comienza con letra
+    - solo letras, números y guión bajo
     """
-    # Verificar longitud mínima
-    if len(value) < 3:
-        raise ValidationError('El nombre de usuario debe tener al menos 3 caracteres.')
-    
-    # Verificar longitud máxima
-    if len(value) > 20:
-        raise ValidationError('El nombre de usuario no puede exceder 20 caracteres.')
-    
-    # Verificar que no comience con número o carácter especial
-    if not value[0].isalpha():
-        raise ValidationError('El nombre de usuario debe comenzar con una letra.')
-    
-    # Verificar que solo contenga caracteres permitidos (letras, números, guiones bajos)
-    if not re.match(r'^[a-zA-Z][a-zA-Z0-9_]*$', value):
+    pattern = r'^[A-Za-z][A-Za-z0-9_]{2,19}$'
+    if not re.match(pattern, value):
         raise ValidationError(
-            'El nombre de usuario solo puede contener letras, números y guiones bajos, '
-            'y debe comenzar con una letra.'
+            'El nombre de usuario debe tener entre 3 y 20 caracteres, '
+            'comenzar con una letra y solo puede contener letras, números y guiones bajos.'
         )
 
 class Usuario(AbstractUser):
     """
-    Modelo personalizado para usuarios
+    Modelo personalizado para usuarios.
+    Asegúrate de tener AUTH_USER_MODEL = 'tuapp.Usuario' en settings.py
+    antes de crear las migraciones iniciales.
     """
-    GRUPOS = settings.GRUPOS
+    GRUPOS = getattr(settings, 'GRUPOS', None)
 
     username = models.CharField(
         'Nombre de usuario',
@@ -48,45 +33,55 @@ class Usuario(AbstractUser):
         unique=True,
         validators=[validate_username],
         help_text='Nombre de usuario único. 3-20 caracteres. Debe comenzar con letra.',
-        error_messages={
-            'unique': "Ya existe un Usuario con este nombre.",
-        },  
+        error_messages={'unique': "Ya existe un Usuario con este nombre."},
     )
     
+    p00 = models.CharField(
+        'P00',
+        max_length=8,
+        unique=True,
+        help_text='Código P00 único del usuario (8 caracteres).',
+    )
+
     email = models.EmailField(unique=True)
-    ubicacion = models.ForeignKey(
-        'core.Ubicacion', on_delete=models.SET_NULL, 
-        null=True,
-        help_text="La sede/edificio al que pertenece el usuario", 
-    )
-    piso = models.PositiveSmallIntegerField(
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(0), MaxValueValidator(40)],
-        help_text="Piso en el que puede moderar o reservar"
-    )
+
+    telefono = models.CharField(max_length=100)
+
+    vicepresidencia = models.CharField('Vicepresidencia', max_length=6, blank=True, help_text='Vicepresidencia del usuario')
+    
+    gerencia = models.CharField('Gerencia', max_length=6, blank=True, help_text='Gerencia del usuario')
 
     class Meta:
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         ordering = ['username']
 
-
     def __str__(self):
         return self.username
 
-    @property
-    def is_moderador(self):
-        return self.groups.filter(name=self.GRUPOS.MODERADOR).exists()
-
-    @property
-    def is_usuario(self):
-        return self.groups.filter(name=self.GRUPOS.USUARIO).exists()
+    # Utilidad general para comprobar pertenencia a grupo
+    def has_group(self, group_name):
+        return self.groups.filter(name=group_name).exists()
 
     @property
     def is_admin(self):
-        return self.groups.filter(name=self.GRUPOS.ADMINISTRADOR).exists()
+        if not self.GRUPOS:
+            return self.has_group('Administrador')
+        return self.has_group(self.GRUPOS.ADMINISTRADOR)
+
+    @property
+    def is_usuario(self):
+        if not self.GRUPOS:
+            return self.has_group('Usuario')
+        return self.has_group(self.GRUPOS.USUARIO)
 
     @property
     def grupo(self):
-        return self.groups.first().name if self.groups.exists() else self.GRUPOS.USUARIO
+        """
+        Devuelve el primer grupo del usuario (si existe) o el grupo por defecto.
+        """
+        if self.groups.exists():
+            return self.groups.first().name
+        if hasattr(self.GRUPOS, 'USUARIO'):
+            return self.GRUPOS.USUARIO
+        return 'usuario'

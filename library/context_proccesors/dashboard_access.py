@@ -24,21 +24,15 @@ class DashboardAccess:
                         {'type': 'link', 'label': 'Listado', 'url': 'reserva'},
                         {'type': 'link', 'label': 'Calendario', 'url': 'calendario'},
                     ]}
-        USUARIOS = {'type': 'link', 'label': 'Usuarios', 'url': 'usuarios'}
         ESPACIOS = {'type': 'link', 'label': 'Espacios', 'url': 'espacios'}
 
     links_for_group = {
             GRUPOS.ADMINISTRADOR: [
                 LinksTitle.INICIO,
                 LinksTitle.RESERVA,
-                LinksTitle.USUARIOS,
                 LinksTitle.ESPACIOS,    
             ],
-            GRUPOS.MODERADOR: [
-                LinksTitle.INICIO,
-                LinksTitle.RESERVA,
-                LinksTitle.USUARIOS,
-            ],
+
             GRUPOS.USUARIO: [
                 LinksTitle.INICIO,
                 LinksTitle.RESERVA,

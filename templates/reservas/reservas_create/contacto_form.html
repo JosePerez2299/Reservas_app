@@ -3,7 +3,9 @@
 {% load render_field_msg %}
 
 {% block form_header %}
-<!-- Buscador de Usuario -->
+
+<!-- Buscador de Usuario - Solo para Administradores -->
+{% if user.is_admin %}
 <div class="card bg-base-200 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 mb-6">
     <div class="flex items-center gap-3 mb-4">
         <div class="w-8 h-8 bg-base-100 rounded-full flex items-center justify-center">
@@ -50,6 +52,21 @@
 
     <div id="resultado" class="mt-3 text-sm"></div>
 </div>
+{% else %}
+<!-- Mensaje informativo para usuarios normales -->
+<div class="card bg-info/10 border border-info/30 p-4 mb-6">
+    <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-info/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-user text-info"></i>
+        </div>
+        <div>
+            <h3 class="font-semibold text-info">Reserva Personal</h3>
+            <p class="text-sm text-base-content/60">Los datos se han completado automáticamente con tu información de usuario</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock form_header %}
 
 {% block form_content %}
@@ -74,13 +91,13 @@
                     <label class="flex justify-between items-center" for="{{ form.p00_solicitante.id_for_label }}">
                         <span class="flex items-center gap-2">
                             <i class="fas fa-at h-4 w-4"></i>
-                            Usuario Solicitante
+                            P00 del usuario 
                         </span>
                         {% if form.p00_solicitante.field.required %}
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.p00_solicitante|add_class:"input-disabled bg-base-200" }}
+                    {{ form.p00_solicitante|add_class:"w-full input-disabled bg-base-200" }}
                 </div>
                 {% field_messages form.p00_solicitante %}
             </div>
@@ -97,7 +114,7 @@
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.nombre_solicitante|add_class:"input-disabled bg-base-200" }}
+                    {{ form.nombre_solicitante|add_class:"w-full input-disabled bg-base-200" }}
                 </div>
                 {% field_messages form.nombre_solicitante %}
             </div>
@@ -114,7 +131,7 @@
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.email_solicitante|add_class:"input-disabled bg-base-200" }}
+                    {{ form.email_solicitante|add_class:"w-full input-disabled bg-base-200" }}
                 </div>
                 {% field_messages form.email_solicitante %}
             </div>
@@ -148,7 +165,7 @@
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.vicepresidencia_solicitante|add_class:"input-disabled bg-base-200" }}
+                    {{ form.vicepresidencia_solicitante|add_class:"w-full input-disabled bg-base-200" }}
                 </div>
                 {% field_messages form.vicepresidencia_solicitante %}
             </div>
@@ -165,7 +182,7 @@
                         <span class="badge badge-xs badge-outline badge-error">Requerido</span>
                         {% endif %}
                     </label>
-                    {{ form.gerencia_solicitante|add_class:"input-disabled bg-base-200" }}
+                    {{ form.gerencia_solicitante|add_class:"w-full input-disabled bg-base-200" }}
                 </div>
                 {% field_messages form.gerencia_solicitante %}
             </div>
@@ -177,6 +194,8 @@
 {% block form_script %}
 <script>
     (() => {
+        {% if user.is_admin %}
+        // Funcionalidad del buscador para administradores
         const form = document.getElementById('searchForm');
         const input = document.getElementById('valorInput');
         const resultado = document.getElementById('resultado');
@@ -390,6 +409,72 @@
         }
 
         input.focus();
+        
+        {% else %}
+        // Auto-completar formulario para usuarios normales
+        function detectStepPrefix() {
+            const formFields = document.querySelectorAll('input[name*="-"], select[name*="-"], textarea[name*="-"]');
+            for (let field of formFields) {
+                const name = field.name;
+                if (name.includes('-')) {
+                    const prefix = name.split('-')[0];
+                    if (/^[a-zA-Z0-9_]+$/.test(prefix)) return prefix;
+                }
+            }
+            return '';
+        }
+
+        const stepPrefix = detectStepPrefix();
+
+        function getFieldName(fieldName) {
+            return stepPrefix ? `${stepPrefix}-${fieldName}` : fieldName;
+        }
+
+        function fillUserData() {
+            const userData = {
+                p00_solicitante: '{{ user.p00|default:"" }}',
+                nombre_solicitante: '{{ user.get_full_name|default:user.username }}',
+                email_solicitante: '{{ user.email|default:"" }}',
+                telefono_solicitante: '{{ user.telefono|default:"" }}',
+                vicepresidencia_solicitante: '{{ user.vicepresidencia|default:"" }}',
+                gerencia_solicitante: '{{ user.gerencia|default:"" }}'
+            };
+
+            let fieldsUpdated = 0;
+
+            Object.keys(userData).forEach(fieldName => {
+                const fullFieldName = getFieldName(fieldName);
+                let formField = document.querySelector(`[name="${fullFieldName}"]`) ||
+                              document.querySelector(`[name$="-${fieldName}"]`) ||
+                              document.querySelector(`[name="${fieldName}"]`);
+                
+                if (formField && userData[fieldName]) {
+                    const wasReadonly = formField.readOnly;
+                    if (wasReadonly) formField.readOnly = false;
+                    formField.value = userData[fieldName];
+                    formField.dispatchEvent(new Event('change', { bubbles: true }));
+                    formField.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (wasReadonly) formField.readOnly = true;
+                    fieldsUpdated++;
+                    
+                    // Agregar efecto visual
+                    formField.classList.add('field-updated');
+                    setTimeout(() => formField.classList.remove('field-updated'), 2000);
+                }
+            });
+
+            console.log(`Auto-completados ${fieldsUpdated} campos con datos del usuario`);
+        }
+
+        // Ejecutar auto-completado cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', fillUserData);
+        // Ejecutar inmediatamente por si el DOM ya está listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', fillUserData);
+        } else {
+            fillUserData();
+        }
+        {% endif %}
     })();
 </script>
 

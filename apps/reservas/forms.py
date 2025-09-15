@@ -12,7 +12,8 @@ from phonenumber_field.formfields import PhoneNumberField
 # Step1: Contacto
 class ContactoForm(forms.ModelForm):
     p00_solicitante = forms.CharField(
-        widget=forms.TextInput(attrs={"class": "input ", "readonly": True})
+        widget=forms.TextInput(attrs={"class": "input ", "readonly": True}),
+        help_text="P00 del  usuario",
     )
 
     nombre_solicitante = forms.CharField(
@@ -24,6 +25,7 @@ class ContactoForm(forms.ModelForm):
                 "readonly": True,
             }
         ),
+        help_text="Nombre del solicitante",
     )
 
     email_solicitante = forms.EmailField(
@@ -33,18 +35,21 @@ class ContactoForm(forms.ModelForm):
                 "placeholder": "Email del solicitante",
                 "readonly": True,
             }
-        )
+        ),
+        help_text="Email del solicitante",
     )
 
     telefono_solicitante = PhoneNumberField(
         widget=forms.TextInput(attrs={
             'type': 'tel',
             'placeholder': '+58 414 123 4567',
-            'class': 'input input-bordered'
+            'class': 'input w-full'
         }),
         error_messages={
             'invalid': 'Por favor, ingrese un número de teléfono válido.',
         },
+        help_text="Este campo es editable, debe tener el formato +58 414 123 4567",
+        
         label='Número de Celular',
         region='VE'  
     )
@@ -58,6 +63,7 @@ class ContactoForm(forms.ModelForm):
                 "readonly": True,
             }
         ),
+        help_text="Vicepresidencia del solicitante",
     )
 
     gerencia_solicitante = forms.CharField(
@@ -69,7 +75,7 @@ class ContactoForm(forms.ModelForm):
                 "readonly": True,
             }
         ),
-    )
+            )
 
 
     class Meta:

@@ -2,17 +2,9 @@
 
 from django.urls import path
 
-from apps.usuarios.views import UsuarioApiView, UsuarioListView, UsuarioCreateView, UsuarioDetailView, UsuarioUpdateView, UsuarioDeleteView
+from apps.usuarios.views import UsuarioApiView
 
 
 urlpatterns = [
-    path('', UsuarioListView.as_view(), name='usuarios'),
-    path('crear/', UsuarioCreateView.as_view(), name='usuario_create'),
-    path('view/<int:pk>/',
-         UsuarioDetailView.as_view(), name='usuario_view'),
-    path('edit/<int:pk>/',
-         UsuarioUpdateView.as_view(), name='usuario_edit'),
-    path('delete/<int:pk>/',
-         UsuarioDeleteView.as_view(), name='usuario_delete'),
-     path('api/search/<str:p00>/', UsuarioApiView.as_view(), name='usuario_api'),
+    path('api/search/<str:p00>/', UsuarioApiView.as_view(), name='usuario_api'),
 ]

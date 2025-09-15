@@ -45,10 +45,5 @@ def puede_aprobar(context, objeto):
     if user.is_admin and reserva.estado == 'pendiente':
         return True
 
-    if user.is_moderador:
-        return (
-            reserva.estado == 'pendiente' and 
-            reserva.espacio.piso == user.piso and 
-            reserva.espacio.ubicacion == user.ubicacion
-            )
+  
     return False

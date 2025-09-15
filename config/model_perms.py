@@ -2,7 +2,6 @@
             
 class GRUPOS:
     ADMINISTRADOR = 'administrador'
-    MODERADOR = 'moderador'
     USUARIO = 'usuario'
 
 class MODELOS  :
@@ -24,13 +23,6 @@ DASHBOARD_ACCESS = {
             {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.ESPACIO, 'perms':['add', 'change', 'view', 'delete']},
-            {'model': MODELOS.LOGENTRY, 'perms':['view']},
-
-        ],
-    GRUPOS.MODERADOR: 
-        [
-            {'model': MODELOS.RESERVA, 'perms':['add', 'change', 'view', 'delete']},
-            {'model': MODELOS.USUARIO, 'perms':['add', 'change', 'view', 'delete']},
             {'model': MODELOS.LOGENTRY, 'perms':['view']},
 
         ],
