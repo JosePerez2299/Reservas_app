@@ -44,8 +44,8 @@ def get_stats(request):
     user = request.user
     stats_func_map = {
         'is_admin': get_stats_administrador,
-        'is_usuario': get_stats_usuario, 
-        'is_moderador': get_stats_moderador
+        'is_usuario': get_stats_administrador, 
+        'is_moderador': get_stats_administrador
     }
     
     for attr, func in stats_func_map.items():

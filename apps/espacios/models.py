@@ -54,13 +54,13 @@ class Espacio(models.Model):
     @property
     def ubicacion(self):
         if self.tipo == 'fisico':
-            if self.detalles_fisicos.exists():
-                return self.detalles_fisicos.first().ubicacion.nombre
+            if self.detalle_fisico:
+                return self.detalle_fisico.ubicacion.nombre
             return None
 
         elif self.tipo == 'digital':
-            if self.detalles_digitales.exists():
-                return self.detalles_digitales.first().plataforma.nombre
+            if self.detalle_digital:
+                return self.detalle_digital.plataforma.nombre
         return None
 
     def __str__(self):

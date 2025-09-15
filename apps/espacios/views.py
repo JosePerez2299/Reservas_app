@@ -22,7 +22,6 @@ from django_filters.views import FilterView
 from library.mixins.helpers import *
 from django.urls import reverse_lazy
 from django.db.models.functions import Lower
-from django.db.models import Count, Q   
 from django.db import IntegrityError, transaction
 from django.core.files.storage import FileSystemStorage
 from formtools.wizard.views import SessionWizardView
@@ -54,9 +53,11 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
         'delete': 'espacio_delete',
     }
     
+
 def es_espacio_digital(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
     return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
+
 
 def es_espacio_fisico(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
@@ -167,34 +168,20 @@ class EspacioUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
         return ctx
 
 
-
-
-class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, FormContextMixin, DetailView):
+class EspacioDetailView(DetailView):
     model = Espacio
-    template_name = 'reservas/espacio_detail.html'
-    permission_required = 'espacios.view_espacio'
-    context_object_name = 'object'
-    html_title = 'Detalles del Espacio'
-    url = 'espacio_view'
+    template_name = "reservas/espacio_detail.html"
+    context_object_name = "espacio"
     
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        espacio = self.get_object()
-        
-        # Obtener estadísticas de reservas
-        reservas_stats = Reserva.objects.filter(espacio=espacio).aggregate(
-            total=Count('id'),
-            aprobadas=Count('id', filter=Q(estado='aprobada')),
-            pendientes=Count('id', filter=Q(estado='pendiente')),
-            rechazadas=Count('id', filter=Q(estado='rechazada'))
-        )
-        
-        context['total_reservas'] = reservas_stats['total']
-        context['reservas_aprobadas'] = reservas_stats['aprobadas']
-        context['reservas_pendientes'] = reservas_stats['pendientes']
-        context['reservas_rechazadas'] = reservas_stats['rechazadas']
-        
-        return context
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Detalles del Espacio'
+        ctx['subtitle'] = 'Información del espacio'
+        if self.object.tipo == Espacio.Tipo.DIGITAL:
+            ctx['header_icon'] = 'laptop'
+        elif self.object.tipo == Espacio.Tipo.FISICO:
+            ctx['header_icon'] = 'building'
+        return ctx
 
 class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """

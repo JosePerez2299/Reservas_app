@@ -5,6 +5,9 @@
 @source inline('border-l-{warning,info,success,error}');
 
 @source inline('progress-{warning,info,success,error}');
+@source inline('bg-{warning,info,success,error,accent}');
+@source inline('text-{warning,info,success,error,accent}');
+
 
 
 
