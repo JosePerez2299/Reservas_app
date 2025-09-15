@@ -130,7 +130,7 @@
          Reservar
         </button>
         {% if request.user.is_admin %}
-        <button class="btn btn-primary btn-sm">
+        <button hx-get="{% url 'espacio_edit' espacio.id %}" hx-target="#generic_modal_content" hx-swap="innerHTML" class="btn btn-primary btn-sm">
             <i class="fas fa-edit"></i>
          Editar
         </button>
