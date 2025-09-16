@@ -157,6 +157,10 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     filterset_class = ReservaFilter 
 
 
+    def get_queryset(self):
+        return lista_reservas_usuario(self.request.user)
+    
+
 class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,SessionWizardView):
     """
     Crea una nueva reserva
