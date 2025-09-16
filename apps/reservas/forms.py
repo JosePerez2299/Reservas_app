@@ -7,7 +7,8 @@ from apps.usuarios.models import Usuario
 from django import forms
 from django.utils import timezone
 from phonenumber_field.formfields import PhoneNumberField
-
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 # Step1: Contacto
 class ContactoForm(forms.ModelForm):
@@ -173,9 +174,6 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
             return cleaned_data
             
         # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
-        from django.db.models import Q
-        from .models import ReservaEspacio, Reserva
-        
         reservas_solapadas = ReservaEspacio.objects.filter(
             espacio=espacio,
             reserva__fecha_uso=self.reserva.fecha_uso,
@@ -188,14 +186,16 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
         )
         
         if reservas_solapadas.exists():
-            from django.core.exceptions import ValidationError
             raise ValidationError(
                 "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
             )
             
+        if self.cleaned_data['numero_participantes'] > espacio.capacidad_maxima:
+            raise ValidationError(
+                "El número de participantes supera la capacidad del espacio. Capacidad máxima: {}".format(espacio.capacidad_maxima)
+            )
         return cleaned_data
             
-        return cleaned_data
 
     
 #Step5: Espacio Virtual (Solo virtual o mixta)
@@ -219,9 +219,6 @@ class ReservaEspacioDigitalForm(forms.ModelForm):
             return cleaned_data
             
         # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
-        from django.db.models import Q
-        from .models import ReservaEspacio, Reserva
-        
         reservas_solapadas = ReservaEspacio.objects.filter(
             espacio=espacio,
             reserva__fecha_uso=self.reserva.fecha_uso,
@@ -234,9 +231,13 @@ class ReservaEspacioDigitalForm(forms.ModelForm):
         )
         
         if reservas_solapadas.exists():
-            from django.core.exceptions import ValidationError
             raise ValidationError(
                 "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+            )
+
+        if self.cleaned_data['numero_participantes'] > espacio.capacidad_maxima:
+            raise ValidationError(
+                "El número de participantes supera la capacidad del espacio. Capacidad máxima: {}".format(espacio.capacidad_maxima)
             )
             
         return cleaned_data
