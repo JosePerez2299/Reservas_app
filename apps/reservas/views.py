@@ -32,20 +32,14 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 from django.db import transaction
 import time 
+from .services import *
 
 def qs_condiciones(user):
     if user.is_admin:
         return Q()
-    elif user.is_moderador:
-        return Q(
-            Q(usuario=user) | 
-            Q(aprobado_por=user) | 
-            (Q(espacio__ubicacion=user.ubicacion)  & 
-            Q(espacio__piso=user.piso))
-        )
-    elif user.is_usuario:
-        return Q(usuario=user)
-    return Q()
+
+    else:
+        return Q(p00_solicitante=user.p00)
 
 class ReservasMonthlyCount(LoginRequiredMixin, PermissionRequiredMixin,View):
     """
@@ -163,47 +157,11 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     filterset_class = ReservaFilter 
 
 
-
-
-
-STEP_LABELS = {
-    'contacto': 'Contacto',
-    'tipo': 'Tipo de Espacio',
-    'reserva': 'Información General', 
-    'detalle': 'Detalles Digitales',
-    'requerimiento': 'Requerimientos',
-    'resumen': 'Resumen'
-}
-
-def es_reserva_presencial(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
-    return cleaned_data.get('modalidad') == Reserva.Modalidad.PRESENCIAL
-
-def es_reserva_virtual(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
-    return cleaned_data.get('modalidad') == Reserva.Modalidad.VIRTUAL
-
-def es_reserva_mixta(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
-    return cleaned_data.get('modalidad') == Reserva.Modalidad.MIXTA
-
-def es_presencial_o_mixta(wizard):
-    """Muestra el paso de requerimientos si la modalidad es presencial o mixta"""
-    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
-    modalidad = cleaned_data.get('modalidad')
-    return modalidad in [Reserva.Modalidad.PRESENCIAL, Reserva.Modalidad.MIXTA]
-
-
-def es_virtual_o_mixta(wizard):
-    """Muestra el paso de requerimientos si la modalidad es presencial o mixta"""
-    cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
-    modalidad = cleaned_data.get('modalidad')
-    return modalidad in [Reserva.Modalidad.VIRTUAL, Reserva.Modalidad.MIXTA]
-
-class ReservaCreateWizardView(SessionWizardView):
+class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,SessionWizardView):
     """
     Crea una nueva reserva
     """
+    permission_required = 'reservas.add_reserva'
     form_list = [
         ('contacto', ContactoForm),
         ('reserva', ReservaForm),
@@ -457,7 +415,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     """
     pass
 
-class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, FormContextMixin, DetailView):
+class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin,  FormContextMixin, DetailView):
     """
     Muestra los detalles de una reserva
     """
@@ -467,12 +425,15 @@ class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMix
     html_title = 'Detalles de Reserva'
     url = reverse_lazy('reserva_view')
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones)
-        return qs
+    def dispatch(self, request, *args, **kwargs):
+        # Solo permitir peticiones AJAX/HTMX
+        if not (request.headers.get('HX-Request') or request.headers.get('X-Requested-With') == 'XMLHttpRequest'):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
+    def get_queryset(self):
+        return lista_reservas_usuario(self.request.user)
+    
 class ReservaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteMixin, DeleteView):
     """
     Elimina una reserva existente

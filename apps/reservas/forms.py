@@ -64,6 +64,7 @@ class ContactoForm(forms.ModelForm):
                 "readonly": True,
             }
         ),
+        required=False,
         help_text="Vicepresidencia del solicitante",
     )
 
@@ -75,8 +76,12 @@ class ContactoForm(forms.ModelForm):
                 "placeholder": "Gerencia del solicitante",
                 "readonly": True,
             }
+
         ),
-            )
+        required=False,
+        help_text="Gerencia del solicitante",
+
+    )
 
 
     class Meta:
@@ -163,7 +168,7 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
         # Recibimos la reserva desde el wizard
         self.reserva = kwargs.pop('reserva', None)
         super().__init__(*args, **kwargs)
-        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.FISICO)
+        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.FISICO, disponible=True)
     
     def clean(self):
         cleaned_data = super().clean()
@@ -208,7 +213,7 @@ class ReservaEspacioDigitalForm(forms.ModelForm):
         # Recibimos la reserva desde el wizard
         self.reserva = kwargs.pop('reserva', None)
         super().__init__(*args, **kwargs)
-        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.DIGITAL)
+        self.fields['espacio'].queryset = Espacio.objects.filter(tipo=Espacio.Tipo.DIGITAL, disponible=True)
         
     def clean(self):
         cleaned_data = super().clean()
