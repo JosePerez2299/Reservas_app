@@ -5,6 +5,39 @@ from config.model_perms import DASHBOARD_ACCESS
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
+from django_auth_ldap.backend import populate_user
+import logging
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+
+logger = logging.getLogger(__name__)
+User = get_user_model()
+
+
+@receiver(post_save, sender=User)
+def assign_default_group_on_create(sender, instance, created, **kwargs):
+    """
+    Al crearse un usuario (created=True):
+      - Si no tiene grupos asignados, le damos 'usuario' por defecto.
+      - Si ya tiene 'administrador', no tocamos nada.
+    Esto evita modificar usuarios creados manualmente en admin (si ya tienen grupos).
+    """
+    if not created:
+        return
+
+    try:
+        # si ya tiene algún grupo (p.e. admin lo creó con grupos), no hacemos nada
+        if instance.groups.exists():
+            logger.debug("Nuevo usuario ya tiene grupos: %s", instance.username)
+            return
+
+        # buscar/crear grupo 'usuario' y añadirlo
+        usuario_group, _ = Group.objects.get_or_create(name="usuario")
+        instance.groups.add(usuario_group)
+        logger.debug("Asignado grupo 'usuario' al nuevo usuario %s", instance.username)
+
+    except Exception as e:
+        logger.exception("Error al asignar grupo por defecto al usuario %s: %s", instance.username, e)
 
 @receiver(post_migrate) 
 def crear_grupos_y_permisos(sender, **kwargs):

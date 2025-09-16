@@ -101,14 +101,15 @@ class Command(BaseCommand):
                     user = User.objects.create_user(
                         username=u['username'],
                         email=u['email'],
+                        p00='P00'+u['p00'],
                         password=u['password'],
                         telefono=u['telefono'],
+                        first_name=u['first_name'],
+                        last_name=u['last_name'],
                         vicepresidencia=u['vicepresidencia'],
                         gerencia=u['gerencia'],
                     )
                     # Asignar campos adicionales y guardar
-                    user.p00 = u['p00']
-                    # Si quieres puedes rellenar otros campos por defecto (ubicacion, gerencia, etc.)
                     user.save()
 
                     # Añadir al grupo

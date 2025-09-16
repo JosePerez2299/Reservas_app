@@ -8,8 +8,6 @@ class UsuarioAdmin(admin.ModelAdmin):
     fields = [
         'username',
         'email',
-        'ubicacion',
-        'piso',
         'is_active',
         'is_staff',
         'groups',
