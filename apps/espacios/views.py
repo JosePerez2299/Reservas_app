@@ -175,7 +175,7 @@ class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
         current_index = all_steps.index(self.steps.current)
         ctx['all_steps'] = all_steps
         ctx['current_index'] = current_index
-
+        ctx['is_update'] = True
         if self.steps.current == 'resumen':
             ctx['resumen_data'] = self.get_resumen_data()
 

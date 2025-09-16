@@ -57,23 +57,30 @@
             </div>
 
             <!-- Campo Tipo -->
-            <div>
-                <div class="form-control">
-                    <label class="flex justify-between items-center" for="{{ form.tipo.id_for_label }}">
-                        <span>
-                            <i class="fas fa-building h-4 w-4 "></i>
-                            Tipo de espacio
-                        </span>
-                        {% if form.tipo.field.required %}
-                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                        {% endif %}
-
-                    </label>
-                    {{ form.tipo|add_class:"w-full" }}
-                </div>
-                {% field_messages form.tipo %}
-            </div>
-
+  <!-- Campo Tipo -->
+<div>
+    <div class="form-control">
+      <label class="flex justify-between items-center" for="{{ form.tipo.id_for_label }}">
+        <span>
+          <i class="fas fa-building h-4 w-4 "></i>
+          Tipo de espacio
+        </span>
+        {% if form.tipo.field.required %}
+        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+        {% endif %}
+      </label>
+  
+      {% if is_update %}
+        <!-- Mostrar como texto (legible para usuario) -->
+        
+        {{ form.tipo|attr:"disabled" }}
+        {{ form.tipo.as_hidden }}
+      {% else %}
+        {{ form.tipo|add_class:"w-full" }}
+      {% endif %}
+    </div>
+    {% field_messages form.tipo %}
+  </div>
             <div>
 
                 <!-- Campo Disponible -->
