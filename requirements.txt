@@ -9,3 +9,4 @@ fontawesomefree
 pillow
 django-phonenumber-field[phonenumbers]
 django-auth-ldap
+requests>=2.31.0

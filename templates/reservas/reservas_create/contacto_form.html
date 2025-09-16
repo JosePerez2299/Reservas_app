@@ -253,16 +253,20 @@
             let solicitanteField = document.querySelector(`[name="${solicitanteFieldName}"]`) ||
                                  document.querySelector(`[name$="-p00_solicitante"]`) ||
                                  document.querySelector(`[name="p00_solicitante"]`);
-            
+
             if (solicitanteField) {
                 const wasReadonly = solicitanteField.readOnly;
                 if (wasReadonly) solicitanteField.readOnly = false;
-                solicitanteField.value = input.value.trim();
+            
+                // tomar el valor raw desde el input de búsqueda y garantizar prefijo P00 (sin duplicar)
+                const raw = input.value.trim();
+                const p00value = raw.toUpperCase().startsWith('P00') ? raw : `P00${raw}`;
+            
+                solicitanteField.value = p00value;
                 solicitanteField.dispatchEvent(new Event('change', { bubbles: true }));
                 fieldsUpdated++;
                 if (wasReadonly) solicitanteField.readOnly = true;
             }
-
             return fieldsUpdated;
         }
 

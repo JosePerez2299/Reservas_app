@@ -25,6 +25,7 @@ from django.conf import settings
 from django.views import View
 from django.http import JsonResponse, response
 from django.contrib.auth import get_user_model
+import requests
 
 User = get_user_model()
 
@@ -38,58 +39,42 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
     Muestra los detalles de un usuario
     """
     permission_required = 'usuarios.view_usuario'
-    
+
     def get(self, request, *args, **kwargs):
         p00 = kwargs.get('p00')
-        data_dummy = {
-            'P00150000': {
-                "nombre": "Juan Pérez",
-                "nom_gerencia": "Gerencia general",
-                "email": "juan.perez@empresa.com",
-                "nom_vicepresidencia": "Vicepresidencia general",
-                "telefono": "+58 412 555 1212"
-            },
-            'P00150001': {
-                "nombre": "María González",
-                "nom_gerencia": "Gerencia de recursos humanos",
-                "email": "maria.gonzalez@empresa.com",
-                "nom_vicepresidencia": "Vicepresidencia administrativa",
-                "telefono": "+58 412 555 1213"
-            },
-            'P00150002': {
-                "nombre": "Carlos Rodríguez",
-                "nom_gerencia": "Gerencia de tecnología",
-                "email": "carlos.rodriguez@empresa.com",
-                "nom_vicepresidencia": "Vicepresidencia técnica",
-                "telefono": "+58 412 555 1214"
-            },
-            'P00150003': {
-                "nombre": "Ana Martínez",
-                "nom_gerencia": "Gerencia de finanzas",
-                "email": "ana.martinez@empresa.com",
-                "nom_vicepresidencia": "Vicepresidencia financiera",
-                "telefono": "+58 412 555 1215"
-            },
-            'P00150004': {
-                "nombre": "Luis Fernández",
-                "nom_gerencia": "Gerencia de operaciones",
-                "email": "luis.fernandez@empresa.com",
-                "nom_vicepresidencia": "Vicepresidencia operativa",
-                "telefono": "+58 412 555 1216"
+
+        payload = {'id_sap': p00}
+
+        url = "http://161.196.39.206/talento_produccion/public/api/empleado/consultar"
+        response = requests.post(url, json=payload, verify=False)
+
+        data = response.json()
+
+        if 'message' not in data or data['message'] != 'Empleado no existe' and data['id_sap'] != 'Debe tener 6 digitos.':
+
+            nombres = data.get('nombres', '').strip().title()
+            apellidos = data.get('apellidos', '').strip().title()
+            email = data.get("email", "").strip().lower()
+            telefono = data.get("tlf_celular", "")
+
+            resultado = {
+                "nombre": f"{nombres} {apellidos}".strip(),
+                "nom_gerencia": data.get("posicion", {}).get("nom_posicion_reporta", ""),
+                "email": email,
+                "nom_vicepresidencia": data.get("posicion", {}).get("nom_posicion", ""),
+                "telefono": telefono
             }
-        }
 
-        data = data_dummy.get('P00'+ p00)
+            return JsonResponse(resultado)
+        else:
 
-        if not data:
             return JsonResponse({
                 'error': True,
                 'message': f'Usuario con código P00 {p00} no encontrado',
                 'code': 'USER_NOT_FOUND'
             }, status=404)
 
-        print(data)
-        return JsonResponse(data)
+
 
 class Dashboard(LoginRequiredMixin, TemplateView):
 
