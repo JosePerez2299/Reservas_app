@@ -1,59 +1,95 @@
-<div class="reserva-detail">
-    <h3>Detalles de la Reserva #{{ object.id }}</h3>
+<div class="reserva-detail space-y-6">
+    <h3 class="text-2xl font-bold mb-6">Detalles de la Reserva #{{ object.id }}</h3>
     
-    <ul class="list-disc ">
-        <li><strong>ID:</strong> {{ object.id }}</li>
-        <li><strong>P00 Solicitante:</strong> {{ object.p00_solicitante }}</li>
-        <li><strong>Nombre Solicitante:</strong> {{ object.nombre_solicitante }}</li>
-        <li><strong>Email:</strong> {{ object.email_solicitante }}</li>
-        <li><strong>Teléfono:</strong> {{ object.telefono_solicitante }}</li>
-        <li><strong>Vicepresidencia:</strong> {{ object.vicepresidencia_solicitante }}</li>
-        <li><strong>Gerencia:</strong> {{ object.gerencia_solicitante }}</li>
-        <li><strong>Modalidad:</strong> {{ object.modalidad }}</li>
-        <li><strong>Tipo de Solicitud:</strong> {{ object.tipo_solicitud }}</li>
-        <li><strong>Tipo de Actividad:</strong> {{ object.tipo_actividad }}</li>
-        <li><strong>Fecha de Uso:</strong> {{ object.fecha_uso|date:"d/m/Y" }}</li>
-        <li><strong>Hora Inicio:</strong> {{ object.hora_inicio|time:"H:i" }}</li>
-        <li><strong>Hora Fin:</strong> {{ object.hora_fin|time:"H:i" }}</li>
-        <li><strong>Estado:</strong> {{ object.estado }}</li>
-        <li><strong>Motivo:</strong> {{ object.motivo }}</li>
-   
-        {% if object.fecha_aprobacion %}
-        <li><strong>Fecha de Aprobación:</strong> {{ object.fecha_aprobacion|date:"d/m/Y H:i" }}</li>
-        {% endif %}
-        {% if object.fecha_creacion %}
-        <li><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</li>
-        {% endif %}
-        {% if object.requerimientos %}
-        <li><strong>Requerimientos:</strong> 
-            <pre class="json-format">{{ object.requerimientos|pprint }}</pre>
-        </li>
-        {% endif %}
-        {% if object.observacion %}
-        <li><strong>Observación:</strong> {{ object.observacion }}</li>
-        {% endif %}
-        {% if object.aprobado_por %}
-        <li><strong>Aprobado por:</strong> {{ object.aprobado_por }}</li>
-        {% endif %}
-        <li class="bg-primary/10 p-2">
-            <strong>Espacios:</strong>
-            {% if object.reserva_espacios.all %}
-                <ul class="list-disc list-inside">
-                    {% for reserva_espacio in object.reserva_espacios.all %}
-                        <li>
-                            <strong>{{ reserva_espacio.espacio.nombre }}</strong>
-                            {% if reserva_espacio.numero_participantes %}
-                                ({{ reserva_espacio.numero_participantes }} participantes)
-                            {% endif %}
-                            {% if reserva_espacio.espacio.tipo %}
-                                - Tipo: {{ reserva_espacio.espacio.get_tipo_display }}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <span class="text-muted">No hay espacios asignados</span>
+    <!-- Información de la Reserva -->
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información de la Reserva</h4>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><strong>ID:</strong> {{ object.id }}</li>
+            <li><strong>Estado:</strong> <span class="font-medium">{{ object.estado }}</span></li>
+            {% if object.fecha_creacion %}
+            <li><strong>Fecha de Creación:</strong> {{ object.fecha_creacion|date:"d/m/Y H:i" }}</li>
             {% endif %}
-        </li>
-    </ul>
+            {% if object.fecha_aprobacion %}
+            <li><strong>Fecha de Aprobación:</strong> {{ object.fecha_aprobacion|date:"d/m/Y H:i" }}</li>
+            {% endif %}
+            {% if object.aprobado_por %}
+            <li><strong>Aprobado por:</strong> {{ object.aprobado_por }}</li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Información del Solicitante -->
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información del Solicitante</h4>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><strong>P00:</strong> {{ object.p00_solicitante }}</li>
+            <li><strong>Nombre:</strong> {{ object.nombre_solicitante }}</li>
+            <li><strong>Email:</strong> {{ object.email_solicitante }}</li>
+            <li><strong>Teléfono:</strong> {{ object.telefono_solicitante }}</li>
+            <li><strong>Vicepresidencia:</strong> {{ object.vicepresidencia_solicitante }}</li>
+            <li><strong>Gerencia:</strong> {{ object.gerencia_solicitante }}</li>
+        </ul>
+    </div>
+
+    <!-- Detalles de la Actividad -->
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Detalles de la Actividad</h4>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><strong>Modalidad:</strong> {{ object.modalidad }}</li>
+            <li><strong>Tipo de Solicitud:</strong> {{ object.tipo_solicitud }}</li>
+            <li><strong>Tipo de Actividad:</strong> {{ object.tipo_actividad }}</li>
+            <li><strong>Motivo:</strong> {{ object.motivo }}</li>
+            {% if object.requerimientos %}
+            <li class="mt-2">
+                <strong>Requerimientos:</strong> 
+                <div class="mt-1 p-2 bg-gray-50 rounded">
+                    <pre class="text-sm">{{ object.requerimientos|pprint }}</pre>
+                </div>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Fechas y Horarios -->
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Fechas y Horarios</h4>
+        <ul class="list-disc pl-5 space-y-2">
+            <li><strong>Fecha de Uso:</strong> {{ object.fecha_uso|date:"d/m/Y" }}</li>
+            <li><strong>Hora de Inicio:</strong> {{ object.hora_inicio|time:"H:i" }}</li>
+            <li><strong>Hora de Fin:</strong> {{ object.hora_fin|time:"H:i" }}</li>
+        </ul>
+    </div>
+
+    <!-- Espacios Asignados -->
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Espacios Asignados</h4>
+        {% if object.reserva_espacios.all %}
+            <ul class="list-disc pl-5 space-y-3">
+                {% for reserva_espacio in object.reserva_espacios.all %}
+                    <li class="bg-gray-50 p-3 rounded">
+                        <div class="font-medium">{{ reserva_espacio.espacio.nombre }}</div>
+                        {% if reserva_espacio.espacio.tipo %}
+                            <div class="text-sm text-gray-600">Tipo: {{ reserva_espacio.espacio.get_tipo_display }}</div>
+                        {% endif %}
+                        {% if reserva_espacio.numero_participantes %}
+                            <div class="text-sm text-gray-600">Participantes: {{ reserva_espacio.numero_participantes }}</div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500 italic">No hay espacios asignados</p>
+        {% endif %}
+    </div>
+
+    <!-- Información Adicional -->
+    {% if object.observacion %}
+    <div class="bg-white p-4 rounded-lg shadow">
+        <h4 class="text-lg font-semibold mb-3 border-b pb-2">Información Adicional</h4>
+        <div class="p-3 bg-gray-50 rounded">
+            <p class="whitespace-pre-line">{{ object.observacion }}</p>
+        </div>
+    </div>
+    {% endif %}
 </div>
