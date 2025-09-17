@@ -104,3 +104,51 @@ def crear_ubicaciones(sender, **kwargs):
     
     for plataforma in plataformas:
         PlataformaDigital.objects.get_or_create(nombre=plataforma[0], url=plataforma[1])
+
+from apps.reservas.models import TipoActividad
+
+@receiver(post_migrate)
+def crear_tipos_actividad(sender, **kwargs):
+    
+    tipos_actividad = [
+    'Actividad política',
+    'Actividades de Responsabilidad Social',
+    'Asamblea',
+    'Celebración de fecha conmemorativa',
+    'Comité',
+    'Conversatorio',
+    'Curso',
+    'Encuentro de gerentes',
+    'Ensayo',   
+    'Entrega de reconocimiento',
+    'Entrega de servicio',
+    'Entrevista',
+    'Evento de patrocinio',
+    'Evento electoral',
+    'Evento presidencial',
+    'Feria',
+    'Formación',
+    'Foro',
+    'Grabación',
+    'Graduación',
+    'Inauguración',
+    'Integración',  
+    'Jornada',
+    'Patrocinio',
+    'Perifoneo',
+    'Podcast',
+    'Pregira',
+    'Premiación',
+    'Presentación de proyectos',        
+    'Reunión de trabajo',
+    'Ruedas de prensa',
+    'Sinergia',
+    'Taller',
+    'Videoconfencia',
+    'Visita guiadas',
+    'Otros',
+    ]
+
+    for tipo_actividad in tipos_actividad:
+        TipoActividad.objects.get_or_create(nombre=tipo_actividad)
+
