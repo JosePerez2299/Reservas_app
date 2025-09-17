@@ -15,7 +15,6 @@ def lista_reservas_usuario(user, qs=None):
     return base_qs.filter(condiciones)
 
 
-
 def es_reserva_presencial(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
     return cleaned_data.get('modalidad') == Reserva.Modalidad.PRESENCIAL

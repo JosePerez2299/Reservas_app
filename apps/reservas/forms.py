@@ -10,6 +10,8 @@ from phonenumber_field.formfields import PhoneNumberField
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
+
+######## ReservasCreate Forms ######################
 # Step1: Contacto
 class ContactoForm(forms.ModelForm):
     p00_solicitante = forms.CharField(
@@ -194,6 +196,26 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
             raise ValidationError(
                 "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
             )
+        
+        # Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados
+        conflictos_mismo_p00_qs = ReservaEspacio.objects.filter(
+            espacio=espacio,
+            reserva__fecha_uso=self.reserva.fecha_uso,
+            reserva__p00_solicitante=self.reserva.p00_solicitante,
+            reserva__estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+        ).filter(
+            Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+            Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+        )
+
+        # Evitar excluir por instancia sin pk (no guardada aún)
+        if getattr(self.reserva, 'pk', None):
+            conflictos_mismo_p00_qs = conflictos_mismo_p00_qs.exclude(reserva=self.reserva)
+
+        if conflictos_mismo_p00_qs.exists():
+            raise ValidationError(
+                "No puede registrar dos reservas solapadas del mismo espacio el mismo día para el mismo P00."
+            )
             
         if self.cleaned_data['numero_participantes'] > espacio.capacidad_maxima:
             raise ValidationError(
@@ -201,8 +223,6 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
             )
         return cleaned_data
             
-
-    
 #Step5: Espacio Virtual (Solo virtual o mixta)
 class ReservaEspacioDigitalForm(forms.ModelForm):
     class Meta:
@@ -240,61 +260,68 @@ class ReservaEspacioDigitalForm(forms.ModelForm):
                 "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
             )
 
+        # Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados
+        conflictos_mismo_p00_qs = ReservaEspacio.objects.filter(
+            espacio=espacio,
+            reserva__fecha_uso=self.reserva.fecha_uso,
+            reserva__p00_solicitante=self.reserva.p00_solicitante,
+            reserva__estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+        ).filter(
+            Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+            Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+        )
+
+        if getattr(self.reserva, 'pk', None):
+            conflictos_mismo_p00_qs = conflictos_mismo_p00_qs.exclude(reserva=self.reserva)
+
+        if conflictos_mismo_p00_qs.exists():
+            raise ValidationError(
+                "No puede registrar dos reservas solapadas del mismo espacio el mismo día para el mismo P00."
+            )
+
         if self.cleaned_data['numero_participantes'] > espacio.capacidad_maxima:
             raise ValidationError(
                 "El número de participantes supera la capacidad del espacio. Capacidad máxima: {}".format(espacio.capacidad_maxima)
             )
             
+
         return cleaned_data
 
+#Step6: Create
 class DetalleReservaDigitalForm(forms.ModelForm):
     class Meta:
         model = DetalleReservaDigital
         fields = ["anfitrion_usuario", "ubicacion_transmision", "espacio_transmision"]
 
-# Modelo Reserva:
-# Requerimientos y observacion adicionales.
-
-# Modelo ReservaEspacio:
-# Numero de participantes y seleccion de espacios (mostrar sede, y despues los espacios de esa sede).
-# Crear el form para cada uno, si es mixta, hacer doble insert, ejecutar cada step.
-
+#Step6: Create
+class DetalleReservaDigitalForm(forms.ModelForm):
+    class Meta:
+        model = DetalleReservaDigital
+        fields = ["anfitrion_usuario", "ubicacion_transmision", "espacio_transmision"]
 
 
+####################################################
 
 
-
-class ReservaCreateForm(forms.ModelForm):
-    espacio = forms.ModelChoiceField(
-        queryset=Espacio.objects.all(),
-        widget=forms.Select(attrs={"class": "select select-bordered"}),
-    )
-    fecha_uso = forms.DateField(
-        widget=forms.DateInput(attrs={"class": "date-input", "type": "date"})
-    )
-    hora_inicio = forms.TimeField(
-        widget=forms.TimeInput(attrs={"class": "time-input", "type": "time"})
-    )
-    hora_fin = forms.TimeField(
-        widget=forms.TimeInput(attrs={"class": "time-input", "type": "time"})
-    )
-
+class ReservaUpdateForm(forms.ModelForm):
     class Meta:
         model = Reserva
-        fields = [
-            "p00_solicitante",
-            "espacio",
-            "fecha_uso",
+        fields  = [
+            "nombre_solicitante" ,
+            "telefono_solicitante",
+            "tipo_solicitud",
+            "tipo_actividad",
+            "fecha_uso" ,
             "hora_inicio",
             "hora_fin",
-            "motivo",
-        ]
+            ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Marcar el nombre como solo lectura en el formulario
+        self.fields["nombre_solicitante"].disabled = True
+        self.fields["nombre_solicitante"].widget.attrs.update({"readonly": True})
 
-class DetalleReservaDigitalForm(forms.ModelForm):
-    class Meta:
-        model = DetalleReservaDigital
-        fields = ["anfitrion_usuario", "ubicacion_transmision", "espacio_transmision"]
 
 
 class ReservaApproveForm(forms.ModelForm):

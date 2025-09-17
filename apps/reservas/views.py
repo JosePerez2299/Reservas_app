@@ -413,7 +413,7 @@ class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,Sessio
             
             return self.render(form)
 
-class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMixin, View):
+class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     Edita una reserva existente
     """

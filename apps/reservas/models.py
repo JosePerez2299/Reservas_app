@@ -125,6 +125,8 @@ class Reserva(models.Model):
                 name='check_fecha_uso_futuro_o_hoy',
                 violation_error_message="La fecha de uso debe ser hoy o en el futuro."
             ),
+
+            
         ]
 
     def __str__(self):
@@ -260,6 +262,25 @@ class ReservaEspacio(models.Model):
                     "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
                 )
         
+            # 5) Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados
+            conflictos_mismo_p00 = ReservaEspacio.objects.filter(
+                espacio=self.espacio,
+                reserva__fecha_uso=self.reserva.fecha_uso,
+                reserva__p00_solicitante=self.reserva.p00_solicitante,
+                # Consideramos reservas activas: pendientes o aprobadas
+                reserva__estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+            ).exclude(
+                reserva=self.reserva
+            ).filter(
+                Q(reserva__hora_inicio__lt=self.reserva.hora_fin) &
+                Q(reserva__hora_fin__gt=self.reserva.hora_inicio)
+            )
+
+            if conflictos_mismo_p00.exists():
+                raise ValidationError(
+                    "No puede registrar dos reservas solapadas del mismo espacio el mismo día para el mismo P00."
+                )
+
         
 
     def __str__(self):
