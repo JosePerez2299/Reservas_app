@@ -38,7 +38,7 @@ class Usuario(AbstractUser):
     
     p00 = models.CharField(
         'P00',
-        max_length=8,
+        max_length=9,
         unique=True,
         help_text='Código P00 único del usuario (8 caracteres).',
     )
@@ -47,9 +47,9 @@ class Usuario(AbstractUser):
 
     telefono = models.CharField(max_length=100)
 
-    vicepresidencia = models.CharField('Vicepresidencia', max_length=6, blank=True, help_text='Vicepresidencia del usuario')
+    vicepresidencia = models.CharField('Vicepresidencia', max_length=40, blank=True, help_text='Vicepresidencia del usuario')
     
-    gerencia = models.CharField('Gerencia', max_length=6, blank=True, help_text='Gerencia del usuario')
+    gerencia = models.CharField('Gerencia', max_length=40, blank=True, help_text='Gerencia del usuario')
 
     class Meta:
         verbose_name = "Usuario"
