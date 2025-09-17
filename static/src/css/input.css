@@ -74,6 +74,14 @@ data-select-item {
 .form-control input[type="text" ], input[type="number"] {
     @apply input w-full block ;
 }
+.form-control select {
+  @apply select w-full block ;
+}
+
+.form-control textarea {
+  @apply textarea block resize-none w-full ;
+}
+
 
 .form-control label {
     @apply label ;

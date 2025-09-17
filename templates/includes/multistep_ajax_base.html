@@ -28,44 +28,22 @@
     <!-- Divisor -->
     <div class="divider mt-0"></div>
 
+    <!-- Header -->
     {% block form_header %}
-
     {% endblock form_header %}
-    {% if form.errors %}
-    <div id="form-errors"
-        class="bg-error/50 text-error-content mb-4 border border-error-content/20 rounded-lg p-4 transition-all duration-500 ease-in-out">
-        <h4 class="font-semibold text-lg mb-2">
-            <i class="fas fa-exclamation-triangle"></i>
-            Por favor, corrija los errores antes de continuar.
 
-        </h4>
+    <!-- Box de errores -->
+    {% include "includes/error_box.html" %}
 
-
-        {% for field in form.visible_fields %}
-        {% for error in field.errors %}
-        <li>Error en el campo <strong>'{{ field.label }}':</strong> {{ error }}</li>
-
-
-        {% endfor %}
-        {% endfor %}
-        </ul>
-
-        {% for error in form.non_field_errors %}
-        <li><strong>Error general:</strong> {{ error }}</li>
-        {% endfor %}
-
-    </div>
-    {% endif %}
     <form class=" flex-1" method="POST" hx-post="{{url}}" hx-target="#generic_modal_content" hx-swap="innerHTML"
         id="ajax-form" novalidate enctype="multipart/form-data">
         {% csrf_token %}
         {{ wizard.management_form }}
+
         {% block form_content %}
         {% endblock form_content %}
 
         <footer>
-
-
             <div class="mt-2 flex justify-between ">
                 {% if wizard.steps.prev %}
                 <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn ">
@@ -79,11 +57,7 @@
                     <i class="fas fa-check"></i> Confirmar y Crear
                 </button>
             </div>
-
-
-
         </footer>
-
     </form>
 
     {% block form_script %}

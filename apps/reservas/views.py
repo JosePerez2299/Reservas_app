@@ -417,8 +417,35 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
     """
     Edita una reserva existente
     """
-    pass
+    model = Reserva
+    form_class = ReservaUpdateForm
+    template_name = 'reservas/reservas_edit.html'
+    success_url = reverse_lazy('reserva')
+    permission_required = 'reservas.change_reserva'
 
+    def success_message(self):
+        return 'Reserva editada correctamente'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['url'] = reverse_lazy('reserva_edit', args=[self.object.pk])
+        ctx['title'] = 'Editar Reserva'
+        ctx['subtitle'] = 'Actualiza los datos de la reserva'
+      
+        return ctx
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Si es una petición HTMX, retornar 204 y disparar un trigger para mensajes
+        if self.request.headers.get('HX-Request'):
+            resp = HttpResponse(status=204)
+            resp['HX-Trigger'] = json.dumps({'showMessage': self.success_message()})
+            return resp
+        return response
+
+    def get_queryset(self):
+        return lista_reservas_usuario(self.request.user)
+        
 class ReservaDetailView(LoginRequiredMixin, PermissionRequiredMixin,  FormContextMixin, DetailView):
     """
     Muestra los detalles de una reserva

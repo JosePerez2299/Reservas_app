@@ -1,0 +1,25 @@
+{% if form.errors %}
+<div id="form-errors"
+    class="bg-error/50 wrap-normal text-error-content mb-4 border border-error-content/20 rounded-lg p-4 transition-all duration-500 ease-in-out">
+    <h4 class="font-semibold text-lg mb-2">
+        <i class="fas fa-exclamation-triangle"></i>
+        Por favor, corrija los errores antes de continuar.
+
+    </h4>
+
+
+    {% for field in form.visible_fields %}
+    {% for error in field.errors %}
+    <li>Error en el campo <strong>'{{ field.label }}':</strong> {{ error }}</li>
+
+
+    {% endfor %}
+    {% endfor %}
+    </ul>
+
+    {% for error in form.non_field_errors %}
+    <li><strong>Error general:</strong> {{ error }}</li>
+    {% endfor %}
+
+</div>
+{% endif %}
