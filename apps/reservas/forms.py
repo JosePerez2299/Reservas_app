@@ -200,7 +200,7 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
 
         if reservas_solapadas.exists():
             raise ValidationError(
-                "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+                "El espacio ya se encuentra reservado para el horario seleccionado, por favor cambiar fecha u horario."
             )
 
         # Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados
@@ -269,7 +269,7 @@ class ReservaEspacioDigitalForm(forms.ModelForm):
 
         if reservas_solapadas.exists():
             raise ValidationError(
-                "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+                "El espacio ya se encuentra reservado para el horario seleccionado, por favor cambiar fecha u horario."
             )
 
         # Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados
@@ -335,7 +335,7 @@ class ReservaUpdateForm(forms.ModelForm):
         disabled=True,
         help_text="Nombre del solicitante",
     )
-    
+
     telefono_solicitante = PhoneNumberField(
         widget=forms.TextInput(attrs={
             'type': 'tel',
@@ -361,7 +361,7 @@ class ReservaUpdateForm(forms.ModelForm):
         widget=forms.DateInput(
             format='%Y-%m-%d',  # Formato ISO requerido por type="date"
             attrs={
-                "class": "input w-full", 
+                "class": "input w-full",
                 "type": "date"
             }
         ),
@@ -411,20 +411,17 @@ class ReservaUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Configurar restricciones de fecha dinámicamente
         today = timezone.now().date()
         max_date = today + timedelta(days=30)
-        
+
         self.fields['fecha_uso'].widget.attrs.update({
             "min": today.strftime('%Y-%m-%d'),
             "max": max_date.strftime('%Y-%m-%d')
         })
-        
-        # Asegurar formato correcto para type="date"
-        if self.instance and self.instance.pk and self.instance.fecha_uso:
-            # Django automáticamente usa el formato especificado en el widget
-            pass  # No necesitamos hacer nada más
+
+
 class ReservaApproveForm(forms.ModelForm):
     class Meta:
         model = Reserva

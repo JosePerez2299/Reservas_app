@@ -259,7 +259,7 @@ class ReservaEspacio(models.Model):
             
             if reservas_solapadas.exists():
                 raise ValidationError(
-                    "Ya existe una reserva aprobada para este espacio en la fecha y horario seleccionados."
+                    "El espacio ya se encuentra reservado para el horario seleccionado, por favor cambiar fecha u horario."
                 )
         
             # 5) Evitar que el mismo p00 reserve el mismo espacio en la misma fecha con horarios solapados

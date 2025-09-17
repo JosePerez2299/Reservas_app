@@ -512,20 +512,12 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
         ctx['subtitle'] = 'Aprobar/Rechazar la reserva'
         return ctx
 
-    def get_form_kwargs(self):
-        """
-        Pasa el objeto request al formulario
-        """
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
-
     def get_queryset(self):
-        if not self.request.user.is_admin and not self.request.user.is_moderador:
+        if not self.request.user.is_admin :
             raise Http404
-        
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones & Q(estado='pendiente'))
-        return qs
+        return super().get_queryset()
 
+    def form_valid(self, form):
+        form.instance.aprobado_por = self.request.user
+        return super().form_valid(form)
+        
