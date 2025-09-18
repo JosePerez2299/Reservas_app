@@ -370,7 +370,7 @@ class ReservaUpdateForm(forms.ModelForm):
 
     tipo_actividad = forms.ModelChoiceField(
         queryset=TipoActividad.objects.all(),
-        help_text="Indica el tipo de actividad que se realizará en el espacio, si no existe, selecionar 'otro'",
+        help_text="Indica el tipo de actividad que se realizará en el espacio, si no existe, selecionar 'Otros'",
         widget=forms.Select(attrs={"class": "select2 w-full"}),
     )
 
@@ -396,18 +396,42 @@ class ReservaUpdateForm(forms.ModelForm):
         )
     )
 
+    p00_solicitante =  forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "readonly": True,
+            }
+        ),
+        disabled=True,
+        help_text="Nombre del solicitante",
+    )
+    modalidad = forms.ChoiceField(
+        choices=Reserva.Modalidad.choices,
+        help_text="Indica la modalidad de la reserva",
+        widget=forms.Select(attrs={"class": "select select-bordered w-full"}),
+        disabled=True,
+    )
+    requerimientos = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False  # Importante: debe ser False
+    )
     class Meta:
         model = Reserva
         fields = [
             "nombre_solicitante",
+            'p00_solicitante',
             "telefono_solicitante",
             "tipo_solicitud",
             "tipo_actividad",
             "fecha_uso",
             "hora_inicio",
             "hora_fin",
-            'motivo'
-        ]
+            'motivo',
+            'requerimientos',
+            'observacion',
+            'modalidad',
+            ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -423,6 +447,18 @@ class ReservaUpdateForm(forms.ModelForm):
 
 
 class ReservaApproveForm(forms.ModelForm):
+    estado = forms.ChoiceField(
+        choices=[
+            (Reserva.Estado.APROBADA, 'Aprobada'),
+            (Reserva.Estado.RECHAZADA, 'Rechazada'),
+        ],
+        widget=forms.Select(attrs={"class": "select w-full"}),
+        help_text="Indica el estado de la reserva",
+    )
+    observacion = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered w-full resize-none", "rows": 5}),
+        help_text="Indica una observación adicional",
+    )
     class Meta:
         model = Reserva
         fields = ["estado", "mensaje_aprobar_rechazar"]

@@ -1,17 +1,8 @@
 <div class="w-4xl mx-auto p-6">
-    {{steps}}
     <!-- Header con progreso a la derecha - ARRIBA -->
     <div class="bg-base-100 pb-4 flex items-center justify-between flex-shrink-0">
         <!-- Título a la izquierda -->
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-primary text-primary-content rounded-full flex items-center justify-center">
-                <i class="fas fa-{{header_icon|default:'edit'}} text-sm"></i>
-            </div>
-            <div>
-                <h1 class="text-lg font-bold">{{title}}</h1>
-                <p class="text-xs text-base-content/60">{{subtitle|default:'Complete la información requerida'}}</p>
-            </div>
-        </div>
+        {% include "includes/form_header.html" %}
 
         <!-- Progreso Visual Compacto a la derecha -->
         <ul class="steps steps-horizontal">

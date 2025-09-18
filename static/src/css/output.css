@@ -938,6 +938,15 @@
     cursor: unset;
     transition: visibility 0.2s, padding 0.2s ease-out, background-color 0.2s ease-out;
   }
+  .collapse-open {
+    grid-template-rows: max-content 1fr;
+    > .collapse-content {
+      visibility: visible;
+      min-height: fit-content;
+      padding-bottom: 1rem;
+      transition: padding 0.2s ease-out, background-color 0.2s ease-out;
+    }
+  }
   .collapse {
     visibility: collapse;
   }
@@ -3978,6 +3987,9 @@
   .pb-4 {
     padding-bottom: calc(var(--spacing) * 4);
   }
+  .pl-5 {
+    padding-left: calc(var(--spacing) * 5);
+  }
   .pl-6 {
     padding-left: calc(var(--spacing) * 6);
   }
@@ -4064,6 +4076,9 @@
   }
   .whitespace-normal {
     white-space: normal;
+  }
+  .whitespace-pre-line {
+    white-space: pre-line;
   }
   .checkbox-accent {
     color: var(--color-accent-content);
@@ -4275,6 +4290,9 @@
   .uppercase {
     text-transform: uppercase;
   }
+  .italic {
+    font-style: italic;
+  }
   .opacity-0 {
     opacity: 0%;
   }
@@ -4292,6 +4310,10 @@
   }
   .opacity-100 {
     opacity: 100%;
+  }
+  .shadow {
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .shadow-2xl {
     --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
@@ -4674,6 +4696,16 @@
       }
     }
   }
+  .hover\:border-primary\/50 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-primary);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
+        }
+      }
+    }
+  }
   .hover\:border-success\/30 {
     &:hover {
       @media (hover: hover) {
@@ -4855,6 +4887,16 @@
   .focus\:border-purple-500 {
     &:focus {
       border-color: var(--color-purple-500);
+    }
+  }
+  .focus\:bg-secondary {
+    &:focus {
+      background-color: var(--color-secondary);
+    }
+  }
+  .focus\:text-secondary-content {
+    &:focus {
+      color: var(--color-secondary-content);
     }
   }
   .focus\:ring-2 {
@@ -5170,6 +5212,13 @@ data-select-item {
   }
 }
 @layer components {
+  .form-control {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
   .form-control input[type="text" ], input[type="number"] {
     cursor: text;
     border: var(--border) solid #0000;
@@ -5471,6 +5520,8 @@ data-select-item {
         }
       }
     }
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
   }
   .form-control input[type="radio"], input[type="checkbox"] {
     position: relative;

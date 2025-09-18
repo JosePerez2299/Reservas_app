@@ -413,6 +413,28 @@ class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,Sessio
             
             return self.render(form)
 
+
+class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
+    form_list = [
+        {'reserva': ReservaUpdateForm},
+        {'requerimiento': RequerimientoForm},
+
+    ]
+
+    condition_dict = {
+        'requerimiento': es_presencial_o_mixta,
+    }
+    
+    def get_template_names(self):
+        TEMPLATES = {
+            "reserva": "reservas/reservas_edit.html",
+            "requerimiento": "reservas/reservas_create/requerimiento_form.html",
+        }
+        return [TEMPLATES[self.steps.current]]
+    
+    def done(self, form_list, **kwargs):
+        return HttpResponse('fino')
+
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
     Edita una reserva existente
@@ -431,7 +453,7 @@ class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
         ctx['url'] = reverse_lazy('reserva_edit', args=[self.object.pk])
         ctx['title'] = 'Editar Reserva'
         ctx['subtitle'] = 'Actualiza los datos de la reserva'
-      
+        ctx['modalidad'] = self.object.modalidad
         return ctx
 
     def form_valid(self, form):
@@ -513,9 +535,12 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
         return ctx
 
     def get_queryset(self):
-        if not self.request.user.is_admin :
+        if not self.request.user.is_admin:
             raise Http404
-        return super().get_queryset()
+
+        qs = super().get_queryset()
+        qs = qs.filter(Q(estado='pendiente'))
+        return qs
 
     def form_valid(self, form):
         form.instance.aprobado_por = self.request.user

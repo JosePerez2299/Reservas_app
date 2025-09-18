@@ -71,6 +71,9 @@ data-select-item {
   }
 }
 @layer components {
+.form-control {
+    @apply space-y-2;
+  }
 .form-control input[type="text" ], input[type="number"] {
     @apply input w-full block ;
 }
@@ -84,7 +87,7 @@ data-select-item {
 
 
 .form-control label {
-    @apply label ;
+    @apply label text-sm ;
 }
 
 .form-control input[type="radio"], input[type="checkbox"] {
