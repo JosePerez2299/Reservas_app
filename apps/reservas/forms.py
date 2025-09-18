@@ -222,8 +222,9 @@ class ReservaEspacioFisicoForm(forms.ModelForm):
 
         if conflictos_mismo_p00_qs.exists():
             raise ValidationError(
-                "No puede registrar dos reservas solapadas del mismo espacio el mismo día para el mismo P00."
+                "Este usuario ya tiene una reserva para el mismo espacio en el mismo horario."
             )
+
 
         if self.cleaned_data['numero_participantes'] > espacio.capacidad_maxima:
             raise ValidationError(
@@ -416,6 +417,7 @@ class ReservaUpdateForm(forms.ModelForm):
         widget=forms.HiddenInput(),
         required=False  # Importante: debe ser False
     )
+    
     class Meta:
         model = Reserva
         fields = [
@@ -428,8 +430,6 @@ class ReservaUpdateForm(forms.ModelForm):
             "hora_inicio",
             "hora_fin",
             'motivo',
-            'requerimientos',
-            'observacion',
             'modalidad',
             ]
 
@@ -445,6 +445,60 @@ class ReservaUpdateForm(forms.ModelForm):
             "max": max_date.strftime('%Y-%m-%d')
         })
 
+    def clean(self):
+        cleaned_data = super().clean()
+        reserva = self.instance
+
+        fecha_uso = cleaned_data.get("fecha_uso")
+        hora_inicio = cleaned_data.get("hora_inicio")
+        hora_fin = cleaned_data.get("hora_fin")
+        p00_solicitante = cleaned_data.get("p00_solicitante")
+
+        # Si falta algo, salimos temprano
+        if not fecha_uso or not hora_inicio or not hora_fin:
+            return cleaned_data
+
+        espacios = reserva.espacios.all()
+
+        # Buscar reservas aprobadas del mismo espacio en la misma fecha que se solapan con el horario
+        reservas_solapadas = ReservaEspacio.objects.filter(
+            espacio__in=espacios,
+            reserva__fecha_uso=fecha_uso,
+            reserva__estado=Reserva.Estado.APROBADA
+        ).filter(
+            Q(reserva__hora_inicio__lt=hora_fin) &
+            Q(reserva__hora_fin__gt=hora_inicio)
+        )
+
+        # Excluir la misma reserva si ya existe
+        if reserva.pk:
+            reservas_solapadas = reservas_solapadas.exclude(reserva=reserva)
+
+        if reservas_solapadas.exists():
+            raise ValidationError(
+                "Alguno de los espacios ya se encuentra reservado para el horario seleccionado, por favor cambiar fecha u horario."
+            )
+
+        # Conflictos del mismo p00
+        conflictos_mismo_p00_qs = ReservaEspacio.objects.filter(
+            espacio__in=espacios,
+            reserva__fecha_uso=fecha_uso,
+            reserva__p00_solicitante=p00_solicitante,
+            reserva__estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+        ).filter(
+            Q(reserva__hora_inicio__lt=hora_fin) &
+            Q(reserva__hora_fin__gt=hora_inicio)
+        )
+
+        if reserva.pk:
+            conflictos_mismo_p00_qs = conflictos_mismo_p00_qs.exclude(reserva=reserva)
+
+        if conflictos_mismo_p00_qs.exists():
+            raise ValidationError(
+                "Este usuario ya tiene una reserva para el mismo espacio en el mismo horario."
+            )
+
+        return cleaned_data
 
 class ReservaApproveForm(forms.ModelForm):
     estado = forms.ChoiceField(
@@ -455,10 +509,7 @@ class ReservaApproveForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "select w-full"}),
         help_text="Indica el estado de la reserva",
     )
-    observacion = forms.CharField(
-        widget=forms.Textarea(attrs={"class": "textarea textarea-bordered w-full resize-none", "rows": 5}),
-        help_text="Indica una observación adicional",
-    )
+
     class Meta:
         model = Reserva
         fields = ["estado", "mensaje_aprobar_rechazar"]
