@@ -7,7 +7,7 @@ urlpatterns = [
 
     path('', ReservaListView.as_view(), name='reserva'),
     path('view/<int:pk>/', ReservaDetailView.as_view(), name='reserva_view'),
-    path('edit/<int:pk>/', ReservaUpdateView.as_view(), name='reserva_edit'),
+    path('edit/<int:pk>/', ReservaUpdateWizardView.as_view(), name='reserva_edit'),
     path('delete/<int:pk>/', ReservaDeleteView.as_view(), name='reserva_delete'),
     path('calendario/', CalendarioReservasView.as_view(), name='calendario'),
     path('api/mes/', ReservasMonthlyCount.as_view(), name='reservas_monthly_count'),

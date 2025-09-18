@@ -1,156 +1,150 @@
+{% extends "includes/multistep_ajax_base.html" %}
 {% load render_field_msg %}
 {% load widget_tweaks %}
-<div class="w-4xl p-6">
-    <!-- Header -->
-    <div class="pb-4">
-        {% include "includes/form_header.html" %}
+
+{% block form_content %}
+<div class="space-y-6">
+    {% csrf_token %}
+    <!-- Información del Solicitante -->
+    <div id="info_solicitante"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-primary"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold">Información del Solicitante</h3>
+                <p class="text-sm text-base-content/60">Datos de la persona que solicita la reserva</p>
+            </div>
+        </div>
+
+        <div class="space-y-4 px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Usuario Solicitante -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.p00_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-at h-4 w-4"></i>
+                            P00 del usuario
+                        </span>
+                        {% if form.p00_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.p00_solicitante|add_class:"w-full input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.p00_solicitante %}
+            </div>
+
+            <!-- Nombre Completo -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.nombre_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-user h-4 w-4"></i>
+                            Nombre Completo
+                        </span>
+                        {% if form.nombre_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.nombre_solicitante|add_class:"w-full input-disabled bg-base-200" }}
+                </div>
+                {% field_messages form.nombre_solicitante %}
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.telefono_solicitante.id_for_label }}">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-phone h-4 w-4"></i>
+                            Teléfono
+                        </span>
+                        {% if form.telefono_solicitante.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.telefono_solicitante }}
+                </div>
+                {% field_messages form.telefono_solicitante %}
+            </div>
+
+
+        </div>
     </div>
-    <div class="divider mt-0"></div>
 
-    {% include "includes/error_box.html" %}
-
-    <form method="post" hx-post="{{ url }}" hx-target="#generic_modal_content" hx-swap="innerHTML" class="space-y-6">
-        {% csrf_token %}
-        <!-- Información del Solicitante -->
-        <div id="info_solicitante"
-            class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <i class="fas fa-user text-primary"></i>
-                </div>
-                <div>
-                    <h3 class="font-semibold">Información del Solicitante</h3>
-                    <p class="text-sm text-base-content/60">Datos de la persona que solicita la reserva</p>
-                </div>
+    <!-- Información General -->
+    <div id="info_general"
+        class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 ">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i class="fas fa-info-circle text-primary"></i>
             </div>
-            
-            <div class="space-y-4 px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Usuario Solicitante -->
-                <div>
-                    <div class="form-control">
-                        <label class="flex justify-between items-center" for="{{ form.p00_solicitante.id_for_label }}">
-                            <span class="flex items-center gap-2">
-                                <i class="fas fa-at h-4 w-4"></i>
-                                P00 del usuario 
-                            </span>
-                            {% if form.p00_solicitante.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-                        </label>
-                        {{ form.p00_solicitante|add_class:"w-full input-disabled bg-base-200" }}
-                    </div>
-                    {% field_messages form.p00_solicitante %}
+            <div>
+                <h3 class="font-semibold"> Información General</h3>
+                <p class="text-sm text-base-content/60">Proporciona la información general de la reserva</p>
+            </div>
+
+        </div>
+        <div class="space-y-4 px-4 grid grid-cols-2 gap-4">
+            <!-- Campo tipo de solicitud -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.tipo_solicitud.id_for_label }}">
+                        <span>
+                            <i class="fas fa-tag h-4 w-4 "></i>
+                            Tipo de solicitud
+                        </span>
+
+                        {% if form.tipo_solicitud.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+
+                    {{ form.tipo_solicitud }}
                 </div>
 
-                <!-- Nombre Completo -->
-                <div>
-                    <div class="form-control">
-                        <label class="flex justify-between items-center" for="{{ form.nombre_solicitante.id_for_label }}">
-                            <span class="flex items-center gap-2">
-                                <i class="fas fa-user h-4 w-4"></i>
-                                Nombre Completo
-                            </span>
-                            {% if form.nombre_solicitante.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-                        </label>
-                        {{ form.nombre_solicitante|add_class:"w-full input-disabled bg-base-200" }}
-                    </div>
-                    {% field_messages form.nombre_solicitante %}
+                {% field_messages form.tipo_solicitud %}
+
+            </div>
+            <!-- Campo modalidad -->
+            <div>
+                <div class="form-control">
+                    <label class="flex justify-between items-center" for="{{ form.modalidad.id_for_label }}">
+                        <span class="flex justify-between items-center gap-2">
+                            <i class="fas fa-laptop h-4 w-4  "></i>
+                            Modalidad
+                        </span>
+                        {% if form.modalidad.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+                    </label>
+                    {{ form.modalidad }}
                 </div>
+                {% field_messages form.modalidad %}
 
-                <!-- Teléfono -->
-                <div>
-                    <div class="form-control">
-                        <label class="flex justify-between items-center" for="{{ form.telefono_solicitante.id_for_label }}">
-                            <span class="flex items-center gap-2">
-                                <i class="fas fa-phone h-4 w-4"></i>
-                                Teléfono
-                            </span>
-                            {% if form.telefono_solicitante.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-                        </label>
-                        {{ form.telefono_solicitante }}
-                    </div>
-                    {% field_messages form.telefono_solicitante %}
+            </div>
+
+            <!-- Campo tipo de actividad -->
+            <div class="col-span-2">
+                <div class="form-control">
+                    <label class="flex justify-start items-center" for="{{ form.tipo_actividad.id_for_label }}">
+                        <span>
+                            <i class="fas fa-tasks h-4 w-4 "></i>
+                            Tipo de actividad
+                        </span>
+                        {% if form.tipo_actividad.field.required %}
+                        <span class="badge badge-xs badge-outline badge-error">Requerido</span>
+                        {% endif %}
+
+                    </label>
+                    {{ form.tipo_actividad|add_class:"select2 " }}
                 </div>
-
-
+                {% field_messages form.tipo_actividad %}
             </div>
         </div>
-             
-          <!-- Información General -->
-        <div id="info_general"
-            class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 ">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <i class="fas fa-info-circle text-primary"></i>
-                </div>
-                <div>
-                    <h3 class="font-semibold"> Información General</h3>
-                    <p class="text-sm text-base-content/60">Proporciona la información general de la reserva</p>
-                </div>
-
-            </div>
-            <div class="space-y-4 px-4 grid grid-cols-2 gap-4">
-                <!-- Campo tipo de solicitud -->
-                <div>
-                    <div class="form-control">
-                        <label class="flex justify-between items-center" for="{{ form.tipo_solicitud.id_for_label }}">
-                            <span>
-                                <i class="fas fa-tag h-4 w-4 "></i>
-                                Tipo de solicitud
-                            </span>
-
-                            {% if form.tipo_solicitud.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-                        </label>
-
-                        {{ form.tipo_solicitud }}
-                    </div>
-
-                    {% field_messages form.tipo_solicitud %}
-
-                </div>
-                <!-- Campo modalidad -->
-                <div>
-                    <div class="form-control">
-                        <label class="flex justify-between items-center" for="{{ form.modalidad.id_for_label }}">
-                            <span class="flex justify-between items-center gap-2">
-                                <i class="fas fa-laptop h-4 w-4  "></i>
-                                Modalidad
-                            </span>
-                            {% if form.modalidad.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-                        </label>
-                        {{ form.modalidad }}
-                    </div>
-                    {% field_messages form.modalidad %}
-
-                </div>
-
-                <!-- Campo tipo de actividad -->
-                <div class="col-span-2">
-                    <div class="form-control">
-                        <label class="flex justify-start items-center" for="{{ form.tipo_actividad.id_for_label }}">
-                            <span>
-                                <i class="fas fa-tasks h-4 w-4 "></i>
-                                Tipo de actividad
-                            </span>
-                            {% if form.tipo_actividad.field.required %}
-                            <span class="badge badge-xs badge-outline badge-error">Requerido</span>
-                            {% endif %}
-
-                        </label>
-                        {{ form.tipo_actividad|add_class:"select2 " }}
-                    </div>
-                    {% field_messages form.tipo_actividad %}
-                </div>
-            </div>
-        </div>
+    </div>
     <!-- Fecha y horario -->
     <div id="fecha_horario"
         class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4">
@@ -255,963 +249,5 @@
         </div>
     </div>
 
-
-
-            <div class="collapse bg-base-200 border-base-300 border">
-                <input type="checkbox" />
-                <div class="collapse-title font-semibold text-base-content/60">Click aqui para modificar los Requerimientos</div>
-                <div class="collapse-content text-sm">
-                
-                    <!-- Requerimientos -->
-                    <div id="requerimientos"
-                    class="card bg-primary/5 border border-base-300 hover:border-primary/30 transition-all duration-300 p-4 mb-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            <i class="fas fa-cogs text-primary"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold">Requerimientos</h3>
-                            <p class="text-sm text-base-content/60">Especifica los requerimientos necesarios para tu evento</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6 px-4">
-                        
-                        <!-- Requerimientos Técnicos -->
-                        <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="requerimientos-tecnicos">
-                            <h4 class="font-medium text-base mb-4 flex items-center gap-2">
-                                <i class="fas fa-microchip text-primary"></i>
-                                Requerimientos Técnicos
-                                <small class="text-xs badge badge-outline badge-primary">Solo espacios físicos</small>
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Micrófono -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_microfono">
-                                        <span class="label-text">Micrófono</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_microfono">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="10" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_microfono" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Sistema de sonido -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_sonido">
-                                        <span class="label-text">Sistema de sonido</span>
-                                    </label>
-                                </div>
-
-                                <!-- Proyector -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_proyector">
-                                        <span class="label-text">Proyector</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_proyector">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="5" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_proyector" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Pantallas -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_pantallas">
-                                        <span class="label-text">Pantallas adicionales</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_pantallas">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="8" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_pantallas" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Computadoras -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_computadoras">
-                                        <span class="label-text">Computadoras</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_computadoras">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="20" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_computadoras" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Wi-Fi -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-primary toggle-sm" id="req_wifi">
-                                        <span class="label-text">Wi-Fi reforzado</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Materiales de Apoyo -->
-                        <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="materiales-apoyo">
-                            <h4 class="font-medium text-base mb-4 flex items-center gap-2">
-                                <i class="fas fa-chair text-secondary"></i>
-                                Materiales de Apoyo
-                            </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Mesas adicionales -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_mesas">
-                                        <span class="label-text">Mesas adicionales</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_mesas">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="20" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_mesas" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Sillas adicionales -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_sillas">
-                                        <span class="label-text">Sillas adicionales</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_sillas">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="50" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_sillas" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Atriles -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_atriles">
-                                        <span class="label-text">Atriles</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_atriles">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="5" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_atriles" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Pizarras -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-secondary toggle-sm" id="req_pizarras">
-                                        <span class="label-text">Pizarras/Flipchart</span>
-                                    </label>
-                                    <div class="hidden pl-6 mt-1" id="div_cantidad_pizarras">
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="3" value="1" class="input input-bordered input-xs w-20" 
-                                                id="cantidad_pizarras" placeholder="Cant.">
-                                            <span class="text-xs text-base-content/60">unidades</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Servicios Adicionales -->
-                        <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="servicios-adicionales">
-                            <h4 class="font-medium text-base mb-4 flex items-center gap-2">
-                                <i class="fas fa-concierge-bell text-accent"></i>
-                                Servicios Adicionales
-                            </h4>
-                            <div class="space-y-4">
-                                <!-- Catering -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-accent toggle-sm" id="req_catering">
-                                        <span class="label-text">Servicio de catering</span>
-                                    </label>
-                                    <div class="hidden pl-6 space-y-3 mt-1 p-3 bg-base-200/50 rounded-md" id="div_catering_detalles">
-                                        <div class="grid grid-cols-2 gap-3">
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_cafe">
-                                                <span class="text-sm">Café</span>
-                                            </label>
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_refrigerios">
-                                                <span class="text-sm">Refrigerios</span>
-                                            </label>
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_almuerzo">
-                                                <span class="text-sm">Almuerzo</span>
-                                            </label>
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="catering_agua">
-                                                <span class="text-sm">Agua</span>
-                                            </label>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <input type="number" min="1" max="200" value="10" class="input input-bordered input-xs w-24" 
-                                                id="catering_personas" placeholder="Personas">
-                                            <span class="text-xs text-base-content/60">personas</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Personal de apoyo -->
-                                <div class="form-control">
-                                    <label class="label cursor-pointer justify-start gap-3">
-                                        <input type="checkbox" class="toggle toggle-accent toggle-sm" id="req_personal">
-                                        <span class="label-text">Personal de apoyo</span>
-                                    </label>
-                                    <div class="hidden pl-6 space-y-2 mt-1 p-3 bg-base-200/50 rounded-md" id="div_personal_detalles">
-                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_fotografo">
-                                                <span class="text-sm">Fotógrafo</span>
-                                            </label>
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_tecnico">
-                                                <span class="text-sm">Técnico de sonido</span>
-                                            </label>
-                                            <label class="label cursor-pointer justify-start gap-2">
-                                                <input type="checkbox" class="checkbox checkbox-xs checkbox-accent" id="personal_protocolo">
-                                                <span class="text-sm">Personal de protocolo</span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Nivel de Seguridad -->
-                        <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="nivel-seguridad">
-                            <h4 class="font-medium text-base mb-4 flex items-center gap-2">
-                                <i class="fas fa-shield-alt text-warning"></i>
-                                Nivel de Seguridad
-                            </h4>
-                            <div class="form-control">
-                                <label class="label">
-                                    <span class="label-text">¿El evento requiere seguridad adicional?</span>
-                                </label>
-                                <select class="select select-bordered w-full" id="nivel_seguridad">
-                                    <option value="">Sin requerimientos especiales</option>
-                                    <option value="basica">Seguridad básica</option>
-                                    <option value="protocolar">Evento protocolar</option>
-                                    <option value="politico">Evento político</option>
-                                    <option value="alto_riesgo">Alto riesgo</option>
-                                </select>
-                                <div class="label">
-                                    <span class="label-text-alt text-base-content/60">
-                                        Eventos protocolares o políticos pueden requerir coordinación adicional
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Contacto de Apoyo -->
-                        <div class="card bg-base-100 shadow-sm p-5 border border-base-200" id="contacto-apoyo">
-                            <h4 class="font-medium text-base mb-4 flex items-center gap-2">
-                                <i class="fas fa-user-friends text-info"></i>
-                                Contacto de Apoyo
-                            </h4>
-                            <div class="form-control mb-3">
-                                <label class="label cursor-pointer justify-start gap-3">
-                                    <input type="checkbox" class="toggle toggle-info toggle-sm" id="req_contacto_apoyo">
-                                    <span class="label-text">Designar persona de contacto diferente al solicitante</span>
-                                </label>
-                            </div>
-                            <div class="hidden space-y-3 mt-1 p-3 bg-base-200/50 rounded-md" id="div_contacto_apoyo_detalles">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="form-control">
-                                        <label class="label">
-                                            <span class="label-text">Nombre completo</span>
-                                        </label>
-                                        <input type="text" class="input input-bordered input-sm w-full" 
-                                            id="contacto_apoyo_nombre" placeholder="Nombre del contacto">
-                                    </div>
-                                    <div class="form-control">
-                                        <label class="label">
-                                            <span class="label-text">Teléfono</span>
-                                        </label>
-                                        <input type="tel" class="input input-bordered input-sm w-full" 
-                                            id="contacto_apoyo_telefono" placeholder="+58 414 123 4567">
-                                    </div>
-                                    <div class="form-control md:col-span-2">
-                                        <label class="label">
-                                            <span class="label-text">Email</span>
-                                        </label>
-                                        <input type="email" class="input input-bordered input-sm w-full" 
-                                            id="contacto_apoyo_email" placeholder="contacto@ejemplo.com">
-                                    </div>
-                                    <div class="form-control md:col-span-2">
-                                        <label class="label">
-                                            <span class="label-text">Cargo/Función</span>
-                                        </label>
-                                        <input type="text" class="input input-bordered input-sm w-full" 
-                                            id="contacto_apoyo_cargo" placeholder="Coordinador del evento">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Campo oculto para el JSON -->
-                        {{ form.requerimientos|add_class:"hidden"|attr:"id:id_requerimientos" }}
-                    </div>
-                    </div>
-
-    
-                </div>
-            </div>
-
-            <!-- Campo oculto para el JSON -->
-            {{ form.requerimientos|add_class:"hidden"|attr:"id:id_requerimientos" }}
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <a onclick="closeModal()" class="btn">Cancelar</a>
-            </div>
-
-        </form>
-        <script>
-         // Sistema de Requerimientos - Versión UpdateView
-(function() {
-    'use strict';
-    
-    let isInitialized = false;
-    
-    // Función principal de inicialización
-    function initializeRequerimientos() {
-        // Verificar que los elementos existen
-        const requerimientosContainer = document.getElementById('requerimientos');
-        const hiddenField = document.getElementById('id_requerimientos');
-        
-        if (!requerimientosContainer || !hiddenField) {
-            console.log('Elementos de requerimientos no encontrados');
-            return;
-        }
-        
-        // Evitar inicialización múltiple
-        if (isInitialized) {
-            console.log('Sistema ya inicializado');
-            return;
-        }
-        
-        console.log('Inicializando sistema de requerimientos...');
-        isInitialized = true;
-        
-        // 1. PRIMERO: Cargar datos existentes si los hay
-        loadExistingData();
-        
-        // 2. SEGUNDO: Configurar event listeners
-        setupEventListeners();
-        
-        // 3. TERCERO: Configurar toggles de modalidad
-        setupModalidadToggle();
-        
-        // 4. CUARTO: Configurar feedback visual
-        setupContactoFeedback();
-        
-        // 5. QUINTO: Configurar debugging del formulario
-        setupFormDebugging();
-        
-        console.log('Sistema de requerimientos inicializado correctamente');
-    }
-    
-    // Cargar datos existentes del JSON
-    function loadExistingData() {
-        const hiddenField = document.getElementById('id_requerimientos');
-        if (!hiddenField || !hiddenField.value.trim()) {
-            console.log('No hay datos JSON para cargar');
-            return;
-        }
-        
-        try {
-            const data = JSON.parse(hiddenField.value);
-            console.log('Cargando datos existentes:', data);
-            
-            // Cargar requerimientos técnicos
-            loadRequerimientosTecnicos(data.requerimientos_tecnicos || {});
-            
-            // Cargar materiales de apoyo
-            loadMaterialesApoyo(data.materiales_apoyo || {});
-            
-            // Cargar servicios adicionales
-            loadServiciosAdicionales(data.servicios_adicionales || {});
-            
-            // Cargar nivel de seguridad
-            loadNivelSeguridad(data.nivel_seguridad || '');
-            
-            // Cargar contacto de apoyo
-            loadContactoApoyo(data.contacto_apoyo || {});
-            
-        } catch (error) {
-            console.error('Error al cargar datos JSON:', error);
-        }
-    }
-    
-    // Cargar requerimientos técnicos
-    function loadRequerimientosTecnicos(tecnicos) {
-        // Micrófono
-        if (tecnicos.microfono) {
-            setCheckbox('req_microfono', tecnicos.microfono.solicitado);
-            if (tecnicos.microfono.solicitado) {
-                setValue('cantidad_microfono', tecnicos.microfono.cantidad);
-                showElement('div_cantidad_microfono');
-            }
-        }
-        
-        // Sonido
-        setCheckbox('req_sonido', tecnicos.sonido);
-        
-        // Proyector
-        if (tecnicos.proyector) {
-            setCheckbox('req_proyector', tecnicos.proyector.solicitado);
-            if (tecnicos.proyector.solicitado) {
-                setValue('cantidad_proyector', tecnicos.proyector.cantidad);
-                showElement('div_cantidad_proyector');
-            }
-        }
-        
-        // Pantallas
-        if (tecnicos.pantallas) {
-            setCheckbox('req_pantallas', tecnicos.pantallas.solicitado);
-            if (tecnicos.pantallas.solicitado) {
-                setValue('cantidad_pantallas', tecnicos.pantallas.cantidad);
-                showElement('div_cantidad_pantallas');
-            }
-        }
-        
-        // Computadoras
-        if (tecnicos.computadoras) {
-            setCheckbox('req_computadoras', tecnicos.computadoras.solicitado);
-            if (tecnicos.computadoras.solicitado) {
-                setValue('cantidad_computadoras', tecnicos.computadoras.cantidad);
-                showElement('div_cantidad_computadoras');
-            }
-        }
-        
-        // WiFi
-        setCheckbox('req_wifi', tecnicos.wifi);
-    }
-    
-    // Cargar materiales de apoyo
-    function loadMaterialesApoyo(materiales) {
-        // Mesas
-        if (materiales.mesas) {
-            setCheckbox('req_mesas', materiales.mesas.solicitado);
-            if (materiales.mesas.solicitado) {
-                setValue('cantidad_mesas', materiales.mesas.cantidad);
-                showElement('div_cantidad_mesas');
-            }
-        }
-        
-        // Sillas
-        if (materiales.sillas) {
-            setCheckbox('req_sillas', materiales.sillas.solicitado);
-            if (materiales.sillas.solicitado) {
-                setValue('cantidad_sillas', materiales.sillas.cantidad);
-                showElement('div_cantidad_sillas');
-            }
-        }
-        
-        // Atriles
-        if (materiales.atriles) {
-            setCheckbox('req_atriles', materiales.atriles.solicitado);
-            if (materiales.atriles.solicitado) {
-                setValue('cantidad_atriles', materiales.atriles.cantidad);
-                showElement('div_cantidad_atriles');
-            }
-        }
-        
-        // Pizarras
-        if (materiales.pizarras) {
-            setCheckbox('req_pizarras', materiales.pizarras.solicitado);
-            if (materiales.pizarras.solicitado) {
-                setValue('cantidad_pizarras', materiales.pizarras.cantidad);
-                showElement('div_cantidad_pizarras');
-            }
-        }
-    }
-    
-    // Cargar servicios adicionales
-    function loadServiciosAdicionales(servicios) {
-        // Catering
-        if (servicios.catering) {
-            setCheckbox('req_catering', servicios.catering.solicitado);
-            if (servicios.catering.solicitado) {
-                showElement('div_catering_detalles');
-                setValue('catering_personas', servicios.catering.personas || 10);
-                
-                // Detalles de catering
-                const detalles = servicios.catering.detalles || [];
-                setCheckbox('catering_cafe', detalles.includes('cafe'));
-                setCheckbox('catering_refrigerios', detalles.includes('refrigerios'));
-                setCheckbox('catering_almuerzo', detalles.includes('almuerzo'));
-                setCheckbox('catering_agua', detalles.includes('agua'));
-            }
-        }
-        
-        // Personal
-        if (servicios.personal) {
-            setCheckbox('req_personal', servicios.personal.solicitado);
-            if (servicios.personal.solicitado) {
-                showElement('div_personal_detalles');
-                
-                // Tipos de personal
-                const tipos = servicios.personal.tipos || [];
-                setCheckbox('personal_fotografo', tipos.includes('fotografo'));
-                setCheckbox('personal_tecnico', tipos.includes('tecnico_sonido'));
-                setCheckbox('personal_protocolo', tipos.includes('protocolo'));
-            }
-        }
-    }
-    
-    // Cargar nivel de seguridad
-    function loadNivelSeguridad(nivel) {
-        setValue('nivel_seguridad', nivel);
-    }
-    
-    // Cargar contacto de apoyo
-    function loadContactoApoyo(contacto) {
-        setCheckbox('req_contacto_apoyo', contacto.solicitado);
-        if (contacto.solicitado && contacto.datos) {
-            showElement('div_contacto_apoyo_detalles');
-            setValue('contacto_apoyo_nombre', contacto.datos.nombre || '');
-            setValue('contacto_apoyo_telefono', contacto.datos.telefono || '');
-            setValue('contacto_apoyo_email', contacto.datos.email || '');
-            setValue('contacto_apoyo_cargo', contacto.datos.cargo || '');
-        }
-    }
-    
-    // Configurar event listeners
-    function setupEventListeners() {
-        // Listeners para checkboxes con cantidad
-        setupQuantityToggle('req_microfono', 'div_cantidad_microfono');
-        setupQuantityToggle('req_proyector', 'div_cantidad_proyector');
-        setupQuantityToggle('req_pantallas', 'div_cantidad_pantallas');
-        setupQuantityToggle('req_computadoras', 'div_cantidad_computadoras');
-        setupQuantityToggle('req_mesas', 'div_cantidad_mesas');
-        setupQuantityToggle('req_sillas', 'div_cantidad_sillas');
-        setupQuantityToggle('req_atriles', 'div_cantidad_atriles');
-        setupQuantityToggle('req_pizarras', 'div_cantidad_pizarras');
-        
-        // Listeners para secciones completas
-        setupSectionToggle('req_catering', 'div_catering_detalles');
-        setupSectionToggle('req_personal', 'div_personal_detalles');
-        setupSectionToggle('req_contacto_apoyo', 'div_contacto_apoyo_detalles');
-        
-        // Listeners para todos los inputs que afectan el JSON
-        const container = document.getElementById('requerimientos');
-        if (container) {
-            const inputs = container.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('change', updateJSON);
-                if (['text', 'number', 'tel', 'email'].includes(input.type)) {
-                    input.addEventListener('input', updateJSON);
-                }
-            });
-        }
-    }
-    
-    // Configurar toggle de cantidad
-    function setupQuantityToggle(checkboxId, divId) {
-        const checkbox = getElement(checkboxId);
-        const div = getElement(divId);
-        
-        if (checkbox && div) {
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    div.classList.remove('hidden');
-                } else {
-                    div.classList.add('hidden');
-                }
-                updateJSON();
-            });
-        }
-    }
-    
-    // Configurar toggle de sección
-    function setupSectionToggle(checkboxId, divId) {
-        const checkbox = getElement(checkboxId);
-        const div = getElement(divId);
-        
-        if (checkbox && div) {
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    div.classList.remove('hidden');
-                } else {
-                    div.classList.add('hidden');
-                    // Limpiar campos de la sección
-                    clearSection(div);
-                }
-                updateJSON();
-            });
-        }
-    }
-    
-    // Configurar toggle de modalidad
-    function setupModalidadToggle() {
-        const modalidadSelect = getElement('id_modalidad');
-        if (modalidadSelect) {
-            modalidadSelect.addEventListener('change', toggleTecnicosByModalidad);
-            // Ejecutar una vez al cargar
-            toggleTecnicosByModalidad();
-        }
-    }
-    
-    // Toggle requerimientos técnicos por modalidad
-    function toggleTecnicosByModalidad() {
-        const modalidad = getValue('id_modalidad');
-        const tecnicosSection = getElement('requerimientos-tecnicos');
-        
-        if (tecnicosSection) {
-            if (modalidad === 'virtual') {
-                tecnicosSection.classList.add('hidden');
-                // Desmarcar todos los checkboxes técnicos
-                clearTecnicosSection();
-            } else {
-                tecnicosSection.classList.remove('hidden');
-            }
-            updateJSON();
-        }
-    }
-    
-    // Limpiar sección técnica
-    function clearTecnicosSection() {
-        const tecnicos = getElement('requerimientos-tecnicos');
-        if (tecnicos) {
-            const checkboxes = tecnicos.querySelectorAll('input[type="checkbox"]');
-            const quantities = tecnicos.querySelectorAll('[id^="div_cantidad_"]');
-            
-            checkboxes.forEach(cb => cb.checked = false);
-            quantities.forEach(div => div.classList.add('hidden'));
-        }
-    }
-    
-    // Configurar feedback de contacto
-    function setupContactoFeedback() {
-        const campos = ['contacto_apoyo_nombre', 'contacto_apoyo_telefono', 'contacto_apoyo_email'];
-        campos.forEach(campoId => {
-            const campo = getElement(campoId);
-            if (campo) {
-                campo.addEventListener('blur', validateContactoField);
-            }
-        });
-        
-        // Agregar mensaje de ayuda
-        addContactoHelpMessage();
-    }
-    
-    // Actualizar JSON
-    function updateJSON() {
-        const data = {
-            requerimientos_tecnicos: buildRequerimientosTecnicos(),
-            materiales_apoyo: buildMaterialesApoyo(),
-            servicios_adicionales: buildServiciosAdicionales(),
-            nivel_seguridad: getValue('nivel_seguridad') || '',
-            contacto_apoyo: buildContactoApoyo()
-        };
-        
-        const hiddenField = getElement('id_requerimientos');
-        if (hiddenField) {
-            const jsonString = JSON.stringify(data);
-            hiddenField.value = jsonString;
-            
-            // Marcar el campo como modificado para Django
-            hiddenField.setAttribute('data-modified', 'true');
-            
-            // Disparar evento change para notificar al formulario
-            const changeEvent = new Event('change', { bubbles: true });
-            hiddenField.dispatchEvent(changeEvent);
-            
-            console.log('JSON actualizado:', data);
-            console.log('Campo hidden value:', hiddenField.value);
-            console.log('Campo hidden name:', hiddenField.name);
-        } else {
-            console.error('Campo hidden id_requerimientos no encontrado!');
-        }
-    }
-    
-    // Construir requerimientos técnicos
-    function buildRequerimientosTecnicos() {
-        return {
-            microfono: {
-                solicitado: isChecked('req_microfono'),
-                cantidad: isChecked('req_microfono') ? parseInt(getValue('cantidad_microfono') || '1') : 0
-            },
-            sonido: isChecked('req_sonido'),
-            proyector: {
-                solicitado: isChecked('req_proyector'),
-                cantidad: isChecked('req_proyector') ? parseInt(getValue('cantidad_proyector') || '1') : 0
-            },
-            pantallas: {
-                solicitado: isChecked('req_pantallas'),
-                cantidad: isChecked('req_pantallas') ? parseInt(getValue('cantidad_pantallas') || '1') : 0
-            },
-            computadoras: {
-                solicitado: isChecked('req_computadoras'),
-                cantidad: isChecked('req_computadoras') ? parseInt(getValue('cantidad_computadoras') || '1') : 0
-            },
-            wifi: isChecked('req_wifi')
-        };
-    }
-    
-    // Construir materiales de apoyo
-    function buildMaterialesApoyo() {
-        return {
-            mesas: {
-                solicitado: isChecked('req_mesas'),
-                cantidad: isChecked('req_mesas') ? parseInt(getValue('cantidad_mesas') || '1') : 0
-            },
-            sillas: {
-                solicitado: isChecked('req_sillas'),
-                cantidad: isChecked('req_sillas') ? parseInt(getValue('cantidad_sillas') || '1') : 0
-            },
-            atriles: {
-                solicitado: isChecked('req_atriles'),
-                cantidad: isChecked('req_atriles') ? parseInt(getValue('cantidad_atriles') || '1') : 0
-            },
-            pizarras: {
-                solicitado: isChecked('req_pizarras'),
-                cantidad: isChecked('req_pizarras') ? parseInt(getValue('cantidad_pizarras') || '1') : 0
-            }
-        };
-    }
-    
-    // Construir servicios adicionales
-    function buildServiciosAdicionales() {
-        const catering = {
-            solicitado: isChecked('req_catering'),
-            detalles: [],
-            personas: 0
-        };
-        
-        if (catering.solicitado) {
-            if (isChecked('catering_cafe')) catering.detalles.push('cafe');
-            if (isChecked('catering_refrigerios')) catering.detalles.push('refrigerios');
-            if (isChecked('catering_almuerzo')) catering.detalles.push('almuerzo');
-            if (isChecked('catering_agua')) catering.detalles.push('agua');
-            catering.personas = parseInt(getValue('catering_personas') || '10');
-        }
-        
-        const personal = {
-            solicitado: isChecked('req_personal'),
-            tipos: []
-        };
-        
-        if (personal.solicitado) {
-            if (isChecked('personal_fotografo')) personal.tipos.push('fotografo');
-            if (isChecked('personal_tecnico')) personal.tipos.push('tecnico_sonido');
-            if (isChecked('personal_protocolo')) personal.tipos.push('protocolo');
-        }
-        
-        return { catering, personal };
-    }
-    
-    // Construir contacto de apoyo
-    function buildContactoApoyo() {
-        const solicitado = isChecked('req_contacto_apoyo');
-        const datos = {};
-        
-        if (solicitado) {
-            const nombre = getValue('contacto_apoyo_nombre').trim();
-            const telefono = getValue('contacto_apoyo_telefono').trim();
-            const email = getValue('contacto_apoyo_email').trim();
-            const cargo = getValue('contacto_apoyo_cargo').trim();
-            
-            // Validar campos obligatorios
-            if (nombre && telefono && email) {
-                datos.nombre = nombre;
-                datos.telefono = telefono;
-                datos.email = email;
-                datos.cargo = cargo;
-                return { solicitado: true, datos };
-            } else {
-                // Marcar campos con error
-                markFieldError('contacto_apoyo_nombre', !nombre);
-                markFieldError('contacto_apoyo_telefono', !telefono);
-                markFieldError('contacto_apoyo_email', !email);
-                return { solicitado: false, datos: {} };
-            }
-        }
-        
-        return { solicitado: false, datos: {} };
-    }
-    
-    // --- FUNCIONES HELPER ---
-    
-    function getElement(id) {
-        return document.getElementById(id);
-    }
-    
-    function getValue(id) {
-        const element = getElement(id);
-        return element ? element.value : '';
-    }
-    
-    function setValue(id, value) {
-        const element = getElement(id);
-        if (element) {
-            element.value = value || '';
-        }
-    }
-    
-    function isChecked(id) {
-        const element = getElement(id);
-        return element ? element.checked : false;
-    }
-    
-    function setCheckbox(id, checked) {
-        const element = getElement(id);
-        if (element) {
-            element.checked = Boolean(checked);
-        }
-    }
-    
-    function showElement(id) {
-        const element = getElement(id);
-        if (element) {
-            element.classList.remove('hidden');
-        }
-    }
-    
-    function hideElement(id) {
-        const element = getElement(id);
-        if (element) {
-            element.classList.add('hidden');
-        }
-    }
-    
-    function clearSection(div) {
-        const inputs = div.querySelectorAll('input, select');
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-    }
-    
-    function validateContactoField() {
-        updateJSON(); // Revalidar al perder foco
-    }
-    
-    function markFieldError(id, hasError) {
-        const element = getElement(id);
-        if (element) {
-            if (hasError) {
-                element.classList.add('input-error');
-            } else {
-                element.classList.remove('input-error');
-            }
-        }
-    }
-    
-    function addContactoHelpMessage() {
-        const divContacto = getElement('div_contacto_apoyo_detalles');
-        if (divContacto && !divContacto.querySelector('.mensaje-ayuda-contacto')) {
-            const mensaje = document.createElement('div');
-            mensaje.className = 'mensaje-ayuda-contacto text-sm text-warning mt-2 mb-2';
-            mensaje.innerHTML = 'Los campos Nombre, Teléfono y Email son obligatorios';
-            divContacto.appendChild(mensaje);
-        }
-    }
-    
-    // --- INICIALIZACIÓN ---
-    
-    // Función para reinicializar (útil para HTMX)
-    function reinitialize() {
-        isInitialized = false;
-        initializeRequerimientos();
-    }
-    
-    // Función de debugging para el formulario
-    function debugForm() {
-        const form = document.querySelector('form');
-        const hiddenField = getElement('id_requerimientos');
-        
-        if (form && hiddenField) {
-            console.log('=== DEBUG FORMULARIO ===');
-            console.log('Formulario encontrado:', form);
-            console.log('Campo hidden encontrado:', hiddenField);
-            console.log('Nombre del campo:', hiddenField.name);
-            console.log('ID del campo:', hiddenField.id);
-            console.log('Valor actual:', hiddenField.value);
-            console.log('Está en el formulario:', form.contains(hiddenField));
-            
-            // Verificar si el campo está siendo serializado
-            const formData = new FormData(form);
-            console.log('FormData contiene requerimientos:', formData.has(hiddenField.name));
-            console.log('Valor en FormData:', formData.get(hiddenField.name));
-            
-            // Listar todos los campos del formulario
-            console.log('Todos los campos del formulario:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
-            }
-        } else {
-            console.error('Formulario o campo hidden no encontrado');
-        }
-    }
-    
-    // Interceptar submit del formulario para debugging
-    function setupFormDebugging() {
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                console.log('=== FORMULARIO ENVIÁNDOSE ===');
-                debugForm();
-                
-                // Forzar actualización del JSON antes del envío
-                updateJSON();
-                
-                // Pequeño delay para verificar
-                setTimeout(() => {
-                    const hiddenField = getElement('id_requerimientos');
-                    console.log('Valor final antes de envío:', hiddenField?.value);
-                }, 10);
-            });
-        }
-    }
-    
-    // Exponer funciones globalmente para HTMX y debugging
-    window.initializeRequerimientos = initializeRequerimientos;
-    window.reinitializeRequerimientos = reinitialize;
-    window.debugRequerimientosForm = debugForm;
-    window.updateRequerimientosJSON = updateJSON;
-    
-    // Inicialización automática
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initializeRequerimientos, 100);
-        });
-    } else {
-        setTimeout(initializeRequerimientos, 100);
-    }
-    
-    // HTMX support
-    document.addEventListener('htmx:afterSwap', function(event) {
-        if (document.getElementById('requerimientos')) {
-            console.log('HTMX swap detectado, reinicializando...');
-            setTimeout(reinitialize, 100);
-        }
-    });
-    
-})();
-        </script>
 </div>
+{% endblock %}

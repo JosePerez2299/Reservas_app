@@ -33,7 +33,7 @@ from django.shortcuts import render, redirect
 from django.db import transaction
 import time 
 from .services import *
-
+from django.shortcuts import get_object_or_404
 def qs_condiciones(user):
     if user.is_admin:
         return Q()
@@ -415,15 +415,43 @@ class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,Sessio
 
 
 class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
+    permission_required = 'reservas.change_reserva'
+
     form_list = [
-        {'reserva': ReservaUpdateForm},
-        {'requerimiento': RequerimientoForm},
+        ('reserva', ReservaUpdateForm),
+        ('requerimiento', RequerimientoForm),
 
     ]
 
     condition_dict = {
         'requerimiento': es_presencial_o_mixta,
     }
+
+    def dispatch(self, request, *args, **kwargs):
+        # Carga la instancia que vamos a editar (pk en la URL)
+        self.reserva = get_object_or_404(Reserva, pk=kwargs.get('pk'))
+        return super().dispatch(request, *args, **kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['title'] = 'Reserva de Espacios'
+        ctx['subtitle'] = 'Complete la información requerida'
+        ctx['header_icon'] = 'calendar-alt'
+        ctx['url'] = reverse_lazy('reserva_edit', args=[self.reserva.pk])
+        
+        # Steps info
+        all_steps = list(self.get_form_list().keys())
+        current_index = all_steps.index(self.steps.current)
+        
+        ctx['all_steps'] = all_steps
+        ctx['current_index'] = current_index
+
+        return ctx
+
+    def get_form_instance(self, step):
+        return self.reserva
+      
     
     def get_template_names(self):
         TEMPLATES = {
@@ -433,7 +461,22 @@ class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
         return [TEMPLATES[self.steps.current]]
     
     def done(self, form_list, **kwargs):
-        return HttpResponse('fino')
+        
+        try:
+            with transaction.atomic():
+                reserva = form_list[0].save(commit=False)
+
+                if reserva.modalidad == 'Presencial':
+                    form1 = form_list[1].save(commit=False)
+                    reserva.requerimiento = form1.requerimientos
+                    reserva.observacion = form1.observacion
+                reserva.save()
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = json.dumps({'showMessage': 'Se ha creado exitosamente'})
+                return response
+        except Exception as e:
+            # En caso de error, la transacción se revierte automáticamente
+            return HttpResponse(f'Error al guardar: {str(e)}', status=500)
 
 class ReservaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     """
