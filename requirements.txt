@@ -5,3 +5,7 @@ django-compressor
 pandas
 django-auditlog
 fontawesomefree
+pillow
+django-phonenumber-field[phonenumbers]
+psycopg[binary]
+django-environ

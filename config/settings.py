@@ -12,20 +12,27 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from cProfile import label
 from pathlib import Path
+import os
+from django.urls import reverse_lazy
+import environ
 
+# Inicializa django-environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env()
+# Toma variables desde el archivo .env
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-_889w=q*7^50mv#48&eigo9t*b82t*k_uk@8cneb324bod&(+9'
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = env("DEBUG")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 
 # Application definition
@@ -44,7 +51,7 @@ INSTALLED_APPS = [
     'apps.logs',
     'apps.core',
 
-
+    'formtools',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -113,11 +120,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT', default='5432'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -168,7 +178,54 @@ APPEND_SLASH = True
 LOGIN_REDIRECT_URL = '/inicio/'
 LOGIN_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
+# LDAP Config
+
+# AUTH_LDAP_SERVER_URI = env("LDAP_SERVER_URI")
+# AUTH_LDAP_BIND_DN = env("LDAP_BIND_DN")
+# AUTH_LDAP_BIND_PASSWORD = env("LDAP_BIND_PASSWORD")
+
+# AUTH_LDAP_USER_SEARCH = LDAPSearch(
+#     env("LDAP_BASE_DN"),
+#     ldap.SCOPE_SUBTREE,
+#     env("LDAP_USER_FILTER"),
+# )
+
+# AUTH_LDAP_CONNECTION_OPTIONS = {
+#         ldap.OPT_DEBUG_LEVEL: 0,
+#         ldap.OPT_REFERRALS: 0,
+# }
+
+# AUTH_LDAP_ALWAYS_UPDATE_USER = True
+# AUTH_LDAP_CACHE_GROUPS = True
+# AUTH_LDAP_GROUP_CACHE_TIMEOUT = 3600
+
+# AUTH_LDAP_USER_ATTR_MAP = {
+#     "first_name": "givenName",
+#     "email": "mail", 
+#     "username": "sAMAccountName",
+#     "last_name": "sn",
+#     "telefono": "telephoneNumber",
+#     "p00":"employeeid", }
+
+# AUTH_LDAP_GROUP_BASE = "ou=Siscolvir,ou=Grupos,dc=cantv,dc=com, dc=ve"
+# AUTH_LDAP_GROUP_FILTER = "(objectClass=group)"
+# AUTH_LDAP_GROUP_SEARCH = LDAPSearch(AUTH_LDAP_GROUP_BASE,
+#                                    ldap.SCOPE_SUBTREE, AUTH_LDAP_GROUP_FILTER)
+
+# AUTH_LDAP_GROUP_TYPE = GroupOfNamesType(name_attr="cn")
+# AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+#     'is_staff': 'cn=NACMOVI,' + AUTH_LDAP_GROUP_BASE,
+#     'is_support': 'cn=NACMOVI,' + AUTH_LDAP_GROUP_BASE,
+#     'is_superuser': 'cn=NACMOVI,' + AUTH_LDAP_GROUP_BASE,
+# }
+
+AUTHENTICATION_BACKENDS = (
+# 'django_auth_ldap.backend.LDAPBackend',
+'django.contrib.auth.backends.ModelBackend',
+)
 
 class GRUPOS:
     ADMINISTRADOR = 'administrador'
