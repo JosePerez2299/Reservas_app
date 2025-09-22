@@ -58,17 +58,6 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
     }
     
 
-def es_espacio_digital(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
-    return cleaned_data.get('tipo') == Espacio.Tipo.DIGITAL
-
-
-def es_espacio_fisico(wizard):
-    cleaned_data = wizard.get_cleaned_data_for_step('espacio') or {}
-    return cleaned_data.get('tipo') == Espacio.Tipo.FISICO
-
-
-
 class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
     file_storage = FileSystemStorage(  location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
     permission_required = 'espacios.add_espacio'
