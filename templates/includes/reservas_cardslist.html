@@ -14,18 +14,21 @@
             <!-- Avatar o inicial -->
             <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
               <span class="text-xs font-medium text-blue-600">
-                {{ reserva.usuario.first_name|first|default:reserva.usuario.username|first|upper }}
+                {{reserva.nombre_solicitante|default:reserva.p00_solicitante|first|upper}}
               </span>
             </div>
             <!-- Info principal -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center space-x-2">
                 <h4 class="font-medium text-gray-900 text-sm truncate">
-                  {{ reserva.usuario.get_full_name|default:reserva.usuario.username|truncatechars:15 }}
+                {{reserva.nombre_solicitante|default:reserva.p00_solicitante|truncatechars:15}}
                 </h4>
                 <div class="badge p-1 badge-xs badge-{{ reserva|get_color_reserva }}">{{ reserva.estado|first|upper }}</div>
               </div>
-              <p class="text-xs text-gray-500 truncate">{{ reserva.espacio.nombre|truncatechars:15 }}</p>
+              <p class="text-xs text-gray-500 truncate"> 
+
+                {{ reserva.modalidad|capfirst }} - {{ reserva.espacios.count }} espacio{{ reserva.espacios.count|pluralize }}
+              </p>
             </div>
           </div>
           <!-- Hora -->
@@ -53,7 +56,19 @@
               </div>
               <div class="col-span-2 border-t border-base-300">
                 <span class="text-gray-500">Espacio:</span>
-                <span class="text-gray-900">{{ reserva.espacio.nombre }}</span>
+
+                <ul>
+                  {% for espacio in reserva.espacios.all %}
+                  <li>
+
+                    {{espacio}}
+                  </li>
+                  {% endfor %}
+                </ul>
+
+
+
+
                 <div>
                   <span class="text-gray-500">Motivo:</span>
                   <span class="text-gray-900">{{ reserva.motivo|truncatechars:40 }}</span>

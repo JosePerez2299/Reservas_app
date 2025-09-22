@@ -118,11 +118,8 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
         return context
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        condiciones = qs_condiciones(self.request.user)
-        qs = qs.filter(condiciones)
-        return qs
- 
+        return lista_reservas_usuario(self.request.user)
+
     
 class ReservaListView(LoginRequiredMixin, ListCrudMixin, PermissionRequiredMixin, FilterView):
     """
