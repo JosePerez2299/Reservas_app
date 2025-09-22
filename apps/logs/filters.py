@@ -9,7 +9,7 @@ class LogFilter(FilterSet):
         lookup_expr='icontains',
         label='Usuario',
         widget=forms.TextInput(attrs={
-            'class': 'form-control',
+            'class': 'input',
             'placeholder': 'Buscar por usuario…',
             'id': 'actor_filter'
         })
@@ -29,10 +29,10 @@ class LogFilter(FilterSet):
         lookup_expr='iexact',
         label='Modulo',
         choices=[
-            ('Usuario', 'Usuario'),
             ('Espacio', 'Espacio'),
             ('Reserva', 'Reserva'),
-        ]
+        ],
+        widget=forms.Select(attrs={'class': 'select', 'id': 'tipo_filter'})
     )
     action_label = ChoiceFilter(
         field_name='action_label',     
@@ -43,6 +43,7 @@ class LogFilter(FilterSet):
             ('Actualizar', 'Actualizar'),
             ('Eliminar', 'Eliminar'),
         ],
+        widget=forms.Select(attrs={'class': 'select', 'id': 'action_filter'})
     )
     class Meta:
         model = LogEntry

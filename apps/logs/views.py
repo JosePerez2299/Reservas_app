@@ -20,12 +20,12 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     paginate_by = 10
     filterset_class = LogFilter
     cols = {
-        'id': 'Log ID',
-        'actor': 'Usuario',
-        'object_repr': 'Recurso',
-        'tipo': 'Modulo',
-        'action_label': 'Acción',
-        'timestamp': 'Fecha',
+        'id': {'label': 'Log ID'},
+        'actor': {'label': 'Usuario'},
+        'object_repr':  {'label': 'Recurso'},
+        'tipo': {'label': 'Modulo'},
+        'action_label': {'label': 'Acción'},
+        'timestamp': {'label': 'Fecha'},
     }
 
     can_export = False
