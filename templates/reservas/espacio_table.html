@@ -1,5 +1,6 @@
 {% extends "includes/table_view.html" %}
 {% load utils %}
+{% load table_actions %}
 
 {% block header %}
   <div class="bg-base-100 rounded-2xl shadow-sm p-8 mb-6">
@@ -30,4 +31,53 @@
     </div>
   </div>
 {% endblock %}
+
+{% block actions %}
+<td class="">
+  <div class="p-2 flex items-center justify-center">
+      
+      {# Botones principales siempre visibles #}
+      <div class="flex gap-1">
+          {# Ver detalles #}
+          {% if crud_urls.view %}
+          <div class="tooltip" data-tip="Ver detalles">
+              <button
+                  onclick="openModal('{% url crud_urls.view obj.pk %}')"
+                  class="btn btn-ghost btn-sm h-8 w-8 p-0"
+              >
+                  <i class="fas fa-eye text-xs"></i>
+              </button>
+          </div>
+          {% endif %}
+
+          {# Editar #}
+          {% puede_editar obj as puede_editar_obj %}
+          {% if puede_editar_obj and crud_urls.edit %}
+          <div class="tooltip" data-tip="Editar">
+              <button
+                  onclick="openModal('{% url crud_urls.edit obj.pk %}')"
+                  class="btn btn-ghost btn-sm h-8 w-8 p-0"
+              >
+                  <i class="fas fa-edit text-xs"></i>
+              </button>
+          </div>
+          {% endif %}
+      </div>
+
+      {# Dropdown para acciones adicionales #}
+      {% puede_eliminar obj as puede_eliminar_obj %}
+      {% puede_aprobar obj as puede_aprobar_obj %}
+      {% if puede_eliminar_obj%}
+      <div class="tooltip" data-tip="Eliminar">
+        <button
+        onclick="openModal('{% url crud_urls.delete obj.pk %}')"
+        class="btn btn-ghost btn-sm h-8 w-8 p-0 text-error"
+    >
+        <i class="fas fa-trash text-xs"></i>
+       </button>
+      </div>
+      {% endif %}
+  </div
+</td>
+{% endblock actions %}
 

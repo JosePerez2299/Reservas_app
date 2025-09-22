@@ -116,7 +116,7 @@ class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             "espacio": "espacios/espacio_form.html",
             "detalle_digital": "espacios/detalles_digitales_form.html",
             "detalle_fisico": "espacios/detalles_fisicos_form.html",
-            "resumen": "espacios/confirm_create.html" 
+            "resumen": "espacios/resumen_create_form.html" 
         }
         return [TEMPLATES[self.steps.current]]
         
@@ -193,7 +193,7 @@ class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             "espacio": "espacios/espacio_form.html",
             "detalle_digital": "espacios/detalles_digitales_form.html",
             "detalle_fisico": "espacios/detalles_fisicos_form.html",
-            "resumen": "espacios/confirm_create.html"
+            "resumen": "espacios/resumen_create_form.html"
         }
         return [TEMPLATES[self.steps.current]]
 

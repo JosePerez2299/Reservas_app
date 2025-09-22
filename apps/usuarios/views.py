@@ -67,7 +67,6 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
             }, status=500)
 
         url = base_url.rstrip('/') + "/api/empleado/consultar"
-        print(url)
         try:
             response = requests.post(
                 url,

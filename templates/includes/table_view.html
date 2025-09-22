@@ -77,38 +77,38 @@
                 </div>
 
                 <!-- Data Table -->
-                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 min-w-2xl overflow-auto ">
+                <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300/50 min-w-2xl overflow-x-auto ">
                     <div class="">
                         <table class="table table-md text-sm">
                             <thead class="bg-base-200/70">
                                 <tr class="border-b border-base-300">
                                    
-                                    {% for field, config in cols.items %}
-                                    <th class="hover:bg-base-300/50 font-semibold text-base-content/80 text-sm">
-                                        <div class="flex items-center justify-between gap-2 px-2">
-                                            {% if config.sortable %}
-                                                {% if request.GET.ordering == field %}
-                                                    <a href="?{% query_transform request ordering='-'|add:field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
-                                                        {{ config.label }}
-                                                        <i class="fas fa-sort-up text-primary"></i>
-                                                    </a>
-                                                {% elif request.GET.ordering == '-'|add:field %}
-                                                    <a href="?{% query_transform request ordering='' %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
-                                                        {{ config.label }}
-                                                        <i class="fas fa-sort-down text-primary"></i>
-                                                    </a>
+                                  {% for field, config in cols.items %}
+                                        <th class="hover:bg-base-300/50 font-semibold text-base-content/80 text-sm">
+                                            <div class="flex items-center justify-between gap-2 px-2">
+                                                {% if config.sortable %}
+                                                    {% if request.GET.ordering == field %}
+                                                        <a href="?{% query_transform request ordering='-'|add:field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                            {{ config.label }}
+                                                            <i class="fas fa-sort-up text-primary"></i>
+                                                        </a>
+                                                    {% elif request.GET.ordering == '-'|add:field %}
+                                                        <a href="?{% query_transform request ordering='' %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                            {{ config.label }}
+                                                            <i class="fas fa-sort-down text-primary"></i>
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="?{% query_transform request ordering=field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
+                                                            {{ config.label }}
+                                                            <i class="fas fa-sort text-base-content/30"></i>
+                                                        </a>
+                                                    {% endif %}
                                                 {% else %}
-                                                    <a href="?{% query_transform request ordering=field %}" class="flex items-center gap-2 w-full hover:text-primary transition-colors duration-200">
-                                                        {{ config.label }}
-                                                        <i class="fas fa-sort text-base-content/30"></i>
-                                                    </a>
+                                                    <span class="w-full">{{ config.label }}</span>
                                                 {% endif %}
-                                            {% else %}
-                                                <span class="w-full">{{ config.label }}</span>
-                                            {% endif %}
-                                        </div>
-                                    </th>
-                                {% endfor %}
+                                            </div>
+                                        </th>
+                                    {% endfor %}
                                     
                                     {% if actions %}
                                     <th class="text-center font-semibold text-base-content/80 text-sm w-48">Acciones</th>
@@ -128,7 +128,7 @@
                                     </td>
 
                                     {% endfor %}
-                                    {% if actions %}
+                                    {% block actions %}
                                     <td class="">
                                         <div class="p-2 flex items-center justify-center">
                                             
@@ -202,7 +202,7 @@
                                             {% endif %}
                                         </div>
                                     </td>
-                                    {% endif %}
+                                    {% endblock actions %}
 
                                 </tr>
                                 {% empty %}

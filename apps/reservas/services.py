@@ -40,3 +40,18 @@ def es_virtual_o_mixta(wizard):
     modalidad = cleaned_data.get('modalidad')
     return modalidad in [Reserva.Modalidad.VIRTUAL, Reserva.Modalidad.MIXTA]
 
+
+def enviar_email_confirmacion(reserva):
+    """Envía un email de confirmación al usuario que hizo la reserva."""
+    # Aquí iría la lógica para enviar el email
+    print(f"Enviando email de confirmación para la reserva {reserva.id} a {reserva.email_solicitante}")
+
+def enviar_email_aprobacion(reserva):
+    """Envía un email de notificación de aprobación al usuario que hizo la reserva."""
+    # Aquí iría la lógica para enviar el email
+    print(f"Enviando email de aprobación para la reserva {reserva.id} a {reserva.email_solicitante}")
+
+def enviar_email_rechazo(reserva):
+    """Envía un email de notificación de rechazo al usuario que hizo la reserva."""
+    # Aquí iría la lógica para enviar el email
+    print(f"Enviando email de rechazo para la reserva {reserva.id} a {reserva.email_solicitante}")
