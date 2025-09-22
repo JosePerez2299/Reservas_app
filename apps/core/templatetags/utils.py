@@ -183,8 +183,9 @@ def get_td_html(context, obj, field):
             print(f"Espacios relacionados: {obj.espacios.all()}")
             relacionados = obj.espacios.all()
             if relacionados.exists():
+                max_length = 10  # o el número de caracteres deseado
                 items = "".join(
-                    f"<li>{e.nombre}</li>" for e in relacionados
+                    f"<li>{e.nombre[:max_length]}{'...' if len(e.nombre) > max_length else ''}</li>" for e in relacionados
                 )
                 return mark_safe(f"<ul class='list-disc list-inside'>{items}</ul>")
             else:
@@ -504,4 +505,3 @@ def get_field_label(form, field_name):
         return form[field_name].label
     except (KeyError, AttributeError):
         return field_name.replace('_', ' ').title()
-    

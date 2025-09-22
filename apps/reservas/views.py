@@ -124,7 +124,7 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
         return qs
  
     
-class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrderingMixin, ListCrudMixin, FilterView):
+class ReservaListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de reservas con un formulario de filtrado
     """
@@ -153,6 +153,7 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
         'edit': 'reserva_edit',
         'delete': 'reserva_delete',
     }
+    
 
     # Filtros
     filterset_class = ReservaFilter 

@@ -29,8 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 import json
 
-
-class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
+class EspacioListView(LoginRequiredMixin, ListCrudMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de espacios con un formulario de filtrado
     """
@@ -40,23 +39,24 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
     paginate_by = 10
     filterset_class = EspacioFilter
     can_export = True
-
+    ordering = 'id'
+    
+    # Para que el usuario pueda ver la tabla, contexto adicional
     cols = {
-        'id': 'ID',
-        'nombre': 'Nombre',
-        'tipo': 'Tipo',
-        'capacidad_maxima': 'Capacidad',
-        'ubicacion': 'Ubicación',
-        'disponible': 'Disponible',
+        'id': {'label': 'ID', 'sortable': True},
+        'nombre': {'label': 'Nombre', 'sortable': True},
+        'tipo': {'label': 'Tipo', 'sortable': True},
+        'capacidad_maxima': {'label': 'Capacidad', 'sortable': True},
+        'ubicacion': {'label': 'Ubicación', 'sortable': False},
+        'disponible': {'label': 'Disponible', 'sortable': True},
     }
-
+    # Acciones CRUD disponibles en la tabla
     crud_urls = {
         'create': 'espacio_create',
         'view': 'espacio_view',
         'edit': 'espacio_edit', 
         'delete': 'espacio_delete',
-    }
-    
+    }    
 
 class EspacioCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin, SessionWizardView):
     file_storage = FileSystemStorage(  location=os.path.join(settings.MEDIA_ROOT, 'tmp'))
