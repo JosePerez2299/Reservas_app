@@ -179,7 +179,17 @@ def get_td_html(context, obj, field):
                 cls, texto
             )
 
-    # Caso Espacio
+        elif field == "espacios":
+            print(f"Espacios relacionados: {obj.espacios.all()}")
+            relacionados = obj.espacios.all()
+            if relacionados.exists():
+                items = "".join(
+                    f"<li>{e.nombre}</li>" for e in relacionados
+                )
+                return mark_safe(f"<ul class='list-disc list-inside'>{items}</ul>")
+            else:
+                return format_html("<span class='opacity-50'>-</span>")
+        # Caso Espacio
     if isinstance(obj, Espacio):
         if field == "nombre":
             nombre = getattr(obj, 'nombre', '')

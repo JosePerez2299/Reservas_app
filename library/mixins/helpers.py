@@ -10,6 +10,8 @@ from django.db.models.functions import Lower
 from django.db import models
 from django.conf import settings
 import json
+from django.db.models.fields.related import ManyToManyField
+
 
 class AjaxFormMixin:
     def success_message(self):
@@ -114,38 +116,58 @@ class ListCrudMixin:
         return ctx
 
 
-    def export_csv(self):
-        """
-        Construye el CSV usando exactamente el mismo queryset filtrado + ordenado
-        que get_queryset(), pero sin paginación ni template, y con los campos que deseemos.
-        """
-        # 1) Tomamos todos los objetos (ya filtrados/ordenados y con la anotación):
-        qs = self.get_queryset()
 
-        # 2) Definimos qué campos queremos en el CSV. 
-        #    Por ejemplo: id, username, email, ubicación, piso, group_name.
-        #
-        #    Si tuvieras ForeignKey a 'departamento' y quisieras el nombre en vez de ID,
-        #    podrías hacer 'departamento__nombre' como vimos antes. Aquí pongo un ejemplo mínimo.
+    def export_csv(self):
+        qs = self.get_queryset()
         campos = self.cols.keys()
 
-        # 3) Convertimos a DataFrame. Atención: como 'qs' ya fue anotado con 'group_name',
-        #    podemos traerlo directo con .values('group_name'), sin repetir lógica de CASE.
-        df = pd.DataFrame(list(qs.values(*campos)))
+        data = []
+        for obj in qs:
+            row = {}
+            for col in campos:
+                value = None
 
-        # 4) (Opcional) Renombrar columnas para que la cabecera sea más legible:
+                if "__" in col:
+                    # soporte para lookups tipo "fk__campo"
+                    value = obj
+                    for part in col.split("__"):
+                        value = getattr(value, part, "")
+                        if value is None:
+                            break
+                else:
+                    try:
+                        field = obj._meta.get_field(col)
+                    except Exception:
+                        field = None
+
+                    attr = getattr(obj, col, None)
+
+                    # Caso: ManyToMany
+                    if isinstance(field, ManyToManyField):
+                        value = ", ".join(str(v) for v in attr.all())
+
+                    # Caso: método o propiedad
+                    elif callable(attr):
+                        value = attr()
+
+                    # Caso normal
+                    else:
+                        value = attr
+
+                row[col] = value
+            data.append(row)
+
+        df = pd.DataFrame(data)
         df.rename(columns=self.cols, inplace=True)
 
-        # 5) Preparamos la respuesta HTTP tipo CSV
-        response = HttpResponse(content_type='text/csv')
-        timestamp = now().strftime('%Y%m%d%H%M%S')
+        response = HttpResponse(content_type="text/csv")
+        timestamp = now().strftime("%Y%m%d%H%M%S")
         filename = f"{self.model.__name__.lower()}_export_{timestamp}.csv"
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
-        # 6) Volcamos el DataFrame a CSV directamente sobre la HttpResponse
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
         df.to_csv(response, index=False)
-
         return response
+
+
 
 
 

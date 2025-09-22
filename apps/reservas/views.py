@@ -137,8 +137,9 @@ class ReservaListView(LoginRequiredMixin, PermissionRequiredMixin, SmartOrdering
     # Columnas que mostramos en la tabla HTML
     cols = {
         'id': 'ID',
-        'usuario': 'Usuario',
-        'espacio': 'Espacio',
+        'p00_solicitante': 'P00 solicitante',
+        'nombre_solicitante': 'Nombre solicitante',
+        'espacios': 'Espacios',
         'fecha_uso': 'Fecha de uso',
         'estado': 'Estado',
         'aprobado_por': 'Aprobado por',

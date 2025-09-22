@@ -1,5 +1,5 @@
 from django import template
-
+from django.db.models.manager import BaseManager
 register = template.Library()
 
 @register.simple_tag
@@ -12,9 +12,17 @@ def get_model_fields(model, exclude=None):
 
 @register.filter
 def get_attr(obj, attr_name):
-    obj = getattr(obj, attr_name)
-    return obj
+    attr = getattr(obj, attr_name)
 
+    # Si es un ManyToMany → conviértelo en lista de strings
+    if isinstance(attr, BaseManager):
+        return ", ".join(str(x) for x in attr.all())
+
+    # Si es callable (método o property con __call__)
+    if callable(attr):
+        return attr()
+
+    return attr
 
 @register.filter
 def get_field_by_name(form, field_name):
