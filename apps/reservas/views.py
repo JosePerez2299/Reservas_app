@@ -124,7 +124,7 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
         return qs
  
     
-class ReservaListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, PermissionRequiredMixin, FilterView):
+class ReservaListView(LoginRequiredMixin, ListCrudMixin, PermissionRequiredMixin, FilterView):
     """
     Muestra una lista de reservas con un formulario de filtrado
     """
@@ -136,13 +136,13 @@ class ReservaListView(LoginRequiredMixin, ListCrudMixin, SmartOrderingMixin, Per
 
     # Columnas que mostramos en la tabla HTML
     cols = {
-        'id': 'ID',
-        'p00_solicitante': 'P00 solicitante',
-        'nombre_solicitante': 'Nombre solicitante',
-        'espacios': 'Espacios',
-        'fecha_uso': 'Fecha de uso',
-        'estado': 'Estado',
-        'aprobado_por': 'Aprobado por',
+        'id': {'label': 'ID', 'sortable': True},
+        'p00_solicitante': {'label': 'P00 solicitante', 'sortable': True},
+        'modalidad': {'label': 'Modalidad', 'sortable': True},
+        'espacios': {'label': 'Espacios', 'sortable': False},
+        'fecha_uso': {'label': 'Fecha de uso', 'sortable': True},
+        'estado': {'label': 'Estado', 'sortable': True},
+        'aprobado_por': {'label': 'Aprobado por', 'sortable': True},
     }
 
     # Es importante el nombre (key) que sean los definidos, para que el template pueda usarlos. 

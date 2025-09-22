@@ -180,16 +180,22 @@ def get_td_html(context, obj, field):
             )
 
         elif field == "espacios":
-            print(f"Espacios relacionados: {obj.espacios.all()}")
             relacionados = obj.espacios.all()
             if relacionados.exists():
-                max_length = 10  # o el número de caracteres deseado
+                max_length = 8
                 items = "".join(
-                    f"<li>{e.nombre[:max_length]}{'...' if len(e.nombre) > max_length else ''}</li>" for e in relacionados
+                    f"<span class='badge badge-sm badge-outline mr-1 mb-1' title='{e.nombre}'>"
+                    f"{e.nombre[:max_length]}{'...' if len(e.nombre) > max_length else ''}"
+                    f"</span>" 
+                    for e in relacionados[:3]  # Máximo 3 elementos
                 )
-                return mark_safe(f"<ul class='list-disc list-inside'>{items}</ul>")
+                # Si hay más elementos, mostrar contador
+                extra = relacionados.count() - 3
+                if extra > 0:
+                    items += f"<span class='badge badge-sm badge-ghost'>+{extra}</span>"
+                return mark_safe(f"<div class='flex flex-wrap'>{items}</div>")
             else:
-                return format_html("<span class='opacity-50'>-</span>")
+                return format_html("<span class='opacity-50 text-sm'>Sin espacios</span>")
         # Caso Espacio
     if isinstance(obj, Espacio):
         if field == "nombre":

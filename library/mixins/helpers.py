@@ -11,6 +11,7 @@ from django.db import models
 from django.conf import settings
 import json
 from django.db.models.fields.related import ManyToManyField
+from django.db.models import F
 
 
 class AjaxFormMixin:

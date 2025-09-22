@@ -36,8 +36,11 @@
         {% else %}
           <fieldset class="{{ fieldset_classes }}">
             <legend class="label-text font-medium text-sm mb-1">{{ field.label }} {% if field.field.required %}<span class="text-error">*</span>{% endif %}</legend>
-            {{ field|add_class:"input input-bordered w-full max-w-xs" }}
-            
+            {% if field.name == 'ordering' or field.name == 'o' %}
+              {{ field|add_class:"select select-bordered w-full max-w-xs" }}
+            {% else %}
+            {{ field }}
+            {% endif %}
             {# Mostrar ayuda y errores específicos del campo #}
             {% if field.help_text %}
               <p class="form-help"> <i class="fas fa-info-circle text-info mr-1"></i> {{ field.help_text }}</p>
@@ -49,5 +52,7 @@
         {% endif %}
       {% endwith %}
     {% endfor %}
+
+    
     <button type="submit" class="w-full btn btn-primary">Guardar</button>
   </form>

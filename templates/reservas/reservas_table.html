@@ -30,7 +30,7 @@
 
 {% block table_actions %}
     <div class="join">
-      <a href="{% url 'reserva' %}?usuario={{ request.user.username }}" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
+      <a href="{% url 'reserva' %}?p00_solicitante={{ request.user.p00 }}" class="join-item btn btn-sm btn-ghost border border-base-300 gap-2">
         <i class="fas fa-user text-xs"></i>
         <span>Mis reservas</span>
       </a>

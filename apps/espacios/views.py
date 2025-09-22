@@ -205,12 +205,12 @@ class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
             # asumo relación one-to-one o FK con related_name 'detalle_digital'
             try:
                 return self.espacio.detalle_digital
-            except (AttributeError, DetalleDigital.DoesNotExist):
+            except (AttributeError, DetalleEspacioDigital.DoesNotExist):
                 return None
         if step == 'detalle_fisico':
             try:
                 return self.espacio.detalle_fisico
-            except (AttributeError, DetalleFisico.DoesNotExist):
+            except (AttributeError, DetalleEspacioFisico.DoesNotExist):
                 return None
         return None
 
