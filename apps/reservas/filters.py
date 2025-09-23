@@ -92,6 +92,7 @@ class ReservaFilter(django_filters.FilterSet):
             ('id', 'id'),
             ('p00_solicitante', 'p00_solicitante'),
             ('nombre_solicitante', 'nombre_solicitante'),
+            ('modalidad', 'modalidad'),
             ('fecha_uso', 'fecha_uso'),
             ('estado', 'estado'),
             ('aprobado_por__username', 'aprobado_por'),
@@ -99,7 +100,7 @@ class ReservaFilter(django_filters.FilterSet):
         field_labels={
             'id': 'ID',
             'nombre': 'Nombre',
-            'tipo': 'Tipo',
+            'modalidad': 'Modalidad',
             'capacidad_maxima': 'Capacidad',
             'ubicacion': 'Ubicación',
             'disponible': 'Disponible',

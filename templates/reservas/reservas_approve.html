@@ -1,66 +1,126 @@
-{% load render_field_msg %}
-{% load widget_tweaks %}
+<div class="w-3xl p-6">
 
-<div class="w-2xl">
   {% include 'includes/form_header.html' with title='Gestionar Reserva' subtitle='Formulario de Aprobación/Rechazo de reservas' header_icon='check' %}
+
   <div class="divider"></div>
+  <!-- Información de la Reserva -->
+  <div class="card bg-primary/5 border border-base-300 hover:border-primary/60 shadow-md mb-6">
+      <div class="card-body">
+          <h2 class="card-title mb-4">
+              <i class="fas fa-info-circle text-info"></i>
+              Detalles de la Reserva
+          </h2>
+          
+          <!-- Grid de información -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Usuario -->
+              <div class="space-y-3">
+                  <div class="flex items-center gap-2">
+                      <i class="fas fa-user text-base-content/50"></i>
+                      <h3 class="font-semibold">Usuario</h3>
+                  </div>
+                  <div class="ml-6 space-y-1">
+                      <p class="font-medium"> {{ reserva.nombre_solicitante|default:"Usuario no especificado" }}</p>
+                      <p class="text-sm text-base-content/70">{{ reserva.email_solicitante|default:"Email no especificado" }}</p>
+                      <p class="text-sm text-base-content/70"> <i class="fas fa-id-card"></i> {{ reserva.p00_solicitante|default:"P00 no especificado" }}</p>
 
-  <!-- Datos de la reserva -->
-  <div>
-    <div>
-      <h4>Usuario</h4>
-      <p>{{ object.nombre_solicitante }}</p>
-      {% if object.email_solicitante %}
-        <p>{{ object.email_solicitante }}</p>
-      {% endif %}
-    </div>
+                  </div>
+              </div>
 
-    <div>
-      <h4>Espacios</h4>
-      <ul>
-        {% for esp in object.espacios.all %}
-          <li>{{ esp }}</li>
-        {% endfor %}
-      </ul>
-      <p>Modalidad: {{ object.modalidad }}</p>
-    </div>
+              <!-- Fecha y Horario -->
+              <div class="space-y-3">
+                  <div class="flex items-center gap-2">
+                      <i class="fas fa-calendar-alt text-base-content/50"></i>
+                      <h3 class="font-semibold">Fecha y Horario</h3>
+                  </div>
+                  <div class="ml-6 space-y-1">
+                      <p class="font-medium">{{ reserva.fecha_uso }}</p>
+                      <p class="text-sm text-base-content/70">{{ reserva.hora_inicio|time:"g:i A" }} - {{ reserva.hora_fin|time:"g:i A" }}</p>
+                  </div>
+              </div>
+          </div>
 
-    <div>
-      <p>Fecha de uso: {{ object.fecha_uso }}</p>
-      <p>Horario: {{ object.hora_inicio }} - {{ object.hora_fin }}</p>
-    </div>
+          <!-- Espacios -->
+          <div class="mt-6">
+              <div class="flex items-center gap-2 mb-3">
+                  <i class="fas fa-map-marker-alt text-base-content/50"></i>
+                  <h3 class="font-semibold">Espacios Solicitados</h3>
+              </div>
+              <div class="ml-6">
+                  <div class="flex flex-wrap gap-2 mb-3">
+
+                    {% for espacio in reserva.espacios.all %}
+                      <div class="badge badge-info gap-1">
+                          <i class="fas {% if espacio.tipo == 'fisico' %} fa-building {% else %} fa-laptop {% endif %} text-xs"></i>
+                          {{ espacio.nombre }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <p class="text-sm text-base-content/70">
+                      <span class="font-medium">Modalidad:</span>  {{ reserva.get_modalidad_display}}
+                  </p>
+              </div>
+          </div>
+      </div>
   </div>
 
-  <!-- Formulario -->
-  <div>
-    <form method="POST" hx-post="{{ url }}" hx-target="#generic_modal_content" hx-swap="innerHTML">
-      {% csrf_token %}
+  <!-- Formulario de Gestión -->
+  <div class="card bg-base-200  shadow-md">
+      <div class="card-body">
+          <h2 class="card-title mb-4">
+              <i class="fas fa-clipboard-check text-success"></i>
+              Gestionar Solicitud
+          </h2>
 
-      {% if form.non_field_errors %}
-        <div>
-          {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        </div>
-      {% endif %}
+          <form class="space-y-6"       
+          hx-post="{% url 'reserva_approve' reserva.pk %}"
+          hx-target="#generic_modal_content"
+          hx-swap="innerHTML">
 
-      {% for field in form.visible_fields %}
-        <div>
-          <label for="{{ field.id_for_label }}">
-            {{ field.label }}
-            {% if field.field.required %}*{% endif %}
-          </label>
-          {{ field }}
-          {% if field.help_text %}
-            <small>{{ field.help_text }}</small>
-          {% endif %}
-          {% for error in field.errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        </div>
-      {% endfor %}
+          {% csrf_token %}
+              <!-- Estado -->
+              <div>
+                  <label class="label">
+                      <span class="label-text font-medium">
+                          Estado de la Reserva <span class="text-error">*</span>
+                      </span>
+                  </label>
+                  
+                  {{form.estado}}
+              </div>
 
-      <button type="submit">Guardar</button>
-    </form>
+              <!-- Observaciones -->
+              <div class="form-control">
+                  <label class="label">
+                      <span class="label-text font-medium">Observaciones</span>
+                  </label>
+                  {{form.mensaje_aprobar_rechazar}}
+                  <label class="label">
+                      <span class="label-text-alt text-base-content/50">Máximo 250 caracteres</span>
+                  </label>
+              </div>
+
+              <!-- Botones de Acción -->
+              <div class="card-actions justify-end gap-3">
+                  <button 
+                      onclick="closeModal()"
+                      type="button" 
+                      class="btn btn-ghost gap-2"
+                  >
+                      <i class="fas fa-times"></i>
+                      Cancelar
+                  </button>
+                  <button 
+                      type="submit" 
+                      class="btn btn-primary gap-2"
+                  >
+                      <i class="fas fa-save"></i>
+                      Guardar Decisión
+                  </button>
+              </div>
+          </form>
+      </div>
   </div>
+
+
 </div>
