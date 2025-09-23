@@ -60,14 +60,10 @@
                 <ul>
                   {% for espacio in reserva.espacios.all %}
                   <li>
-
                     {{espacio}}
                   </li>
                   {% endfor %}
                 </ul>
-
-
-
 
                 <div>
                   <span class="text-gray-500">Motivo:</span>
@@ -75,47 +71,21 @@
                 </div>
               </div>
             </div>
-
-            {% if perms.reservas.change_reserva %}
-            <div class="flex gap-2">
-
-              {% if reserva.estado == 'pendiente' %}
-                <button
-                onclick="generic_modal.showModal()"
-                class="btn btn-primary btn-xs h-8 w-8 p-0 flex-1"
-                hx-get="{% url 'reserva_edit' reserva.id %}"
-                hx-target="#generic_modal_content"
-                hx-swap="innerHTML"
-              >
-              <i class="fas fa-edit text-xs"></i>
-              Editar
+            <!-- Acciones -->
+            <div class="flex">
+              <button class="btn flex-1">
+                Ver
               </button>
 
-              <button
-              onclick="generic_modal.showModal()"
-              class="btn btn-error btn-xs h-8 w-8 p-0 flex-1"
-              hx-get="{% url 'reserva_delete' reserva.id %}"
-              hx-target="#generic_modal_content"
-              hx-swap="innerHTML"
-            >
-              <i class="fas fa-trash mr-1"></i>Eliminar
-            </button>
-            {% endif %}
-              <button
-              onclick="generic_modal.showModal()"
-              class="btn btn-ghost btn-xs h-8 w-8 p-0 flex-1"
-              hx-get="{% url 'reserva_view' reserva.id %}"
-              hx-target="#generic_modal_content"
-              hx-swap="innerHTML"
-            >
-            <i class="fas fa-eye text-xs"></i>
-            Ver
-           </button>
 
-
-            
+              {% if reserva.estado == 'pendiente' %}
+              <button class="btn flex-1">Editar</button>
+              {% if request.user.is_admin %}
+              <button class="btn flex-1">Aprobar / Rechazar</button>
+              {% endif %}
+              
+              {% endif %}
             </div>
-            {% endif %}
           </div>
         </div>
       </div>
