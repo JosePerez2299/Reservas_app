@@ -225,7 +225,6 @@ AUTH_LDAP_USER_FLAGS_BY_GROUP = {
 }
 
 AUTHENTICATION_BACKENDS = (
-'django_auth_ldap.backend.LDAPBackend',
 'django.contrib.auth.backends.ModelBackend',
 )
 
