@@ -1,3 +1,4 @@
+import logging
 from django.db import transaction
 from django.utils import timezone
 from apps.espacios.forms import EspacioForm, DetalleFisicoForm, DetalleDigitalForm
@@ -9,25 +10,26 @@ def rechazar_reservas_por_indisponibilidad(espacio):
     Rechaza todas las reservas pendientes, aprobadas que incluyen el espacio dado
     en la fecha actual o futura.    
     '''
-    try:
-        fecha_actual = timezone.now().date()
-        reservas_que_incluyen_espacio = Reserva.objects.filter(
-            espacios=espacio,
-            fecha_uso__gte=fecha_actual,
-            estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
-        ).update(
-            estado=Reserva.Estado.RECHAZADA,
-            mensaje_aprobar_rechazar="Rechazada automáticamente por indisponibilidad del espacio."
-        )   
-
-        print(f"Reservas actualizadas: {reservas_que_incluyen_espacio}")
-    except Exception as e:
-        
-        print("No se encontraron reservas que incluyan el espacio.", e)
-        return
-
-
-
+    logger = logging.getLogger(__name__)
+    fecha_actual = timezone.now().date()
+    reservas_que_incluyen_espacio = Reserva.objects.filter(
+        espacios=espacio,
+        fecha_uso__gte=fecha_actual,
+        estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+    )
+    
+    reservas_list = list(reservas_que_incluyen_espacio)
+    count = 0
+    for reserva in reservas_list:
+        try:
+            reserva.estado = Reserva.Estado.RECHAZADA
+            reserva.mensaje_aprobar_rechazar = "Rechazada automáticamente por indisponibilidad del espacio."
+            reserva.save(update_fields=['estado', 'mensaje_aprobar_rechazar'])
+            count += 1
+        except Exception as e:
+            logger.error(f"Error rechazando reserva {reserva.pk} por indisponibilidad: {e}")
+    logger.info(f"Rechazadas automáticamente {count} reservas por indisponibilidad del espacio {espacio.pk}")
+    return count
 
 def create_espacio(espacio_form: EspacioForm, detalle_form: DetalleFisicoForm | DetalleDigitalForm):
     """
