@@ -1,8 +1,9 @@
 from datetime import timezone
 import logging
+from django.conf import settings
 from django.db.models import Q
 from apps.reservas.models import Reserva, ReservaEspacio
-
+from django.core.mail import send_mail
 from django.utils import timezone
 from django.db.models import Q
 
@@ -11,16 +12,16 @@ logger = logging.getLogger(__name__)
 def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     """
     Rechaza automáticamente reservas conflictivas con la aprobada.
-    MODIFICADO para usar save() individual y disparar signals.
+    Usa update() para evitar recursion de señales,
+    y envía los correos manualmente.
     
     Args:
         usuario: Usuario que aprobó la reserva
         reserva_aprobada: Instancia de Reserva que se acaba de aprobar
     """
-    
     now = timezone.now()
-    
-    # PASO 1: Query  para encontrar conflictivas 
+
+    # PASO 1: Query para encontrar conflictivas 
     conflictivas_query = Reserva.objects.filter(
         estado=Reserva.Estado.PENDIENTE,
         fecha_uso=reserva_aprobada.fecha_uso,
@@ -30,32 +31,28 @@ def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     ).exclude(
         id=reserva_aprobada.id
     ).distinct()
-    
-    # Verificar si hay conflictos
+
     if not conflictivas_query.exists():
         return 0
-    
-    # PASO 2: Convertir a lista para evitar problemas con el queryset
+
+    # PASO 2: Convertir a lista (para poder iterar después de update)
     conflictivas_list = list(conflictivas_query)
-    
-    # PASO 3: Actualizar individualmente para disparar signals
-    updated_count = 0
-    
+
+    # PASO 3: Update masivo (sin signals)
+    updated_count = conflictivas_query.update(
+        estado=Reserva.Estado.RECHAZADA,
+        aprobado_por=usuario,
+        fecha_cambio_estado=now,
+        mensaje_aprobar_rechazar="Rechazada automáticamente por conflicto con otra reserva aprobada."
+    )
+
+    # PASO 4: Enviar correos manualmente
     for reserva in conflictivas_list:
         try:
-            # Actualizar campos
-            reserva.estado = Reserva.Estado.RECHAZADA
-            reserva.aprobado_por = usuario
-            reserva.fecha_cambio_estado = now
-            reserva.mensaje_aprobar_rechazar = "Rechazada automáticamente por conflicto con otra reserva aprobada."
-            
-            reserva.save(update_fields=['estado', 'aprobado_por', 'fecha_cambio_estado', 'mensaje_aprobar_rechazar'])
-            
-            updated_count += 1
-            
+            enviar_email_rechazo(reserva)
         except Exception as e:
-            logger.error(f"Error rechazando reserva {reserva.pk}: {e}")
-    
+            logger.error(f"Error enviando correo de rechazo para reserva {reserva.pk}: {e}")
+
     logger.info(f"Rechazadas automáticamente {updated_count} reservas conflictivas")
     return updated_count
 
@@ -96,12 +93,54 @@ def es_virtual_o_mixta(wizard):
 
 def enviar_email_confirmacion(reserva):
     """Email para nuevas reservas creadas"""
-    print(f"📧 Email confirmación enviado a {reserva.email_solicitante}")
+
+    print(f"📧 Email confirmación enviado a {reserva.email_solicitante}, reserva: {reserva.id}")
+    subject = "Confirmación de Reserva: "+ reserva.p00_solicitante
+    message = f"Estimado {reserva.nombre_solicitante}.\nSu reserva con ID {reserva.id} ha sido creada y está pendiente de aprobación.\n\nDetalles:\nFecha: {reserva.fecha_uso}\nHora: {reserva.hora_inicio} - {reserva.hora_fin}\nModalidad: {reserva.get_modalidad_display()}"
+    message += f"\nEspacio\\s: {', '.join([espacio.nombre for espacio in reserva.espacios.all()])}"
+    
+    recipient_list = [reserva.email_solicitante]
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        recipient_list,
+        fail_silently=False,
+    )
 
 def enviar_email_aprobacion(reserva):
     """Email para reservas aprobadas manualmente"""
     print(f"✅ Email aprobación enviado a {reserva.email_solicitante}, reserva: {reserva.id}")
+    subject = "Reserva aprobada. "  + reserva.p00_solicitante
+    message = f"Estimado {reserva.nombre_solicitante}.\nSu reserva con ID {reserva.id} ha sido aprobada.\n\nDetalles:\nFecha: {reserva.fecha_uso}\nHora: {reserva.hora_inicio} - {reserva.hora_fin}\nModalidad: {reserva.get_modalidad_display()}"
 
+    message += f"\nEspacio\\s: {', '.join([espacio.nombre for espacio in reserva.espacios.all()])}"
+    if reserva.mensaje_aprobar_rechazar:
+        message += f"\n\nMensaje adicional:\n{reserva.mensaje_aprobar_rechazar}"
+    recipient_list = [reserva.email_solicitante]
+
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        recipient_list,
+        fail_silently=False,
+    )
 def enviar_email_rechazo(reserva):
     """Email para reservas rechazadas manualmente"""
     print(f"❌ Email rechazo enviado a {reserva.email_solicitante}, reserva: {reserva.id}")
+    subject = "Reserva Rechazada: " + reserva.p00_solicitante
+    message = f"Estimado {reserva.nombre_solicitante}.\nLamento informar que su reserva con ID {reserva.id} ha sido rechazada.\n\nDetalles:\nFecha: {reserva.fecha_uso}\nHora: {reserva.hora_inicio} - {reserva.hora_fin}\nModalidad: {reserva.get_modalidad_display()}"
+    message += f"\nEspacio\\s: {', '.join([espacio.nombre for espacio in reserva.espacios.all()])}"
+
+    if reserva.mensaje_aprobar_rechazar:
+        message += f"\n\nMensaje adicional:\n{reserva.mensaje_aprobar_rechazar}"
+    recipient_list = [reserva.email_solicitante]
+
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        recipient_list,
+        fail_silently=False,
+    )

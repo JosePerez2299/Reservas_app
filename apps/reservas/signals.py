@@ -9,29 +9,6 @@ from apps.reservas.models import Reserva
 
 logger = logging.getLogger(__name__)
 
-@receiver(pre_save, sender=Reserva)
-def reservas_notificaciones(sender, instance, **kwargs):
-    """
-    Signal para enviar notificaciones por email cuando una reserva cambia de estado.
-    """
-    if not instance.pk:
-        enviar_email_confirmacion(instance)
-        return
-        
-    try:
-        anterior = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-    
-    estado_anterior = anterior.estado
-    estado_actual = instance.estado
-    if estado_anterior == Reserva.Estado.PENDIENTE  and estado_anterior != estado_actual:
-        if instance.estado == Reserva.Estado.APROBADA:
-            enviar_email_aprobacion(instance)
-                
-        elif instance.estado == Reserva.Estado.RECHAZADA:
-            enviar_email_rechazo(instance)
-
 
 @receiver(post_save, sender=Reserva)  
 def reserva_rechazar_conflictos(sender, instance, created, **kwargs):
@@ -41,6 +18,7 @@ def reserva_rechazar_conflictos(sender, instance, created, **kwargs):
     """
     # Para creaciones
     if created:
+        print("Creada nueva reserva, no hay que rechazar conflictivas")
         return
     
     # Para updates manuales, necesitamos el estado anterior
@@ -53,13 +31,47 @@ def reserva_rechazar_conflictos(sender, instance, created, **kwargs):
             rechazar_reservas_conflictivas(reserva_aprobada=instance, usuario=instance.aprobado_por)
 
 
-# Signal helper para capturar estado anterior
 @receiver(pre_save, sender=Reserva)
 def capturar_estado_anterior(sender, instance, **kwargs):
-    """Helper para capturar estado anterior para post_save"""
-    if instance:
+    """
+    Captura el estado anterior antes de guardar,
+    para compararlo en post_save.
+    """
+    print("Capturando estado anterior...")
+    if instance.pk:
         try:
             anterior = sender.objects.get(pk=instance.pk)
             instance._estado_anterior = anterior.estado
         except sender.DoesNotExist:
             instance._estado_anterior = None
+    else:
+        instance._estado_anterior = None
+
+
+@receiver(post_save, sender=Reserva)
+def reservas_post_save(sender, instance, created, **kwargs):
+    """
+    Maneja notificaciones por email y rechaza reservas conflictivas
+    después de guardar la reserva.
+    """
+    if created:
+        # Nueva reserva → enviar confirmación
+        enviar_email_confirmacion(instance)
+        return
+
+    estado_anterior = getattr(instance, "_estado_anterior", None)
+
+    if estado_anterior and estado_anterior != instance.estado:
+        if instance.estado == Reserva.Estado.APROBADA:
+            # Notificación de aprobación
+            enviar_email_aprobacion(instance)
+
+            # Rechazar conflictivas (con update masivo + correos manuales)
+            rechazar_reservas_conflictivas(
+                reserva_aprobada=instance,
+                usuario=instance.aprobado_por,
+            )
+
+        elif instance.estado == Reserva.Estado.RECHAZADA:
+            # Notificación de rechazo
+            enviar_email_rechazo(instance)

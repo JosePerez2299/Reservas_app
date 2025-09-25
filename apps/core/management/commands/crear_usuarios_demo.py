@@ -28,7 +28,7 @@ class Command(BaseCommand):
         sample_users = [
             {
                 'username': 'usuario1',
-                'email': 'usuario1@example.com',
+                'email': '16-10882+usuario1@usb.ve',
                 'p00': '150000',
                 'first_name': 'Juan',
                 'last_name': 'Perez',
@@ -40,7 +40,7 @@ class Command(BaseCommand):
             },
             {
                 'username': 'usuario2',
-                'email': 'usuario2@example.com',
+                'email': '16-10882+usuario2@usb.ve',
                 'p00': '150001',
                 'first_name': 'Maria',
                 'last_name': 'Gonzalez',
@@ -52,7 +52,7 @@ class Command(BaseCommand):
             },
             {
                 'username': 'admin1',
-                'email': 'admin1@example.com',
+                'email': '16-10882+admin1@usb.ve',
                 'p00': '150002',
                 'first_name': 'Juan',
                 'last_name': 'Perez',
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             },
             {
                 'username': 'admin2',
-                'email': 'admin2@example.com',
+                'email': '16-10882+admin2@usb.ve',
                 'p00': '150003',
                 'first_name': 'Luis',
                 'last_name': 'Fernandez',
