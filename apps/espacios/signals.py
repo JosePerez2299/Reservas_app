@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from apps.espacios.services import rechazar_reservas_por_indisponibilidad
+from library.utils.async_calls import async_call
 from .models import Espacio
 
 @receiver(pre_save, sender=Espacio)
@@ -13,7 +14,7 @@ def rechazar_reservas_al_cambiar_disponibilidad(sender, instance, **kwargs):
             espacio_anterior = Espacio.objects.get(pk=instance.pk)
             # Si cambió de disponible=True a disponible=False
             if espacio_anterior.disponible and not instance.disponible:
-                rechazar_reservas_por_indisponibilidad(instance)
+                async_call(rechazar_reservas_por_indisponibilidad, instance)
                 
         except Espacio.DoesNotExist:
             pass
