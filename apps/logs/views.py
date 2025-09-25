@@ -16,7 +16,7 @@ class LogListView(LoginRequiredMixin, PermissionRequiredMixin, ListCrudMixin,  S
     """
     model = LogEntry    
     permission_required = 'auditlog.view_logentry' 
-    template_name = 'reservas/actividad_table.html'
+    template_name = 'logs/log_table.html'
     paginate_by = 10
     filterset_class = LogFilter
     cols = {
@@ -80,6 +80,6 @@ class LogDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     """
     model = LogEntry
     permission_required = 'auditlog.view_logentry'
-    template_name = 'reservas/log_detail.html'
+    template_name = 'logs/log_detail.html'
     
    

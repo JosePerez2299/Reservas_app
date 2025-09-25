@@ -40,7 +40,7 @@ def custom_404_view(request, exception=None):
 
 class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """
-    Muestra los detalles de un usuario
+    Muestra los detalles de un usuario con el P00 dado
     """
     permission_required = 'usuarios.view_usuario'
 
@@ -168,30 +168,24 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return JsonResponse(resultado)
 
-
-
 class Dashboard(LoginRequiredMixin, TemplateView):
-
+    '''
+    Muestra el dashboard con estadísticas y gráficos
+    '''
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         stats = get_stats(self.request)
         context['stats'] = stats
         return context
     
-    template_name = 'reservas/dashboard.html'
-
-def qs_condiciones(user):
-    if user.is_admin:
-        return Q(groups__name__in=[settings.GRUPOS.MODERADOR, settings.GRUPOS.USUARIO])
-    elif user.is_moderador:
-        return Q(groups__name=settings.GRUPOS.USUARIO)
-    else:
-        return Q()
-
+    template_name = 'usuarios/dashboard.html'
 
 class ProfileView(LoginRequiredMixin, DetailView):
+    '''
+    Muestra el perfil del usuario
+    '''
     model = Usuario
-    template_name = 'reservas/profile.html'
+    template_name = 'usuarios/profile.html'
     permission_required = 'usuarios.view_usuario'
     url = 'profile'
 

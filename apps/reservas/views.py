@@ -277,15 +277,15 @@ class ReservaCreateWizardView(LoginRequiredMixin, PermissionRequiredMixin,Sessio
     def get_template_names(self):
         # Templates para el wizard de creación de reservas
         TEMPLATES = {
-            'contacto': 'reservas/reservas_create/contacto_form.html',
-            'reserva': 'reservas/reservas_create/reserva_form.html',
-            'tipo': 'reservas/reservas_create/tipo_form.html',
-            'detalle': 'reservas/reservas_create/detalles_digitales_form.html',
-            'requerimiento': 'reservas/reservas_create/requerimiento_form.html',
-            'espacio_presencial': 'reservas/reservas_create/espacio_fisico_form.html',
-            'espacio_digital': 'reservas/reservas_create/espacio_digital_form.html',
-            'detalle_digital': 'reservas/reservas_create/detalles_digitales_form.html',
-            'resumen': 'reservas/reservas_create/resumen_form.html'
+            'contacto': 'reservas/contacto_form.html',
+            'reserva': 'reservas/reserva_form.html',
+            'tipo': 'reservas/tipo_form.html',
+            'detalle': 'reservas/detalles_digitales_form.html',
+            'requerimiento': 'reservas/requerimiento_form.html',
+            'espacio_presencial': 'reservas/espacio_fisico_form.html',
+            'espacio_digital': 'reservas/espacio_digital_form.html',
+            'detalle_digital': 'reservas/detalles_digitales_form.html',
+            'resumen': 'reservas/resumen_form.html'
         }
         return [TEMPLATES[self.steps.current]]
     
@@ -455,7 +455,7 @@ class ReservaUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
     def get_template_names(self):
         TEMPLATES = {
             "reserva": "reservas/reservas_edit.html",
-            "requerimiento": "reservas/reservas_create/requerimiento_form.html",
+            "requerimiento": "reservas/requerimiento_form.html",
         }
         return [TEMPLATES[self.steps.current]]
     
@@ -585,6 +585,7 @@ class ReservaApproveView(LoginRequiredMixin, PermissionRequiredMixin, AjaxFormMi
         return qs
 
     def form_valid(self, form):
+        # Registrar el usuario que aprobo la reserva
         form.instance.aprobado_por = self.request.user
         return super().form_valid(form)
         

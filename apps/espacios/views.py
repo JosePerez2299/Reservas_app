@@ -35,13 +35,13 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, PermissionRequiredMixin
     """
     model = Espacio
     permission_required = 'espacios.view_espacio'
-    template_name = 'reservas/espacio_table.html'
+    template_name = 'espacios/espacio_table.html'
     paginate_by = 10
     filterset_class = EspacioFilter
     can_export = True
     ordering = 'id'
     
-    # Para que el usuario pueda ver la tabla, contexto adicional
+    # Columnas que el usuario pueda ver la tabla, contexto adicional
     cols = {
         'id': {'label': 'ID', 'sortable': True},
         'nombre': {'label': 'Nombre', 'sortable': True},
@@ -50,7 +50,7 @@ class EspacioListView(LoginRequiredMixin, ListCrudMixin, PermissionRequiredMixin
         'ubicacion': {'label': 'Ubicación', 'sortable': False},
         'disponible': {'label': 'Disponible', 'sortable': True},
     }
-    # Acciones CRUD disponibles en la tabla
+    # URLs de las acciones CRUD disponibles en la tabla
     crud_urls = {
         'create': 'espacio_create',
         'view': 'espacio_view',
@@ -260,7 +260,7 @@ class EspacioUpdateWizardView(LoginRequiredMixin, PermissionRequiredMixin, Sessi
 class EspacioDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = Espacio
     permission_required = 'espacios.view_espacio'
-    template_name = "reservas/espacio_detail.html"
+    template_name = "espacios/espacio_detail.html"
     context_object_name = "espacio"
     
     def get_context_data(self, **kwargs):
@@ -279,7 +279,7 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     """
     model = Espacio
     permission_required = 'espacios.delete_espacio'
-    template_name = 'reservas/delete.html'
+    template_name = 'common/delete.html'
     success_url = reverse_lazy('espacios') 
     url = 'espacio_delete'
     details = [ 

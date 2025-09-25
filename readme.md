@@ -57,6 +57,7 @@ Reservas_app/
 │   ├── core/               # Funcionalidades centrales y comandos de gestión (incluye comandos demo)
 │   ├── espacios/           # Gestión de espacios (salas, ubicaciones, disponibilidad)
 │   ├── logs/               # Registro y seguimiento de acciones y errores
+│   ├── reportes/           # Generación de reportes
 │   ├── reservas/           # Funcionalidades de reservas, validaciones, gestión de estados
 │   └── usuarios/           # Administración y perfil de usuarios
 │
@@ -79,7 +80,6 @@ Reservas_app/
 │   ├── base.html           # Plantilla base que se extiende en otras vistas
 │   └── ...                 # Vistas específicas para reservas, usuarios, etc.
 │
-├── db.sqlite3              # Base de datos de desarrollo (por defecto SQLite)
 ├── manage.py               # Script de administración de Django
 ├── package.json            # Configuración de dependencias de Tailwind CSS y otras herramientas en Node.js
 ├── requirements.txt        # Dependencias de Python
@@ -97,7 +97,7 @@ Reservas_app/
 2. **Crear y activar el entorno virtual (recomendado):**
    ```bash
    python -m venv venv
-   source venv/Scripts/activate    # en Windows (usa venv\Scripts\activate en CMD o PowerShell)
+   source venv/bin/activate    # en Windows (usa venv\Scripts\activate en CMD o PowerShell)
    ```
 
 3. **Instalar dependencias de Python:**

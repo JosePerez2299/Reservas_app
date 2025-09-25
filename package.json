@@ -10,18 +10,11 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
-    "daisyui": "^5.0.43",
-    "esbuild": "^0.25.5"
+    "daisyui": "^5.0.43"
   },
   "scripts": {
     "watch:tailwind": "tailwindcss -i ./static/src/css/input.css -o ./static/src/css/output.css --watch",
-    "watch:calendar": "npx esbuild static/src/js/main.calendar.js   --bundle   --outfile=static/src/js/calendar.bundle.js   --format=esm   --watch",
-    "watch:main": "npx esbuild static/src/js/main.js   --bundle   --outfile=static/src/js/main.bundle.js   --format=esm   --watch",
-    "watch": "npm run watch:tailwind && npm run watch:calendar && npm run watch:main",
-    "build:tailwind": "tailwindcss -i ./static/src/css/input.css -o ./static/src/css/output.css",
-    "build:calendar": "npx esbuild static/src/js/main.calendar.js   --bundle   --outfile=static/src/js/calendar.bundle.js   --format=esm",
-    "build:main": "npx esbuild static/src/js/main.js   --bundle   --outfile=static/src/js/main.bundle.js   --format=esm",
-    "build": "npm run build:tailwind && npm run build:calendar && npm run build:main"
+    "build:tailwind": "tailwindcss -i ./static/src/css/input.css -o ./static/src/css/output.css"
   },
   "name": "reservas_app",
   "version": "1.0.0",
