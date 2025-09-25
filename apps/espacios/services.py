@@ -1,6 +1,32 @@
 from django.db import transaction
+from django.utils import timezone
 from apps.espacios.forms import EspacioForm, DetalleFisicoForm, DetalleDigitalForm
 from apps.espacios.models import Espacio
+from apps.reservas.models import Reserva
+
+def rechazar_reservas_por_indisponibilidad(espacio):
+    '''
+    Rechaza todas las reservas pendientes, aprobadas que incluyen el espacio dado
+    en la fecha actual o futura.    
+    '''
+    try:
+        fecha_actual = timezone.now().date()
+        reservas_que_incluyen_espacio = Reserva.objects.filter(
+            espacios=espacio,
+            fecha_uso__gte=fecha_actual,
+            estado__in=[Reserva.Estado.PENDIENTE, Reserva.Estado.APROBADA]
+        ).update(
+            estado=Reserva.Estado.RECHAZADA,
+            mensaje_aprobar_rechazar="Rechazada automáticamente por indisponibilidad del espacio."
+        )   
+
+        print(f"Reservas actualizadas: {reservas_que_incluyen_espacio}")
+    except Exception as e:
+        
+        print("No se encontraron reservas que incluyan el espacio.", e)
+        return
+
+
 
 
 def create_espacio(espacio_form: EspacioForm, detalle_form: DetalleFisicoForm | DetalleDigitalForm):

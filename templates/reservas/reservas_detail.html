@@ -16,6 +16,10 @@
             {% if object.aprobado_por %}
             <li><strong>Aprobado por:</strong> {{ object.aprobado_por }}</li>
             {% endif %}
+
+            {% if object.mensaje_aprobar_rechazar %}
+            <li><strong>Mensaje de Aprobación/Rechazo:</strong> {{ object.mensaje_aprobar_rechazar }}</li>
+            {% endif %}
         </ul>
     </div>
 
