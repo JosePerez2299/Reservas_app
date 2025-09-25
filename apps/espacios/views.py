@@ -280,7 +280,7 @@ class EspacioDeleteView(LoginRequiredMixin, PermissionRequiredMixin, AjaxDeleteM
     model = Espacio
     permission_required = 'espacios.delete_espacio'
     template_name = 'reservas/delete.html'
-    success_url = reverse_lazy('espacios    ') 
+    success_url = reverse_lazy('espacios') 
     url = 'espacio_delete'
     details = [ 
         {'label': 'Nombre', 'value': 'nombre'},
