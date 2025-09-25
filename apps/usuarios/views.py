@@ -47,6 +47,32 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         p00 = kwargs.get('p00')
 
+
+        # Seccion de codigo y variables para debug en entorno local
+        DEBUG_HOME = env.bool("DEBUG_HOME", default=False)
+        if DEBUG_HOME:
+            print(f"Buscando usuario con P00: {p00}")
+            usuarios = Usuario.objects.filter(p00='P00'+ p00).values(
+                'first_name', 'last_name', 'gerencia', 'email', 'vicepresidencia', 'telefono'
+            )
+            print(usuarios)
+            usuario = usuarios.first()
+            print(usuario)
+            if usuario:
+                return JsonResponse({    
+                    "nombre": f"{usuario['first_name']} {usuario['last_name']}".strip(),
+                    "nom_gerencia": usuario.get("gerencia", ""),
+                    "email": usuario.get("email", ""),
+                    "nom_vicepresidencia": usuario.get("vicepresidencia", ""),
+                    "telefono": usuario.get("telefono", "")
+                })
+
+            return JsonResponse({
+                    'error': True,
+                    'message': 'No se pudo procesar la solicitud. Inténtalo más tarde.',
+                    'code': 'MISSING_API_URL'
+                }, status=500)
+
         # Validación temprana del P00 (6 dígitos numéricos) para evitar llamadas innecesarias
         if not p00 or not str(p00).isdigit() or len(str(p00)) != 6:
             return JsonResponse({

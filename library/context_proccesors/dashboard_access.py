@@ -8,7 +8,7 @@ def dashboard_access(request):
     current_path = request.path_info
     current_path = current_path.split('/')[1]
     dashboard_access = DashboardAccess(request.user)   
-
+    print(current_path)
     return {
         "group": dashboard_access.get_group(),
         "dashboard_access": dashboard_access.get_links(),
@@ -25,7 +25,7 @@ class DashboardAccess:
                         {'type': 'link', 'label': 'Calendario', 'url': 'calendario'},
                     ]}
         ESPACIOS = {'type': 'link', 'label': 'Espacios', 'url': 'espacios'}
-        ESTADISTICAS = {'type': 'link', 'label': 'Estadísticas', 'url': 'dashboard'}
+        ESTADISTICAS = {'type': 'link', 'label': 'Reportes', 'url': 'reportes'}
 
     links_for_group = {
             GRUPOS.ADMINISTRADOR: [

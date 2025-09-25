@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'apps.reservas',
     'apps.usuarios',
     'apps.espacios',
+    'apps.reportes',
     'apps.logs',
     'apps.core',
 
