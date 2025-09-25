@@ -47,9 +47,6 @@ def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     
     for reserva in conflictivas_list:
         try:
-            # ✅ CLAVE: Marcar que es un rechazo automático para evitar recursión
-            reserva._es_rechazo_automatico = True
-            reserva._usuario_que_aprobo = usuario
             
             # Actualizar campos
             reserva.estado = Reserva.Estado.RECHAZADA
@@ -103,25 +100,15 @@ def es_virtual_o_mixta(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
     modalidad = cleaned_data.get('modalidad')
     return modalidad in [Reserva.Modalidad.VIRTUAL, Reserva.Modalidad.MIXTA]
+
 def enviar_email_confirmacion(reserva):
     """Email para nuevas reservas creadas"""
     print(f"📧 Email confirmación enviado a {reserva.email_solicitante}")
 
 def enviar_email_aprobacion(reserva):
     """Email para reservas aprobadas manualmente"""
-    print(f"✅ Email aprobación enviado a {reserva.email_solicitante}")
+    print(f"✅ Email aprobación enviado a {reserva.email_solicitante}, reserva: {reserva.id}")
 
 def enviar_email_rechazo(reserva):
     """Email para reservas rechazadas manualmente"""
-    print(f"❌ Email rechazo enviado a {reserva.email_solicitante}")
-
-def enviar_email_rechazo_automatico(reserva, usuario_que_aprobo):
-    """Email especializado para rechazos automáticos por conflicto"""
-    print(f"🤖 Email rechazo AUTOMÁTICO enviado a {reserva.email_solicitante}")
-    print(f"   Motivo: Conflicto con aprobación de {usuario_que_aprobo.username if usuario_que_aprobo else 'Sistema'}")
-
-def enviar_email_admin_conflictos(reserva_aprobada, cantidad_conflictivas):
-    """Email al admin informando sobre conflictivas rechazadas"""
-    admin_email = "admin@empresa.com"  # Configurar según tu caso
-    print(f"📊 Email admin enviado: {cantidad_conflictivas} conflictivas rechazadas por aprobación de reserva {reserva_aprobada.id}")
-
+    print(f"❌ Email rechazo enviado a {reserva.email_solicitante}, reserva: {reserva.id}")
