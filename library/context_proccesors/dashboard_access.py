@@ -25,12 +25,15 @@ class DashboardAccess:
                         {'type': 'link', 'label': 'Calendario', 'url': 'calendario'},
                     ]}
         ESPACIOS = {'type': 'link', 'label': 'Espacios', 'url': 'espacios'}
+        ESTADISTICAS = {'type': 'link', 'label': 'Estadísticas', 'url': 'dashboard'}
 
     links_for_group = {
             GRUPOS.ADMINISTRADOR: [
                 LinksTitle.INICIO,
                 LinksTitle.RESERVA,
                 LinksTitle.ESPACIOS,    
+                LinksTitle.ESTADISTICAS,
+
             ],
 
             GRUPOS.USUARIO: [
