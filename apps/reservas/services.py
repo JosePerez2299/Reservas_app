@@ -47,7 +47,6 @@ def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     
     for reserva in conflictivas_list:
         try:
-            
             # Actualizar campos
             reserva.estado = Reserva.Estado.RECHAZADA
             reserva.aprobado_por = usuario
@@ -93,7 +92,6 @@ def es_presencial_o_mixta(wizard):
     cleaned_data = wizard.get_cleaned_data_for_step('reserva') or {}
     modalidad = cleaned_data.get('modalidad')
     return modalidad in [Reserva.Modalidad.PRESENCIAL, Reserva.Modalidad.MIXTA]
-
 
 def es_virtual_o_mixta(wizard):
     """Muestra el paso de requerimientos si la modalidad es presencial o mixta"""

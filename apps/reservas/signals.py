@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 @receiver(pre_save, sender=Reserva)
 def reservas_notificaciones(sender, instance, **kwargs):
     """
-    Signal SOLO para lógica de negocio.
-    Se ejecuta ANTES de guardar.
+    Signal para enviar notificaciones por email cuando una reserva cambia de estado.
     """
     if not instance.pk:
         enviar_email_confirmacion(instance)
@@ -37,10 +36,9 @@ def reservas_notificaciones(sender, instance, **kwargs):
 @receiver(post_save, sender=Reserva)  
 def reserva_rechazar_conflictos(sender, instance, created, **kwargs):
     """
-    Signal SOLO para notificaciones.
-    Se ejecuta DESPUÉS de guardar (más seguro para emails).
+    Signal para rechazar las reservas conflictivas automáticamente
+    cuando una reserva se aprueba.
     """
-    
     # Para creaciones
     if created:
         return
