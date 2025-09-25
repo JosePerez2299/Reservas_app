@@ -8,7 +8,6 @@ def dashboard_access(request):
     current_path = request.path_info
     current_path = current_path.split('/')[1]
     dashboard_access = DashboardAccess(request.user)   
-    print(current_path)
     return {
         "group": dashboard_access.get_group(),
         "dashboard_access": dashboard_access.get_links(),

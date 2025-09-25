@@ -51,13 +51,10 @@ class UsuarioApiView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # Seccion de codigo y variables para debug en entorno local
         DEBUG_HOME = env.bool("DEBUG_HOME", default=False)
         if DEBUG_HOME:
-            print(f"Buscando usuario con P00: {p00}")
             usuarios = Usuario.objects.filter(p00='P00'+ p00).values(
                 'first_name', 'last_name', 'gerencia', 'email', 'vicepresidencia', 'telefono'
             )
-            print(usuarios)
             usuario = usuarios.first()
-            print(usuario)
             if usuario:
                 return JsonResponse({    
                     "nombre": f"{usuario['first_name']} {usuario['last_name']}".strip(),

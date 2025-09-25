@@ -16,30 +16,36 @@ Reservas App es una aplicación web desarrollada en Django para la gestión de r
 ## Características
 
 - Gestión de reservas de espacios con validaciones y manejo de conflictos.
-- Administración de usuarios con roles (administrador, usuario, moderador).
+- Administración de usuarios con roles (administrador, usuario).
 - Panel de administración (Django Admin) integrado y personalizado.
 - Generación de datos de prueba mediante comandos personalizados como:
   - `crear_usuarios_demo`
-  - `crear_reservas_demo`
 - Interfaz moderna con Tailwind CSS + DaisyUI.
 - Soporte para filtros y búsquedas dentro de las reservas, espacios y usuarios.
 - Registro de actividad y errores para facilitar el mantenimiento.
+
 
 ## Tecnologías
 
 - **Lenguaje:** Python 3.x
 - **Framework:** Django (versión 5.2 o superior)
-- **Base de datos:** SQLite (por defecto), compatible con otros SGBD.
+- **Base de datos:** Postgresql.
 - **Front-end:** HTML, CSS (Tailwind CSS), DaisyUI (Tailwind Library) JavaScript
 - **Dependencias adicionales:**  
+  - **Django:** Framework web para el desarrollo de aplicaciones web.
    - **django-filter:** Filtros avanzados en vistas y formularios.
    - **django-widget-tweaks:** Personalización de widgets en plantillas.
    - **django-compressor:** Optimización y compresión de archivos estáticos.
    - **pandas:** Procesamiento y análisis de datos para reportes.
    - **django-auditlog:** Registro automático de cambios y auditoría.
-   - **django-crispy-forms:** Formularios flexibles y personalizables.
-   - **crispy-tailwind:** Integración de crispy-forms con Tailwind CSS.
+   - **django-formtools:** Formularios flexibles y personalizables.
    - **fontawesomefree:** Iconos modernos para la interfaz.
+   - **pillow:** Procesamiento de imágenes.
+   - **django-phonenumber-field:** Validación de números de teléfono.
+   - **django-auth-ldap:** Autenticación con LDAP.
+   - **psycopg[binary]:** Base de datos Postgresql.
+   - **requests:** Hacer peticiones HTTP.
+   - **django-environ:** Variables de entorno.
 
 - **Herramientas de desarrollo:**
   - Tailwind CSS CLI
@@ -113,7 +119,7 @@ Reservas_app/
 
 5. **Compilar archivos estáticos con Tailwind CSS:**
    ```bash
-   npm run watch:tailwind
+   npm run build:tailwind
    ```
    (Asegúrate de tener el CLI de Tailwind correctamente configurado)
 
@@ -127,6 +133,7 @@ Reservas_app/
    ```bash
    python manage.py createsuperuser
    ```
+8. **Por defecto, los usuarios creados son usuarios normales. para darle permisos al usuario, se debe ir al panel administrativo y darle permisos al usuario. (cambiar de grupo) **
 
 ## Uso y Comandos Personalizados
 
@@ -138,15 +145,6 @@ La aplicación incluye varios comandos personalizados para facilitar la generaci
   ```
   Este comando poblará la base de datos con usuarios de prueba sin privilegios de superusuario.
 
-- **Crear reservas demo:**
-  ```bash
-  python manage.py crear_reservas_demo [total] [--verbose]
-  ```
-  - `total`: Número de reservas pendientes a crear por ubicación (por defecto 10).
-  - `--verbose`: Muestra detalles sobre la creación y errores (ej. validaciones, integridad).
-
-Estas utilidades ayudan a probar diferentes escenarios (como validaciones de fechas, restricciones de integridad, etc.) y mejorar el proceso de desarrollo.
-
 ## Desarrollo y Mantenimiento
 
 - **Estructura de código:**
@@ -154,27 +152,4 @@ Estas utilidades ayudan a probar diferentes escenarios (como validaciones de fec
 
 - **Plantillas y Front-end:**
   La carpeta templates contiene las vistas HTML basadas en una plantilla base (`base.html`). Elementos comunes como el menú, mensajes de alerta y formularios reutilizan componentes parciales incluidos en includes.
-
-- **Control de versiones y deploy:**
-  Se utiliza Git para el control de versiones. Se recomienda realizar ramas para nuevas funcionalidades y seguir la metodología de merge mediante pull requests.
-  
-- **Pruebas:**
-  Cada aplicación cuenta con sus propios tests en la carpeta `tests/` o en archivos específicos (ej. `tests_forms.py`, `tests_models.py` en la app de reservas). Se recomienda ejecutarlas periódicamente:
-  ```bash
-  python manage.py test
-  ```
-
-## Notas y Recomendaciones
-
-- **Errores y validaciones:**
-  El sistema valida la integridad de las reservas (evitando solapamientos, validaciones de fechas, etc.) y muestra estadísticas de errores durante la carga de datos demo.
-  
-- **Estilo y Front-end:**
-  Se utiliza Tailwind CSS para un diseño moderno y responsivo. Revisa el archivo `src/css/input.css` para personalizaciones y adapta el compilado en `static/css/output.css`.
-
-- **Seguridad y permisos:**
-  La configuración de Django y dispositivos del proyecto aseguran que solo usuarios autorizados puedan acceder al panel administrativo y realizar cambios en reservas y espacios.
-  
-- **Mantenimiento y escalabilidad:**
-  La división en múltiples apps (auth, core, espacios, logs, reservas y usuarios) permite agregar nuevas características o modificar la lógica de negocio sin afectar otras partes del sistema.
 

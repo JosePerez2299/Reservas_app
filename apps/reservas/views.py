@@ -99,7 +99,7 @@ class ReservasByDate(PermissionRequiredMixin, FilterView):
     """
     model = Reserva
     permission_required = 'reservas.view_reserva'
-    template_name = 'includes/reservas_cardslist.html'
+    template_name = 'reservas/calendario_reservas_cardslist.html'
     paginate_by = 7
     filterset_class = ReservaFilterCards
     context_object_name = 'reservas'   
