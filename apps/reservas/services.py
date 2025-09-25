@@ -8,10 +8,6 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
-# =============================================================================
-# 🔧 FUNCIÓN MODIFICADA: Con save() individual para disparar signals
-# =============================================================================
-
 def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     """
     Rechaza automáticamente reservas conflictivas con la aprobada.
@@ -24,7 +20,7 @@ def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
     
     now = timezone.now()
     
-    # PASO 1: Query optimizada para encontrar conflictivas (igual que antes)
+    # PASO 1: Query  para encontrar conflictivas 
     conflictivas_query = Reserva.objects.filter(
         estado=Reserva.Estado.PENDIENTE,
         fecha_uso=reserva_aprobada.fecha_uso,
@@ -53,13 +49,12 @@ def rechazar_reservas_conflictivas(usuario, reserva_aprobada):
             reserva.fecha_cambio_estado = now
             reserva.mensaje_aprobar_rechazar = "Rechazada automáticamente por conflicto con otra reserva aprobada."
             
-            # ✅ ESTO SÍ dispara signals (pre_save y post_save)
             reserva.save(update_fields=['estado', 'aprobado_por', 'fecha_cambio_estado', 'mensaje_aprobar_rechazar'])
             
             updated_count += 1
             
         except Exception as e:
-            logger.error(f"Error rechazando reserva {reserva.id}: {e}")
+            logger.error(f"Error rechazando reserva {reserva.pk}: {e}")
     
     logger.info(f"Rechazadas automáticamente {updated_count} reservas conflictivas")
     return updated_count
