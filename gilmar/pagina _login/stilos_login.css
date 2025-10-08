@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+
+}
+body{
+    border: 2px solid red;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor{
+    border: 2px solid black;
+    width: 800px;
+    height: 500px;
+    display: flex;
+}
+.contenedor_form{
+  border: 2px solid blue;
+  height: 100%;
+}
+.contenedor_form form{
+    border: 2px solid red;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    }
+.contenedor_form h2{
+font-size: 30px;
+margin-bottom: 20px;
+    }   
+.social_netword{  
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    }
+.social_netword ion-icon{
+    border: 1px solid #C9CCCB;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    }
+.contenedor_form span{
+    font-size: 12px;
+    margin-bottom: 15px;
+    }      
+.contenedor_input{
+    width: 300px;
+    height: 40px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 0 15px;
+    background-color: #fff4f4;
+    }
+.contenedor_input input{
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+   
+    }
+.contenedor_form a{
+    color: black;
+    font-size: 14px;
+    margin-bottom: 20;
+    margin-top: 5px;
+    }   
+.botton{
+        width: 170;
+        height: 45px;
+        font-size: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+        background-color: rgb(89, 199, 209);
+        color: white;
+    }
+  /*  animacion del formulario :v
+.sign_in{
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.sign_up{
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/*.sign_in{
+
+    transform: translatex(100%);
+}
+
+
+
